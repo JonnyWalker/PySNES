@@ -1,4 +1,8 @@
-ROM_DIR = '../rom/'
+from tool.cartrige import ROMHeader
+from tool.helper import open_as_byte_array
+
+# .../PySNES/venv/pysnes/$ py.test -k test_parse_header
+ROM_DIR = 'rom/'
 
 def test_parse_header0():
     ROM_NAME = 'DonkeyKongCountry.smc'
