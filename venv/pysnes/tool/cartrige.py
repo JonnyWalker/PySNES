@@ -170,3 +170,9 @@ class LoROM(Cartrige):
 
 class HiROM(Cartrige):
     pass
+
+
+class CartrigeType(object):
+    LOROM = 1
+    HIROM = 2
+    # TODO: More ...
