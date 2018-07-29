@@ -15,14 +15,18 @@ class MemoryMapper(object):
     def __init__(self, cartrige_type, RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size):
         if cartrige_type == CartrigeType.LOROM:
             self.mapper = LoROMMemoryMapper(RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size)
+        elif cartrige_type == CartrigeType.HIROM:
+            self.mapper = HiROMMemoryMapper(RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size)
         else:
             raise NotImplementedError()
 
+    # called by the CPU
     def read(self, address):
         bank = (address & 0xFF0000) >> 16 # get first two bytes (MSB)
         offset = address & 0x00FFFF
         return self.mapper.read(bank, offset)
 
+    # called by the CPU
     def write(self, address, value):
         bank = (address & 0xFF0000) >> 16 # get first two bytes (MSB)
         offset = address & 0x00FFFF
@@ -110,9 +114,9 @@ class LoROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
-    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
     # 0x7E:0000 - 0x7F:FFFF read the RAM inside the SNES
     def read_RAM(self, bank, offset):
+        # 8KB LowRAM, 24KB HighRAM, 96KB ExRAM
         if bank == 0x7E:
             return self.RAM[offset]
         elif bank == 0x7F:
@@ -210,9 +214,9 @@ class LoROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
-    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
     # 0x7E:0000 - 0x7F:FFFF writes the RAM inside the SNES
     def write_RAM(self, bank, offset, value):
+        # 8KB LowRAM, 24KB HighRAM, 96KB ExRAM
         if bank == 0x7E:
             self.RAM[offset] = value
         elif bank == 0x7F:
@@ -354,9 +358,9 @@ class HiROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
-    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
     # 0x7E:0000 - 0x7F:FFFF read the RAM inside the SNES
     def read_RAM(self, bank, offset):
+        # 8KB LowRAM, 24KB HighRAM, 96KB ExRAM
         if bank == 0x7E:
             return self.RAM[offset]
         elif bank == 0x7F:
@@ -378,7 +382,7 @@ class HiROMMemoryMapper(object):
             raise IllegalAddressExcpetion()
 
     # 0xFE:0000 - 0xFF:FFFF read more ROM
-    def read_more_SRAM_ROM(self, bank, offset):
+    def read_more_ROM(self, bank, offset):
         if bank == 0xFE:
             return self.ROM[0x3E0000 + offset]
         elif bank == 0xFF:
@@ -468,9 +472,9 @@ class HiROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
-    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
     # 0x7E:0000 - 0x7F:FFFF write the RAM inside the SNES
     def write_RAM(self, bank, offset, value):
+        # 8KB LowRAM, 24KB HighRAM, 96KB ExRAM
         if bank == 0x7E:
             self.RAM[offset] = value
         elif bank == 0x7F:
@@ -482,9 +486,9 @@ class HiROMMemoryMapper(object):
     # 0x80:0000 - 0xFF:FFFF mirror (same as self.write except RAM)
     def write_upper_mirror(self, bank, offset, value):
         if bank >= (0x00 + 0x80) and bank <= (0x1F + 0x80):
-            self.read_system(bank - 0x80, offset, value)
+            self.write_system(bank - 0x80, offset, value)
         elif bank >= (0x20 + 0x80) and bank <= (0x3F + 0x80):
-            self.read_system2(bank - 0x80, offset, value)
+            self.write_system2(bank - 0x80, offset, value)
         elif bank >= (0x40 + 0x80) and bank <= (0x7D + 0x80):
             raise CanNotWriteROMExcpetion()
         elif bank >= (0x7E + 0x80) and bank <= (0x7F + 0x80):
