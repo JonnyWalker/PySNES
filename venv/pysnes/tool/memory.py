@@ -255,7 +255,242 @@ class LoROMMemoryMapper(object):
             raise IllegalAddressExcpetion()
 
 class HiROMMemoryMapper(object):
-    pass # TODO
+    def __init__(self, RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size):
+        self.RAM  = RAM # WRAM
+        self.ROM  = ROM
+        self.SRAM = SRAM
+        self.use_MAD1_mapping = use_MAD1_mapping
+        self.SRAM_size = SRAM_size
+
+    def read(self, bank, offset):
+        if   bank >= 0x00 and bank <= 0x1F:
+            return self.read_system(bank, offset)
+        elif bank >= 0x20 and bank <= 0x3F:
+            return self.read_system2(bank, offset)
+        elif bank >= 0x40 and bank <= 0x7D:
+            return self.read_ROM(bank, offset)
+        elif bank >= 0x7E and bank <= 0x7F:
+            return self.read_RAM(bank, offset)
+        elif bank >= 0x80 and bank <= 0xFF:
+            return self.read_upper_mirror(bank, offset)
+        else:
+            raise IllegalAddressExcpetion()
+
+    # 0x00:0000 - 1F:FFFF read ROM and system stuff
+    # TODO: the doc on the internet is very inconsistent about the memory ranges
+    def read_system(self, bank, offset):
+        if offset <= 0x1FFF:
+            return self.RAM[offset]
+        elif offset>= 0x2000 and offset <= 0x2FFF: # maybe 21FF is correct
+            # TODO: PPU, APU, Hardware Registers
+            # 0x2100 - 0x213F PPU (or PPU2 ?)
+            # 0x2180 - 0x2183 (insde RAM?)
+            raise NotImplementedError()
+        elif offset >= 0x3000 and offset <= 0x3FFF:
+            # TODO: Super-FX, DSP
+            raise NotImplementedError()
+        elif offset >= 0x4000 and offset <= 0x41FF: # maybe 40FF is correct
+            # TODO: Joypad Registers / Controller
+            # 0x4016 - 0x4017 CPU
+            raise NotImplementedError()
+        elif offset >= 0x4200 and offset <= 0x5FFF: # maybe 44FF is correct
+            # TODO: DMA, PPU2, Hardware Registers
+            # 0x4200 - 0x420D CPU
+            # 0x4100 - 0x421F CPU
+            # 0x4300 - 0x437F CPU
+            raise NotImplementedError()
+        elif offset >= 0x6000 and offset <= 0x7FFF:
+            # TODO: enhancement chip memory
+            raise NotImplementedError()
+        elif offset >= 0x8000:
+            # read ROM
+            ROM_bank = (bank) * 0x10000
+            return self.ROM[ROM_bank + offset]
+        else:
+            raise IllegalAddressExcpetion()
+
+
+    # 0x20:0000 - 3F:FFFF read ROM, SRAM and system stuff
+    # TODO: the doc on the internet is very inconsistent about the memory ranges
+    def read_system2(self, bank, offset):
+        if offset <= 0x1FFF:
+            return self.RAM[offset]
+        elif offset>= 0x2000 and offset <= 0x2FFF: # maybe 21FF is correct
+            # TODO: PPU, APU, Hardware Registers
+            # 0x2100 - 0x213F PPU (or PPU2 ?)
+            # 0x2180 - 0x2183 (insde RAM?)
+            raise NotImplementedError()
+        elif offset >= 0x3000 and offset <= 0x3FFF:
+            # TODO: Super-FX, DSP
+            raise NotImplementedError()
+        elif offset >= 0x4000 and offset <= 0x41FF: # maybe 40FF is correct
+            # TODO: Joypad Registers / Controller
+            # 0x4016 - 0x4017 CPU
+            raise NotImplementedError()
+        elif offset >= 0x4200 and offset <= 0x5FFF: # maybe 44FF is correct
+            # TODO: DMA, PPU2, Hardware Registers
+            # 0x4200 - 0x420D CPU
+            # 0x4100 - 0x421F CPU
+            # 0x4300 - 0x437F CPU
+            raise NotImplementedError()
+        elif offset >= 0x6000 and offset <= 0x7FFF:
+            # write SRAM
+            SRAM_page = (bank-0x20)*0x1FFF
+            # if the SRAM is smaller than 32Kbyte it is repeated on and on (SRAM mirror)
+            return self.SRAM[SRAM_page % self.SRAM_size]
+        elif offset >= 0x8000:
+            # read ROM
+            ROM_bank = (bank) * 0x10000
+            return self.ROM[ROM_bank + offset]
+        else:
+            raise IllegalAddressExcpetion()
+
+    # 0x40:0000 - 7D:FFFF read ROM
+    def read_ROM(self, bank, offset):
+        if offset >= 0x0000  and offset <= 0xFFFF:
+            # read ROM
+            ROM_bank = (bank-0x40) * 0x10000
+            return self.ROM[ROM_bank + offset]
+        else:
+            raise IllegalAddressExcpetion()
+
+    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
+    # 0x7E:0000 - 0x7F:FFFF read the RAM inside the SNES
+    def read_RAM(self, bank, offset):
+        if bank == 0x7E:
+            return self.RAM[offset]
+        elif bank == 0x7F:
+            return self.RAM[0x8000 + offset]
+        else:
+            raise IllegalAddressExcpetion()
+
+    # 0x80:0000 - 0xFF:FFFF mirror (same as self.read except RAM)
+    def read_upper_mirror(self, bank, offset):
+        if   bank >= (0x00+0x80) and bank <= (0x1F+0x80):
+            return self.read_system(bank-0x80, offset)
+        elif bank >= (0x20+0x80) and bank <= (0x3F+0x80):
+            return self.read_system2(bank-0x80, offset)
+        elif bank >= (0x40+0x80) and bank <= (0x7D+0x80):
+            return self.read_ROM(bank-0x80, offset)
+        elif bank >= (0x7E+0x80) and bank <= (0x7F+0x80):
+            return self.read_more_ROM(bank, offset) # different to self.read
+        else:
+            raise IllegalAddressExcpetion()
+
+    # 0xFE:0000 - 0xFF:FFFF read more ROM
+    def read_more_SRAM_ROM(self, bank, offset):
+        if bank == 0xFE:
+            return self.ROM[0x3E0000 + offset]
+        elif bank == 0xFF:
+            return self.ROM[0x3F0000 + offset]
+        else:
+            raise IllegalAddressExcpetion()
+
+    def write(self, bank, offset, value):
+        if bank >= 0x00 and bank <= 0x1F:
+            self.write_system(bank, offset, value)
+        elif bank >= 0x20 and bank <= 0x3F:
+            self.write_system2(bank, offset, value)
+        elif bank >= 0x40 and bank <= 0x7D:
+            raise CanNotWriteROMExcpetion()
+        elif bank >= 0x7E and bank <= 0x7F:
+            self.write_RAM(bank, offset, value)
+        elif bank >= 0x80 and bank <= 0xFF:
+            self.write_upper_mirror(bank, offset, value)
+        else:
+            raise IllegalAddressExcpetion()
+
+
+    # 0x00:0000 - 1F:FFFF write system stuff
+    # TODO: the doc on the internet is very inconsistent about the memory ranges
+    def write_system(self, bank, offset, value):
+        if offset <= 0x1FFF:
+            self.RAM[offset] = value
+        elif offset >= 0x2000 and offset <= 0x2FFF:  # maybe 21FF is correct
+            # TODO: PPU, APU, Hardware Registers
+            # 0x2100 - 0x213F PPU (or PPU2 ?)
+            # 0x2180 - 0x2183 (insde RAM?)
+            raise NotImplementedError()
+        elif offset >= 0x3000 and offset <= 0x3FFF:
+            # TODO: Super-FX, DSP
+            raise NotImplementedError()
+        elif offset >= 0x4000 and offset <= 0x41FF:  # maybe 40FF is correct
+            # TODO: Joypad Registers / Controller
+            # 0x4016 - 0x4017 CPU
+            raise NotImplementedError()
+        elif offset >= 0x4200 and offset <= 0x5FFF:  # maybe 44FF is correct
+            # TODO: DMA, PPU2, Hardware Registers
+            # 0x4200 - 0x420D CPU
+            # 0x4100 - 0x421F CPU
+            # 0x4300 - 0x437F CPU
+            raise NotImplementedError()
+        elif offset >= 0x6000 and offset <= 0x7FFF:
+            # TODO: enhancement chip memory
+            raise NotImplementedError()
+        elif offset >= 0x8000:
+            # write ROM
+            raise CanNotWriteROMExcpetion()
+        else:
+            raise IllegalAddressExcpetion()
+
+
+    # 0x20:0000 - 3F:FFFF write SRAM and system stuff
+    # TODO: the doc on the internet is very inconsistent about the memory ranges
+    def write_system2(self, bank, offset, value):
+        if offset <= 0x1FFF:
+            self.RAM[offset] = value
+        elif offset >= 0x2000 and offset <= 0x2FFF:  # maybe 21FF is correct
+            # TODO: PPU, APU, Hardware Registers
+            # 0x2100 - 0x213F PPU (or PPU2 ?)
+            # 0x2180 - 0x2183 (insde RAM?)
+            raise NotImplementedError()
+        elif offset >= 0x3000 and offset <= 0x3FFF:
+            # TODO: Super-FX, DSP
+            raise NotImplementedError()
+        elif offset >= 0x4000 and offset <= 0x41FF:  # maybe 40FF is correct
+            # TODO: Joypad Registers / Controller
+            # 0x4016 - 0x4017 CPU
+            raise NotImplementedError()
+        elif offset >= 0x4200 and offset <= 0x5FFF:  # maybe 44FF is correct
+            # TODO: DMA, PPU2, Hardware Registers
+            # 0x4200 - 0x420D CPU
+            # 0x4100 - 0x421F CPU
+            # 0x4300 - 0x437F CPU
+            raise NotImplementedError()
+        elif offset >= 0x6000 and offset <= 0x7FFF:
+            # write SRAM
+            SRAM_page = (bank - 0x20) * 0x1FFF
+            # if the SRAM is smaller than 32Kbyte it is repeated on and on (SRAM mirror)
+            self.SRAM[SRAM_page % self.SRAM_size] = value
+        elif offset >= 0x8000:
+            # write ROM
+            raise CanNotWriteROMExcpetion()
+        else:
+            raise IllegalAddressExcpetion()
+
+    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
+    # 0x7E:0000 - 0x7F:FFFF write the RAM inside the SNES
+    def write_RAM(self, bank, offset, value):
+        if bank == 0x7E:
+            self.RAM[offset] = value
+        elif bank == 0x7F:
+            self.RAM[0x8000 + offset] = value
+        else:
+            raise IllegalAddressExcpetion()
+
+
+    # 0x80:0000 - 0xFF:FFFF mirror (same as self.write except RAM)
+    def write_upper_mirror(self, bank, offset, value):
+        if bank >= (0x00 + 0x80) and bank <= (0x1F + 0x80):
+            self.read_system(bank - 0x80, offset, value)
+        elif bank >= (0x20 + 0x80) and bank <= (0x3F + 0x80):
+            self.read_system2(bank - 0x80, offset, value)
+        elif bank >= (0x40 + 0x80) and bank <= (0x7D + 0x80):
+            raise CanNotWriteROMExcpetion()
+        elif bank >= (0x7E + 0x80) and bank <= (0x7F + 0x80):
+            raise CanNotWriteROMExcpetion() # different to self.write
+        else:
+            raise IllegalAddressExcpetion()
 
 
 class SA1ROMMemoryMapper(object):
