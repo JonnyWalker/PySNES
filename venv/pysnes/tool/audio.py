@@ -1,0 +1,2 @@
+class AudioProcessingUnit(object):
+    pass

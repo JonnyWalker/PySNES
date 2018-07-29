@@ -2,9 +2,15 @@ from cartrige import CartrigeType
 from exceptions import CanNotWriteROMExcpetion, IllegalAddressExcpetion
 
 # When the CPU puts a signal on its address bus some bytes can be
-# read or written "somewhere" (e.g. ROM, RAM, SRAM or other)
+# read or written from/to "somewhere" (e.g. ROM, RAM, SRAM or other) via the data bus.
 # The Cartirgetype (e.g. LoROM, HiROM, ...) determines what has been addressed.
 # This module implements this memory mapping
+#
+# Note: The SNES CPU only puts a signal on the address bus. Where the data
+# is coming from is handled by a cartirge mem mapper. Normaly this is
+# standardized (LoROM, HiROM, ..) but it can differ from the implementation here
+# on some games. Only in rare cases the mapping is done by the SNES
+# instead of the cartrige (e.g. RAM access)
 class MemoryMapper(object):
     def __init__(self, cartrige_type, RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size):
         if cartrige_type == CartrigeType.LOROM:
@@ -13,19 +19,19 @@ class MemoryMapper(object):
             raise NotImplementedError()
 
     def read(self, address):
-        bank = (address & 0xFF0000) >> 16 # get first two bytes
+        bank = (address & 0xFF0000) >> 16 # get first two bytes (MSB)
         offset = address & 0x00FFFF
         return self.mapper.read(bank, offset)
 
     def write(self, address, value):
-        bank = (address & 0xFF0000) >> 16 # get first two bytes
+        bank = (address & 0xFF0000) >> 16 # get first two bytes (MSB)
         offset = address & 0x00FFFF
         self.mapper.write(bank, offset, value)
 
 
 class LoROMMemoryMapper(object):
     def __init__(self, RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size):
-        self.RAM  = RAM
+        self.RAM  = RAM # TODO: maybe rename to WRAM
         self.ROM  = ROM
         self.SRAM = SRAM
         self.use_MAD1_mapping = use_MAD1_mapping
@@ -46,8 +52,30 @@ class LoROMMemoryMapper(object):
             raise IllegalAddressExcpetion()
 
     # 0x00:0000 - 3F:FFFF read ROM and system stuff
+    # TODO: the doc on the internet is very inconsistent about the memory ranges
     def read_system(self, bank, offset):
-        if offset <= 0x7FFF:
+        if offset <= 0x1FFF:
+            return self.RAM[offset]
+        elif offset>= 0x2000 and offset <= 0x2FFF: # maybe 21FF is correct
+            # TODO: PPU, APU, Hardware Registers
+            # 0x2100 - 0x213F PPU (or PPU2 ?)
+            # 0x2180 - 0x2183 (insde RAM?)
+            raise NotImplementedError()
+        elif offset >= 0x3000 and offset <= 0x3FFF:
+            # TODO: Super-FX, DSP
+            raise NotImplementedError()
+        elif offset >= 0x4000 and offset <= 0x41FF: # maybe 40FF is correct
+            # TODO: Joypad Registers / Controller
+            # 0x4016 - 0x4017 CPU
+            raise NotImplementedError()
+        elif offset >= 0x4200 and offset <= 0x5FFF: # maybe 44FF is correct
+            # TODO: DMA, PPU2, Hardware Registers
+            # 0x4200 - 0x420D CPU
+            # 0x4100 - 0x421F CPU
+            # 0x4300 - 0x437F CPU
+            raise NotImplementedError()
+        elif offset >= 0x6000 and offset <= 0x7FFF:
+            # TODO: enhancement chip memory
             raise NotImplementedError()
         elif offset >= 0x8000:
             # read ROM
@@ -82,6 +110,7 @@ class LoROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
+    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
     # 0x7E:0000 - 0x7F:FFFF read the RAM inside the SNES
     def read_RAM(self, bank, offset):
         if bank == 0x7E:
@@ -137,9 +166,31 @@ class LoROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
-    # 0x00:0000 - 3F:FFFF read ROM and system stuff
+    # 0x00:0000 - 3F:FFFF write system stuff
+    # TODO: the doc on the internet is very inconsistent about the memory ranges
     def write_system(self, bank, offset, value):
-        if offset <= 0x7FFF:
+        if offset <= 0x1FFF:
+            self.RAM[offset] = value
+        elif offset>= 0x2000 and offset <= 0x2FFF: # maybe 21FF is correct
+            # TODO: PPU, APU, Hardware Registers
+            # 0x2100 - 0x213F PPU (or PPU2 ?)
+            # 0x2180 - 0x2183 (insde RAM?)
+            raise NotImplementedError()
+        elif offset >= 0x3000 and offset <= 0x3FFF:
+            # TODO: Super-FX, DSP
+            raise NotImplementedError()
+        elif offset >= 0x4000 and offset <= 0x41FF: # maybe 40FF is correct
+            # TODO: Joypad Registers / Controller
+            # 0x4016 - 0x4017 CPU
+            raise NotImplementedError()
+        elif offset >= 0x4200 and offset <= 0x5FFF: # maybe 44FF is correct
+            # TODO: DMA, PPU2, Hardware Registers
+            # 0x4200 - 0x420D CPU
+            # 0x4100 - 0x421F CPU
+            # 0x4300 - 0x437F CPU
+            raise NotImplementedError()
+        elif offset >= 0x6000 and offset <= 0x7FFF:
+            # TODO: enhancement chip memory
             raise NotImplementedError()
         elif offset >= 0x8000:
             # write ROM
@@ -159,6 +210,7 @@ class LoROMMemoryMapper(object):
         else:
             raise IllegalAddressExcpetion()
 
+    # TODO: check inconsistency on internet docs. some docs say this is wrong! And this must be the ExRAM section
     # 0x7E:0000 - 0x7F:FFFF writes the RAM inside the SNES
     def write_RAM(self, bank, offset, value):
         if bank == 0x7E:
@@ -201,3 +253,18 @@ class LoROMMemoryMapper(object):
                 raise IllegalAddressExcpetion()
         else:
             raise IllegalAddressExcpetion()
+
+class HiROMMemoryMapper(object):
+    pass # TODO
+
+
+class SA1ROMMemoryMapper(object):
+    pass # low impl. priotity (e.g. Super Mario RPG)
+
+
+class ExLoROMMemoryMapper(object):
+    pass # low impl. priotity (e.g. Star Ocean)
+
+
+class ExHiROMMemoryMapper(object):
+    pass # low impl. priotity (e.g. Tales of Phantasia)
