@@ -28,7 +28,7 @@ class Mode(object): # Addressing modes
     BLOCK_MOVE = 25
 
 # The opcode map:
-# HEX: (MNEMONIC, Mode, Flags, Byte-Num, Cycles, Doc )
+# HEX: (MNEMONIC, Mode, Flags(can be affected), Byte-Num, Cycles, Doc )
 # FLAGs NVMXDIZC (Negative, Overflow, A-Size, XY-Size, Decimal, IRQ Disable, Zero, Carry)
 # Native Mode A-Size = 16, X-Size = 16, Y-Size = 16
 # Emulation Mode A-Size = 8, X-Size = 8, Y-Size = 8
@@ -65,6 +65,15 @@ opcode_map = {
     0x39: ('AND', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'AND Accumulator With Memory'), # AND addr, Y
     0x3D: ('AND', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'AND Accumulator With Memory'), # AND addr, X
     0x3F: ('AND', Mode.ABSOLUTE_INDEXED_LONG_X,     0b10000010, 4, 5, 'AND Accumulator With Memory'), # AND long, X
+
+    0x06: ('ASL', Mode.DIRECT,                      0b10000011, 2, 5, 'Arithmetic Shift Left'), # ASL dp
+    0x0A: ('ASL', Mode.IMPLIED,                     0b10000011, 1, 2, 'Arithmetic Shift Left'), # ASL A
+    0x0E: ('ASL', Mode.ABSOLUTE,                    0b10000011, 3, 6, 'Arithmetic Shift Left'), # ASL addr
+    0x16: ('ASL', Mode.DIRECT_INDEXED_WITH_X,       0b10000011, 2, 6, 'Arithmetic Shift Left'), # ASL dp, X
+    0x1E: ('ASL', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000011, 3, 7, 'Arithmetic Shift Left'), # ASL addr, X
+
+    0x90: ('BCC', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Carry Clear'), # BCC nearlabel
+    0xB0: ('BCS', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Carry Set'), # BCS neealabel
 
     0x18: ("CLC", Mode.IMPLIED,                     0b00000001, 1, 2, 'Clear Carry'),
     0xA9: ("LDA", Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),

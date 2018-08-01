@@ -14,6 +14,7 @@ class CPU65816(object):
 
     def fetch_decode_execute(self, code):
         opcode = code[self.PC]
+        # TODO: cycles are longer e.g. if M
         # ADC #const
         if opcode == 0x69:
             const = self.fetch_byte(code)
@@ -21,7 +22,34 @@ class CPU65816(object):
             if self.isC():
                 self.A += 1
             self.cycles += 2
-        self.PC = self.PC + 1
+            self.PC = self.PC + 1
+        # AND #const
+        elif opcode == 0x29:
+            const = self.fetch_byte(code)
+            self.A = self.A & const
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # ASL A
+        elif opcode == 0x0A:
+            self.A = self.A << 1
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # BCC nearlabel
+        elif opcode == 0x90:
+            const = self.fetch_byte(code)
+            if not self.isC():
+                self.PC = const
+            else:
+                self.PC = self.PC + 1
+        # BCS nearlabel
+        elif opcode == 0xB0:
+            const = self.fetch_byte(code)
+            if self.isC():
+                self.PC = const
+            else:
+                self.PC = self.PC + 1
+
+
 
     def fetch_byte(self, code):
         self.PC = self.PC + 1
