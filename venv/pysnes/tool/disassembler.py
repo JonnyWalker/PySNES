@@ -18,18 +18,31 @@ class Disassembler(object):
                 symbolic.append(mnemonic)
             index = index + 1
             # TODO: Use 65816 synatax like dp, [byte], etc...
-            if length == 2  and addr_mode == Mode.IMMEDIATE_8BIT:
+            if length == 2:
                 immediate8bit = byte_array[index]
-                symbolic.append("(I8)" + hex(immediate8bit))
+                symbolic.append(hex(immediate8bit))
                 index = index + 1
-            elif length == 3 and addr_mode == Mode.ABSOLUTE: # Address
+            elif length == 3:
                 addr = byte_array[index]
                 index = index + 1
                 addr = addr + (byte_array[index] << 8)
                 index = index + 1
-                symbolic.append("(ADDR)" + hex(addr))
+                symbolic.append(hex(addr))
+            elif length == 4:
+                addr = byte_array[index]
+                index = index + 1
+                addr = addr + (byte_array[index] << 8)
+                index = index + 1
+                addr = addr + (byte_array[index] << 16)
+                index = index + 1
+                symbolic.append(hex(addr))
             if add_descr:
-                symbolic.append("\t"*(4-length)+descr)
+                if length == 2:
+                    symbolic.append("\t"*(2) + descr)
+                elif length == 3:
+                    symbolic.append("\t"*(2) + descr)
+                else:
+                    symbolic.append("\t"*(3) + descr)
             if add_new_line:
                 symbolic.append("\n")
         return symbolic
