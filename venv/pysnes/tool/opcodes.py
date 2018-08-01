@@ -3,24 +3,24 @@ class Mode(object): # Addressing modes
     IMPLIED = 0                             # obvious by instruction name
     IMMEDIATE_MEMORY_FLAG = 1
     IMMEDIATE_INDEX_FLAG = 2
-    IMMEDIATE_8BIT = 3                      # 0x09: XXX #const
-    RELATIVE = 4
+    IMMEDIATE_8BIT = 3                      # XXX #const
+    RELATIVE = 4                            # XXX nearlabel
     RELATIVE_LONG = 5
-    DIRECT = 6                              # 0x01: XXX dp
-    DIRECT_INDEXED_WITH_X = 7               # 0x15: XXX addr, X
+    DIRECT = 6                              # XXX dp
+    DIRECT_INDEXED_WITH_X = 7               # XXX addr, X
     DIRECT_INDEXED_WITH_Y = 8               # XXX addr, Y
-    DIRECT_INDIRECT = 9                     # 0x12: XXX (dp)
-    DIRECT_INDEXED_INDIRECT_X = 10          # 0x01: XXX (dp, X)
-    DIRECT_INDIRECT_INDEXED_Y = 11          # 0x11: XXX (dp), Y
-    DIRECT_INDIRECT_LONG = 12               # 0x07: XXX [dp]
-    DIRECT_INDIRECT_INDEXED_LONG_Y = 13     # 0x17: XXX [byte], Y
-    ABSOLUTE = 14                           # 0x0D: XXX 2Bytes
-    ABSOLUTE_INDEXED_WITH_X = 15            # 0x1D: XXX dp, X
-    ABSOLUTE_INDEXED_WITH_Y = 16            # 0x19: XXX dp, Y
-    ABSOLUTE_LONG = 17                      # 0x0F: XXX 3Bytes
-    ABSOLUTE_INDEXED_LONG_X = 18            # 0x1F: XXX long, X
-    STACK_RELATIVE = 19                     # 0x03: XXX sr, S
-    STACK_RELATIVE_INDIRECT_INDEXED_Y = 20  # 0x13: XXX (byte, s), Y
+    DIRECT_INDIRECT = 9                     # XXX (dp)
+    DIRECT_INDEXED_INDIRECT_X = 10          # XXX (dp, X)
+    DIRECT_INDIRECT_INDEXED_Y = 11          # XXX (dp), Y
+    DIRECT_INDIRECT_LONG = 12               # XXX [dp]
+    DIRECT_INDIRECT_INDEXED_LONG_Y = 13     # XXX [byte], Y
+    ABSOLUTE = 14                           # XXX 2Bytes
+    ABSOLUTE_INDEXED_WITH_X = 15            # XXX dp, X
+    ABSOLUTE_INDEXED_WITH_Y = 16            # XXX dp, Y
+    ABSOLUTE_LONG = 17                      # XXX 3Bytes
+    ABSOLUTE_INDEXED_LONG_X = 18            # XXX long, X
+    STACK_RELATIVE = 19                     # XXX sr, S
+    STACK_RELATIVE_INDIRECT_INDEXED_Y = 20  # XXX (byte, s), Y
     ABSOLUTE_INDIRECT = 21
     ABSOLUTE_INDIRECT_LONG = 22
     ABSOLUTE_INDEXED_INDIRECT = 23
@@ -28,7 +28,7 @@ class Mode(object): # Addressing modes
     BLOCK_MOVE = 25
 
 # The opcode map:
-# HEX: (MNEMONIC, Mode, Flags(can be affected), Byte-Num, Cycles, Doc )
+# HEX: (MNEMONIC, Mode, Flags(may be set afterwards), Byte-Num, Cycles, Doc )
 # FLAGs NVMXDIZC (Negative, Overflow, A-Size, XY-Size, Decimal, IRQ Disable, Zero, Carry)
 # Native Mode A-Size = 16, X-Size = 16, Y-Size = 16
 # Emulation Mode A-Size = 8, X-Size = 8, Y-Size = 8
@@ -74,6 +74,13 @@ opcode_map = {
 
     0x90: ('BCC', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Carry Clear'), # BCC nearlabel
     0xB0: ('BCS', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Carry Set'), # BCS neealabel
+    0xF0: ('BEQ', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Equal'), # BEQ nearlabel
+
+    0x24: ('BIT', Mode.DIRECT,                      0b11000010, 2, 3, 'Bit Test'), # BIT dp
+    0x2C: ('BIT', Mode.ABSOLUTE,                    0b11000010, 3, 4, 'Bit Test'), # BIT addr
+    0x34: ('BIT', Mode.DIRECT_INDEXED_WITH_X,       0b11000010, 2, 4, 'Bit Test'), # Bit dp, X
+    0x3C: ('BIT', Mode.ABSOLUTE_INDEXED_WITH_X,     0b11000010, 3, 4, 'Bit Test'), # Bit addr, X
+    0x89: ('BIT', Mode.IMMEDIATE_8BIT,              0b00000010, 2, 2, 'Bit Test'), # Bit #const
 
     0x18: ("CLC", Mode.IMPLIED,                     0b00000001, 1, 2, 'Clear Carry'),
     0xA9: ("LDA", Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),
