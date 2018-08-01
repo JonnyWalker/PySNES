@@ -17,6 +17,7 @@ class Disassembler(object):
             else:
                 symbolic.append(mnemonic)
             index = index + 1
+            # TODO: Use 65816 synatax like dp, [byte], etc...
             if length == 2  and addr_mode == Mode.IMMEDIATE_8BIT:
                 immediate8bit = byte_array[index]
                 symbolic.append("(I8)" + hex(immediate8bit))
