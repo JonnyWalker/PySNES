@@ -6,6 +6,7 @@ git push -u origin master
 29.07.2018 - 04 Stunden: LoRAM-MemoryMap Implementierung
 29.07.2018 - 04 Stunden: MemMap Folien und HiROM Mapper
 30.07.2018 - 01 Stunden: Disassembler print schoen machen
-01.08.2018 - 03 Stunden: Disassembler: ADC Opcode, AND Opcode
+01.08.2018 - 03 Stunden: Disassembler/Exec: ADC Opcodes, AND Opcodes, ASL Opcodes, Branch Opcodes, Bit Opcodes
+02.08.2018 - 02 Stunden: Disassembler/Exec: Branch Opcodes, Interrupt Opcodes
 
-Total Time: 30 Stunden
+Total Time: 32 Stunden

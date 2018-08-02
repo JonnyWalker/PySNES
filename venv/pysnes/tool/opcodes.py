@@ -34,10 +34,10 @@ class Mode(object): # Addressing modes
 # Emulation Mode A-Size = 8, X-Size = 8, Y-Size = 8
 #
 opcode_map = {
-    0x61: ("ADC", Mode.DIRECT_INDEXED_INDIRECT_X,   0b11000011, 2, 6, 'Add With Carry'), # ADC (dp, X)
-    0x63: ("ADC", Mode.STACK_RELATIVE,              0b11000011, 2, 4, 'Add With Carry'), # ADC sr, S
-    0x65: ("ADC", Mode.DIRECT,                      0b11000011, 2, 3, 'Add With Carry'), # ADC dp
-    0x67: ("ADC", Mode.DIRECT_INDIRECT_LONG,        0b11000011, 2, 6, 'Add With Carry'), # ADC [dp]
+    0x61: ('ADC', Mode.DIRECT_INDEXED_INDIRECT_X,   0b11000011, 2, 6, 'Add With Carry'), # ADC (dp, X)
+    0x63: ('ADC', Mode.STACK_RELATIVE,              0b11000011, 2, 4, 'Add With Carry'), # ADC sr, S
+    0x65: ('ADC', Mode.DIRECT,                      0b11000011, 2, 3, 'Add With Carry'), # ADC dp
+    0x67: ('ADC', Mode.DIRECT_INDIRECT_LONG,        0b11000011, 2, 6, 'Add With Carry'), # ADC [dp]
     0x69: ('ADC', Mode.IMMEDIATE_8BIT,              0b11000011, 2, 2, 'Add With Carry'), # ADC #const
     0x6D: ('ADC', Mode.ABSOLUTE,                    0b11000011, 3, 2, 'Add With Carry'), # ADC addr
     0x6F: ('ADC', Mode.ABSOLUTE_LONG,               0b11000011, 4, 5, 'Add With Carry'), # ADC long
@@ -82,7 +82,20 @@ opcode_map = {
     0x3C: ('BIT', Mode.ABSOLUTE_INDEXED_WITH_X,     0b11000010, 3, 4, 'Bit Test'), # Bit addr, X
     0x89: ('BIT', Mode.IMMEDIATE_8BIT,              0b00000010, 2, 2, 'Bit Test'), # Bit #const
 
-    0x18: ("CLC", Mode.IMPLIED,                     0b00000001, 1, 2, 'Clear Carry'),
+    0x30: ('BMI', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Minus'), # BMI nearlabel
+    0xD0: ('BNE', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Not Eqaul'), # BNE nearlabel
+    0x10: ('BPL', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Plus'), # BPL nearlabel
+    0x80: ('BRA', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch Always'), # BRA nearlabel
+    0x00: ('BRK', Mode.IMPLIED,                     0b00001100, 2, 7, 'Break'), # BRK
+    0x82: ('BRL', Mode.RELATIVE_LONG,               0b00000000, 3, 4, 'Branch Long Always'), # BRL label
+    0x50: ('BVC', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Overflow Clear'), # BVC nearlabel
+    0x70: ('BVS', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Overflow Set'), # BVS nearlabel
+
+    0x18: ('CLC', Mode.IMPLIED,                     0b00000001, 1, 2, 'Clear Carry'), # CLC
+    0xD8: ('CLD', Mode.IMPLIED,                     0b00001000, 1, 2, 'Clear Decimal Mode Flag'), # CLD
+    0x58: ('CLI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Clear Interrupt Diable Flag'), # CLI
+    0xB8: ('CLV', Mode.IMPLIED,                     0b01000000, 1, 2, 'Clear Overflow Flag'), # CLV
+
     0xA9: ("LDA", Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),
     0x48: ("PHA", Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'),
     0xC2: ("REP", Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
