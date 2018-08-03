@@ -27,7 +27,9 @@ class CPU65816(object):
         # AND #const
         elif opcode == 0x29:
             const = self.fetch_byte(code)
-            self.A = self.A & const
+            result = self.A & const
+            self.compute_flags(result)
+            self.A = result
             self.cycles += 2
             self.PC = self.PC + 1
         # ASL A
@@ -102,7 +104,7 @@ class CPU65816(object):
          # BRL label
         elif opcode == 0x82:
             label = self.fetch_twobyte(code)
-            self.cycles += 2
+            self.cycles += 4
             self.PC = label
         # BVC nearlabel
         elif opcode == 0x50:
@@ -123,49 +125,85 @@ class CPU65816(object):
         # CLC
         elif opcode == 0x18:
             self.clearC()
+            self.cycles += 2
             self.PC = self.PC + 1
         # CLD
         elif opcode == 0xD8:
             self.clearD()
+            self.cycles += 2
             self.PC = self.PC + 1
         # CLI
         elif opcode == 0x58:
             self.clearI()
+            self.cycles += 2
             self.PC = self.PC + 1
         # CLV
         elif opcode == 0xB8:
             self.clearV()
+            self.cycles += 2
             self.PC = self.PC + 1
         # CMP #const
         elif opcode == 0xC9:
             const = self.fetch_byte(code)
             result = self.A - const
-            if result == 0:
-                self.setZ()
-            if result & 0b10000000 != 0:
-                self.setN()
+            self.compute_flags(result)
             if self.A >= const:
                 self.setC()
+            self.cycles += 2
+            self.PC = self.PC + 1
         # CPX #const
         elif opcode == 0xE0:
             const = self.fetch_byte(code)
             result = self.X - const
-            if result == 0:
-                self.setZ()
-            if result & 0b10000000 != 0:
-                self.setN()
+            self.compute_flags(result)
             if self.X >= const:
                 self.setC()
+            self.PC = self.PC + 1
         # CPY #const
         elif opcode == 0xC0:
             const = self.fetch_byte(code)
             result = self.Y - const
-            if result == 0:
-                self.setZ()
-            if result & 0b10000000 != 0:
-                self.setN()
+            self.compute_flags(result)
             if self.Y >= const:
                 self.setC()
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # DEC A
+        elif opcode == 0x3A:
+            result = self.A -1
+            self.compute_flags(result)
+            self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # DEX
+        elif opcode == 0xCA:
+            result = self.X -1
+            self.compute_flags(result)
+            self.X = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # DEY
+        elif opcode == 0x88:
+            result = self.Y -1
+            self.compute_flags(result)
+            self.Y = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # EOR #const
+        elif opcode == 0x49:
+            const = self.fetch_byte(code)
+            result = self.A ^ const
+            self.compute_flags(result)
+            self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # INC A
+        elif opcode == 0x1A:
+            result = self.A + 1
+            self.compute_flags(result)
+            self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
 
     def fetch_byte(self, code):
         self.PC = self.PC + 1
@@ -178,6 +216,12 @@ class CPU65816(object):
         self.PC = self.PC + 1
         addr = addr + (code[self.PC] << 8)
         return addr
+
+    def compute_flags(self, value):
+        if value == 0:
+            self.setZ()
+        if value & 0b10000000 != 0:
+            self.setN()
 
     # True = Negative
     # False = Positive

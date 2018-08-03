@@ -5,7 +5,7 @@ class Mode(object): # Addressing modes
     IMMEDIATE_INDEX_FLAG = 2
     IMMEDIATE_8BIT = 3                      # XXX #const
     RELATIVE = 4                            # XXX nearlabel
-    RELATIVE_LONG = 5
+    RELATIVE_LONG = 5                       # XXX label
     DIRECT = 6                              # XXX dp
     DIRECT_INDEXED_WITH_X = 7               # XXX addr, X
     DIRECT_INDEXED_WITH_Y = 8               # XXX addr, Y
@@ -121,13 +121,46 @@ opcode_map = {
     0xC4: ('CPY', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Index Register Y With Memory'), # CPY dp
     0xCC: ('CPY', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Index Register Y With Memory'), # CPY addr
 
-    0xA9: ("LDA", Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),
-    0x48: ("PHA", Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'),
-    0xC2: ("REP", Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
-    0x78: ("SEI", Mode.IMPLIED,                     0b00000100, 1, 2, 'Set Interrupt Disable Flag'),
-    0xE2: ("SEP", Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
-    0x8D: ("STA", Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Accumulator to Memory'),
-    0x9C: ("STZ", Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Zero to Memory'),
-    0xEB: ("XBA", Mode.IMPLIED,                     0b10000010, 1, 3, 'Exchange B and A 8-bit Accumulators'),
-    0xFB: ("XCE", Mode.IMPLIED,                     0b00110011, 1, 2, 'Exchange Carry and Emulation Flags')
+    0x3A: ('DEC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEC A
+    0xC6: ('DEC', Mode.DIRECT,                      0b10000010, 2, 5, 'Decrecment'), # DEC dp
+    0xCE: ('DEC', Mode.ABSOLUTE,                    0b10000010, 3, 6, 'Decrecment'), # DEC addr
+    0xD6: ('DEC', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 6, 'Decrecment'), # DEC dp, X
+    0xDE: ('DEC', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 7, 'Decrecment'), # DEC addr, X
+    0xCA: ('DEC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEX
+    0x88: ('DEC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEY
+
+    0x41: ('EOR', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 6, 'XOR Accumulator With Memory'), # EOR (dp, X)
+    0x43: ('EOR', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'XOR Accumulator With Memory'), # EOR sr, S
+    0x45: ('EOR', Mode.DIRECT,                      0b10000010, 2, 3, 'XOR Accumulator With Memory'), # EOR dp
+    0x47: ('EOR', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'XOR Accumulator With Memory'), # EOR [dp]
+    0x49: ('EOR', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'XOR Accumulator With Memory'), # EOR #const
+    0x4D: ('EOR', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'XOR Accumulator With Memory'), # EOR addr
+    0x4F: ('EOR', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'XOR Accumulator With Memory'), # EOR long
+    0x51: ('EOR', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'XOR Accumulator With Memory'), # EOR (dp), Y
+    0x52: ('EOR', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'XOR Accumulator With Memory'), # EOR (dp)
+    0x53: ('EOR', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'XOR Accumulator With Memory'), # EOR (sr, S), Y
+    0x55: ('EOR', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'XOR Accumulator With Memory'), # EOR dp, X
+    0x57: ('EOR', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'XOR Accumulator With Memory'), # EOR [dp], Y
+    0x59: ('EOR', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'XOR Accumulator With Memory'), # EOR addr, Y
+    0x5D: ('EOR', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'XOR Accumulator With Memory'), # EOR addr, X
+    0x5F: ('EOR', Mode.ABSOLUTE_INDEXED_LONG_X,     0b10000010, 4, 5, 'XOR Accumulator With Memory'), # EOR long, X
+
+    0x1A: ('INC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Increcment'),  # INC A
+    0xE6: ('INC', Mode.DIRECT,                      0b10000010, 2, 5, 'Increcment'),  # INC dp
+    0xEE: ('INC', Mode.ABSOLUTE,                    0b10000010, 3, 6, 'Increcment'),  # INC addr
+    0xF6: ('INC', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 6, 'Increcment'),  # INC dp, X
+    0xFE: ('INC', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 7, 'Increcment'),  # INC addr, X
+    0xE8: ('INC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Increcment'),  # INX
+    0xC8: ('INC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Increcment'),  # INY
+
+
+    0xA9: ('LDA', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),
+    0x48: ('PHA', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'),
+    0xC2: ('REP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
+    0x78: ('SEI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Set Interrupt Disable Flag'),
+    0xE2: ('SEP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
+    0x8D: ('STA', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Accumulator to Memory'),
+    0x9C: ('STZ', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Zero to Memory'),
+    0xEB: ('XBA', Mode.IMPLIED,                     0b10000010, 1, 3, 'Exchange B and A 8-bit Accumulators'),
+    0xFB: ('XCE', Mode.IMPLIED,                     0b00110011, 1, 2, 'Exchange Carry and Emulation Flags')
 }
