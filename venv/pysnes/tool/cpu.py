@@ -136,6 +136,36 @@ class CPU65816(object):
         elif opcode == 0xB8:
             self.clearV()
             self.PC = self.PC + 1
+        # CMP #const
+        elif opcode == 0xC9:
+            const = self.fetch_byte(code)
+            result = self.A - const
+            if result == 0:
+                self.setZ()
+            if result & 0b10000000 != 0:
+                self.setN()
+            if self.A >= const:
+                self.setC()
+        # CPX #const
+        elif opcode == 0xE0:
+            const = self.fetch_byte(code)
+            result = self.X - const
+            if result == 0:
+                self.setZ()
+            if result & 0b10000000 != 0:
+                self.setN()
+            if self.X >= const:
+                self.setC()
+        # CPY #const
+        elif opcode == 0xC0:
+            const = self.fetch_byte(code)
+            result = self.Y - const
+            if result == 0:
+                self.setZ()
+            if result & 0b10000000 != 0:
+                self.setN()
+            if self.Y >= const:
+                self.setC()
 
     def fetch_byte(self, code):
         self.PC = self.PC + 1

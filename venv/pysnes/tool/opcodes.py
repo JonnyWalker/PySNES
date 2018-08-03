@@ -96,6 +96,31 @@ opcode_map = {
     0x58: ('CLI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Clear Interrupt Diable Flag'), # CLI
     0xB8: ('CLV', Mode.IMPLIED,                     0b01000000, 1, 2, 'Clear Overflow Flag'), # CLV
 
+    0xC1: ('CMP', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000011, 2, 4, 'Compare Accumulator With Memory'), # CMP (dp, X)
+    0xC3: ('CMP', Mode.STACK_RELATIVE,              0b10000011, 2, 4, 'Compare Accumulator With Meomry'), # CMP sr, S
+    0xC5: ('CMP', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Accumulator With Meomry'), # CMP dp
+    0xC7: ('CMP', Mode.DIRECT_INDIRECT_LONG,        0b10000011, 2, 6, 'Compare Accumulator With Meomry'), # CMP [dp]
+    0xC9: ('CMP', Mode.IMMEDIATE_8BIT,              0b10000011, 2, 2, 'Compare Accumulator With Meomry'), # CMP #const
+    0xCD: ('CMP', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Accumulator With Meomry'), # CMP addr
+    0xCF: ('CMP', Mode.ABSOLUTE_LONG,               0b10000011, 4, 5, 'Compare Accumulator With Meomry'), # CMP long
+    0xD1: ('CMP', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000011, 2, 5, 'Compare Accumulator With Meomry'), # CMP (dp), Y
+    0xD2: ('CMP', Mode.DIRECT_INDIRECT,             0b10000011, 2, 5, 'Compare Accumulator With Meomry'), # CMP (dp)
+    0xD3: ('CMP', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000011, 2, 7, 'Compare Accumulator With Meomry'), # CMP (sr, S), Y
+    0xD5: ('CMP', Mode.DIRECT_INDEXED_WITH_X,       0b10000011, 2, 4, 'Compare Accumulator With Meomry'), # CMP dp, X
+    0xD7: ('CMP', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000011, 2, 6, 'Compare Accumulator With Meomry'), # CMP [dp], Y
+    0xD9: ('CMP', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000011, 3, 4, 'Compare Accumulator With Meomry'), # CMP addr, Y
+    0xDD: ('CMP', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000011, 3, 4, 'Compare Accumulator With Meomry'), # CMP addr, X
+    0xDF: ('CMP', Mode.ABSOLUTE_INDEXED_LONG_X,     0b10000011, 2, 7, 'Compare Accumulator With Meomry'), # CMP long, X
+
+    0x02: ('COP', Mode.IMPLIED,                     0b00001100, 2, 7, 'Co-Processor Enable'), # COP #const
+
+    0xE0: ('CPX', Mode.IMMEDIATE_8BIT,              0b10000011, 2, 2, 'Compare Index Register X With Memory'), # CPX #const
+    0xE4: ('CPX', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Index Register X With Memory'), # CPX dp
+    0xEC: ('CPX', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Index Register X With Memory'), # CPX addr
+    0xC0: ('CPY', Mode.IMMEDIATE_8BIT,              0b10000011, 2, 2, 'Compare Index Register Y With Memory'), # CPY #const
+    0xC4: ('CPY', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Index Register Y With Memory'), # CPY dp
+    0xCC: ('CPY', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Index Register Y With Memory'), # CPY addr
+
     0xA9: ("LDA", Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),
     0x48: ("PHA", Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'),
     0xC2: ("REP", Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
