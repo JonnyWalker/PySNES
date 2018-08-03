@@ -153,8 +153,41 @@ opcode_map = {
     0xE8: ('INC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Increcment'),  # INX
     0xC8: ('INC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Increcment'),  # INY
 
+    0x4C: ('JMP', Mode.ABSOLUTE,                    0b00000000, 3, 3, 'Jump'), # JMP addr
+    0x5C: ('JMP', Mode.ABSOLUTE_LONG,               0b00000000, 4, 4, 'Jump'), # JMP long
+    0x6C: ('JMP', Mode.ABSOLUTE_INDIRECT,           0b00000000, 3, 5, 'Jump'), # JMP (addr)
+    0x7C: ('JMP', Mode.ABSOLUTE_INDEXED_INDIRECT,   0b00000000, 3, 6, 'Jump'), # JMP (addr, X)
+    0xDC: ('JMP', Mode.ABSOLUTE_INDIRECT_LONG,      0b00000000, 3, 6, 'Jump'), # JMP [addr]
+    0x20: ('JSR', Mode.ABSOLUTE,                    0b00000000, 3, 6, 'Jump to Subroutine'), # JSR addr
+    0x22: ('JSR', Mode.ABSOLUTE_LONG,               0b00000000, 4, 8, 'Jump to Subroutine'),  # JSR long
+    0xFC: ('JSR', Mode.ABSOLUTE_INDEXED_INDIRECT,   0b00000000, 3, 8, 'Jump to Subroutine'),  # JSR (addr, X)
 
-    0xA9: ('LDA', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator from Memory'),
+    0xA1: ('LDA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA (dp, X)
+    0xA3: ('LDA', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA sr, S
+    0xA5: ('LDA', Mode.DIRECT,                      0b10000010, 2, 3, 'Load Accumulator With Memory'),  # LDA dp
+    0xA7: ('LDA', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA [dp]
+    0xA9: ('LDA', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator With Memory'),  # LDA #const
+    0xAD: ('LDA', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr
+    0xAF: ('LDA', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'Load Accumulator With Memory'),  # LDA long
+    0xB1: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp), Y
+    0xB2: ('LDA', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp)
+    0xB3: ('LDA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'XOR Accumulator With Memory'), # LDA (sr, S), Y
+    0xB5: ('LDA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA dp, X
+    0xB7: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA [dp], Y
+    0xB9: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, Y
+    0xBD: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, X
+    0xBF: ('LDA', Mode.ABSOLUTE_INDEXED_LONG_X,     0b10000010, 4, 5, 'Load Accumulator With Memory'),  # LDA long, X
+    0xA2: ('LDX', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Index Register X from Memory'), # LDX # const
+    0xA6: ('LDX', Mode.DIRECT,                      0b10000010, 2, 3, 'Load Index Register X from Memory'), # LDX dp
+    0xAE: ('LDX', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'Load Index Register X from Memory'), # LDX addr
+    0xB6: ('LDX', Mode.DIRECT_INDEXED_WITH_Y,       0b10000010, 2, 4, 'Load Index Register X from Memory'), # LDX dp, Y
+    0xBE: ('LDX', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'Load Index Register X from Memory'), # LDX addr, Y
+    0xA0: ('LDY', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Index Register Y from Memory'),  # LDY # const
+    0xA4: ('LDY', Mode.DIRECT,                      0b10000010, 2, 3, 'Load Index Register Y from Memory'),  # LDY dp
+    0xAC: ('LDY', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'Load Index Register Y from Memory'),  # LDY addr
+    0xB4: ('LDY', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'Load Index Register Y from Memory'),  # LDY dp, Y
+    0xBC: ('LDY', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'Load Index Register Y from Memory'),  # LDY addr, Y
+
     0x48: ('PHA', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'),
     0xC2: ('REP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
     0x78: ('SEI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Set Interrupt Disable Flag'),

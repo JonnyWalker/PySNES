@@ -77,7 +77,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isN():
-                self.PC = nearlabel # TODO: maybe self.PC += nearlabel is correct in all cases ...
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BNE nearlabel
@@ -85,7 +85,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isZ():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BPL nearlabel
@@ -93,25 +93,25 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isN():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BRA nearlabel
         elif opcode == 0x80:
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
-            self.PC = nearlabel
+            self.PC += nearlabel
          # BRL label
         elif opcode == 0x82:
             label = self.fetch_twobyte(code)
             self.cycles += 4
-            self.PC = label
+            self.PC += label
         # BVC nearlabel
         elif opcode == 0x50:
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isV():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BVS nearlabel
@@ -119,7 +119,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isV():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # CLC
@@ -202,6 +202,35 @@ class CPU65816(object):
             result = self.A + 1
             self.compute_flags(result)
             self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # JMP addr
+        elif opcode == 0x4C:
+            label = self.fetch_twobyte(code)
+            self.cycles += 3
+            self.PC = label
+        # LDA #const
+        elif opcode == 0xA9:
+            const = self.fetch_byte(code)
+            result = const
+            self.compute_flags(result)
+            self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # LDX #const
+        elif opcode == 0xA2:
+            const = self.fetch_byte(code)
+            result = const
+            self.compute_flags(result)
+            self.X = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # LDY #const
+        elif opcode == 0xA0:
+            const = self.fetch_byte(code)
+            result = const
+            self.compute_flags(result)
+            self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
 
