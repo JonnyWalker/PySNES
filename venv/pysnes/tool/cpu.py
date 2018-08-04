@@ -1,15 +1,15 @@
 class CPU65816(object):
-    def __init__(self):
+    def __init__(self, memory):
         self.A = 0   # Accumulator
         self.X = 0   # Index Register
         self.Y = 0   # Index Register
         self.SP = 0  # Stack Pointer
-        self.DBR = 0 # Data Bank Register
-        self.DP = 0  # Direct Page Register
-        self.PBR = 0 # Program Bank Register
+        self.DBR = 0 # Data Bank Register    (also called B)
+        self.DP = 0  # Direct Page Register  (also called D)
+        self.PBR = 0 # Program Bank Register (also called K)
         self.P = 0   # Flag Register
         self.PC = 0  # Program Counter
-
+        self.memory = memory
         self.cycles = 0
 
     def fetch_decode_execute(self, code):
@@ -233,6 +233,39 @@ class CPU65816(object):
             self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
+        # LSR A
+        elif opcode == 0x4A:
+            result = self.A >> 1
+            self.compute_flags(result)
+            if self.A & 0b1 == 1:
+                self.setC()
+            else:
+                self.clearC()
+            self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # NOP
+        elif opcode == 0xEA:
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # ORA #const
+        elif opcode == 0x09:
+            const = self.fetch_byte(code)
+            result = self.A | const
+            self.compute_flags(result)
+            self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # PHA
+        elif opcode == 0x48:
+            self.push_stack(self.A)
+            self.cycles += 3
+            self.PC = self.PC + 1
+        # PLA
+        elif opcode == 0x68:
+            self.A = self.pop_stack()
+            self.cycles += 3
+            self.PC = self.PC + 1
 
     def fetch_byte(self, code):
         self.PC = self.PC + 1
@@ -245,6 +278,19 @@ class CPU65816(object):
         self.PC = self.PC + 1
         addr = addr + (code[self.PC] << 8)
         return addr
+
+    def push_stack(self, value):
+        self.memory.write(self.SP, value & 0x00FF)
+        self.SP = self.SP - 1
+        self.memory.write(self.SP, (value & 0xFF00) >> 8)
+        self.SP = self.SP - 1
+
+    def pop_stack(self):
+        low = self.memory.read(self.SP)
+        self.SP = self.SP + 1
+        high = self.memory.read(self.SP)
+        self.SP = self.SP + 1
+        return low + (high << 88)
 
     def compute_flags(self, value):
         if value == 0:

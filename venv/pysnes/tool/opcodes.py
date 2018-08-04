@@ -188,8 +188,50 @@ opcode_map = {
     0xB4: ('LDY', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'Load Index Register Y from Memory'),  # LDY dp, Y
     0xBC: ('LDY', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'Load Index Register Y from Memory'),  # LDY addr, Y
 
-    0x48: ('PHA', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'),
-    0xC2: ('REP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
+    0x46: ('LSR', Mode.DIRECT,                      0b10000011, 2, 5, 'Logical Shift Right'), # LSR dp
+    0x4A: ('LSR', Mode.IMPLIED,                     0b10000011, 1, 2, 'Logical Shift Right'), # LSR A
+    0x4E: ('LSR', Mode.ABSOLUTE,                    0b10000011, 3, 6, 'Logical Shift Right'), # LSR addr
+    0x56: ('LSR', Mode.DIRECT_INDEXED_WITH_X,       0b10000011, 2, 6, 'Logical Shift Right'), # LSR dp, X
+    0x5E: ('LSR', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000011, 3, 7, 'Logical Shift Right'), # LSR addr, X
+
+    0x54: ('MVN', Mode.BLOCK_MOVE,                  0b00000000, 3, 1, 'Block Move Negative'), # MVN srcbk, destbk
+    0x44: ('MVP', Mode.BLOCK_MOVE,                  0b00000000, 3, 1, 'Block Move Positive'), # MVP srcbk, destbk
+
+    0xEA: ('NOP', Mode.IMPLIED,                     0b00000000, 1, 2, 'No Operation'), # NOP
+
+    0x01: ('ORA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 6, 'OR Accumulator With Memory'),  # ORA (dp, X)
+    0x03: ('ORA', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'OR Accumulator With Memory'),  # ORA sr, S
+    0x05: ('ORA', Mode.DIRECT,                      0b10000010, 2, 3, 'OR Accumulator With Memory'),  # ORA dp
+    0x07: ('ORA', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'OR Accumulator With Memory'),  # ORA [dp]
+    0x09: ('ORA', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'OR Accumulator With Memory'),  # ORA #const
+    0x0D: ('ORA', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'OR Accumulator With Memory'),  # ORA addr
+    0x0F: ('ORA', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'OR Accumulator With Memory'),  # ORA long
+    0x11: ('ORA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'OR Accumulator With Memory'),  # ORA (dp), Y
+    0x12: ('ORA', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'OR Accumulator With Memory'),  # ORA (dp)
+    0x13: ('ORA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'OR Accumulator With Memory'),# ORA (sr, S), Y
+    0x15: ('ORA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'OR Accumulator With Memory'),  # ORA dp, X
+    0x17: ('ORA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'OR Accumulator With Memory'),  # ORA [dp], Y
+    0x19: ('ORA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'OR Accumulator With Memory'),  # ORA addr, Y
+    0x1D: ('ORA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'OR Accumulator With Memory'),  # ORA addr, X
+    0x1F: ('ORA', Mode.ABSOLUTE_INDEXED_LONG_X,     0b10000010, 4, 5, 'OR Accumulator With Memory'),  # ORA long, X
+
+    0x48: ('PHA', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Accumulator'), # PHA
+    0x8B: ('PHB', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Data Bank Register'), # PHB
+    0x0B: ('PHD', Mode.IMPLIED,                     0b00000000, 1, 4, 'Push Direct Page Register'), # PHD
+    0x4B: ('PHK', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Program Bank Register'), # PHK
+    0x08: ('PHP', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Processor Status Register'), # PHP
+    0xDA: ('PHX', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Index Register X'), # PHX
+    0x5A: ('PHY', Mode.IMPLIED,                     0b00000000, 1, 3, 'Push Index Register Y'), # PHY
+
+    0x68: ('PLA', Mode.IMPLIED,                     0b00000000, 1, 4, 'Pull Accumulator'), # PLA
+    0xAB: ('PLB', Mode.IMPLIED,                     0b00000000, 1, 4, 'Pull Data Bank Register'), # PLB
+    0x2B: ('PLD', Mode.IMPLIED,                     0b00000000, 1, 5, 'Pull Direct Page Register'), # PLD
+    0x28: ('PLP', Mode.IMPLIED,                     0b00000000, 1, 4, 'Pull Processor Status Register'), # PLP
+    0xFA: ('PLX', Mode.IMPLIED,                     0b00000000, 1, 4, 'Pull Index Register X'), # PLX
+    0x7A: ('PLY', Mode.IMPLIED,                     0b00000000, 1, 4, 'Pull Index Register Y'), # PLY
+
+    0xC2: ('REP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'), # REP # const
+    
     0x78: ('SEI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Set Interrupt Disable Flag'),
     0xE2: ('SEP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
     0x8D: ('STA', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Accumulator to Memory'),
