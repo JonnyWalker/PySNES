@@ -171,7 +171,7 @@ opcode_map = {
     0xAF: ('LDA', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'Load Accumulator With Memory'),  # LDA long
     0xB1: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp), Y
     0xB2: ('LDA', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp)
-    0xB3: ('LDA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'XOR Accumulator With Memory'), # LDA (sr, S), Y
+    0xB3: ('LDA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'Load Accumulator With Memory'), # LDA (sr, S), Y
     0xB5: ('LDA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA dp, X
     0xB7: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA [dp], Y
     0xB9: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, Y
@@ -231,11 +231,95 @@ opcode_map = {
     0x7A: ('PLY', Mode.IMPLIED,                     0b00000000, 1, 4, 'Pull Index Register Y'), # PLY
 
     0xC2: ('REP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'), # REP # const
-    
-    0x78: ('SEI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Set Interrupt Disable Flag'),
-    0xE2: ('SEP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'),
-    0x8D: ('STA', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Accumulator to Memory'),
-    0x9C: ('STZ', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Zero to Memory'),
-    0xEB: ('XBA', Mode.IMPLIED,                     0b10000010, 1, 3, 'Exchange B and A 8-bit Accumulators'),
-    0xFB: ('XCE', Mode.IMPLIED,                     0b00110011, 1, 2, 'Exchange Carry and Emulation Flags')
+
+    0x26: ('ROL', Mode.DIRECT,                      0b10000011, 2, 5, 'Rotate Left'), # ROL dp
+    0x2A: ('ROL', Mode.IMPLIED,                     0b10000011, 1, 2, 'Rotate Left'), # ROL A
+    0x2E: ('ROL', Mode.ABSOLUTE,                    0b10000011, 3, 6, 'Rotate Left'), # ROL addr
+    0x36: ('ROL', Mode.DIRECT_INDEXED_WITH_X,       0b10000011, 2, 6, 'Rotate Left'), # ROL dp, X
+    0x3E: ('ROL', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000011, 3, 7, 'Rotate Left'), # ROL addr, X
+
+    0x66: ('ROR', Mode.DIRECT,                      0b10000011, 2, 5, 'Rotate Right'),  # ROR dp
+    0x6A: ('ROR', Mode.IMPLIED,                     0b10000011, 1, 2, 'Rotate Right'),  # ROR A
+    0x6E: ('ROR', Mode.ABSOLUTE,                    0b10000011, 3, 6, 'Rotate Right'),  # ROR addr
+    0x76: ('ROR', Mode.DIRECT_INDEXED_WITH_X,       0b10000011, 2, 6, 'Rotate Right'),  # ROR dp, X
+    0x7E: ('ROR', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000011, 3, 7, 'Rotate Right'),  # ROR addr, X
+
+    0x40: ('RTI', Mode.IMPLIED,                     0b11111111, 1, 6, 'Return From Interrupt'), # RTI
+    0x6B: ('RTL', Mode.IMPLIED,                     0b00000000, 1, 6, 'Return From Subroutine Long'), # RTL
+    0x60: ('RTS', Mode.IMPLIED,                     0b00000000, 1, 6, 'Retrun From Subroutine'), # RTS
+
+    0xE1: ('SBC', Mode.DIRECT_INDEXED_INDIRECT_X,   0b11000010, 2, 6, 'Subtract With Borrow From Accumulator'),  # SBC (dp, X)
+    0xE3: ('SBC', Mode.STACK_RELATIVE,              0b11000010, 2, 4, 'Subtract With Borrow From Accumulator'),  # SBC sr, S
+    0xE5: ('SBC', Mode.DIRECT,                      0b11000010, 2, 3, 'Subtract With Borrow From Accumulator'),  # SBC dp
+    0xE7: ('SBC', Mode.DIRECT_INDIRECT_LONG,        0b11000010, 2, 6, 'Subtract With Borrow From Accumulator'),  # SBC [dp]
+    0xE9: ('SBC', Mode.IMMEDIATE_8BIT,              0b11000010, 2, 2, 'Subtract With Borrow From Accumulator'),  # SBC #const
+    0xED: ('SBC', Mode.ABSOLUTE,                    0b11000010, 3, 4, 'Subtract With Borrow From Accumulator'),  # SBC addr
+    0xEF: ('SBC', Mode.ABSOLUTE_LONG,               0b11000010, 4, 5, 'Subtract With Borrow From Accumulator'),  # SBC long
+    0xF1: ('SBC', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b11000010, 2, 5, 'Subtract With Borrow From Accumulator'),  # SBC (dp), Y
+    0xF2: ('SBC', Mode.DIRECT_INDIRECT,             0b11000010, 2, 5, 'Subtract With Borrow From Accumulator'),  # SBC (dp)
+    0xF3: ('SBC', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b11000010, 2, 7, 'Subtract With Borrow From Accumulator'), # SBC (sr, S), Y
+    0xF5: ('SBC', Mode.DIRECT_INDEXED_INDIRECT_X,   0b11000010, 2, 4, 'Subtract With Borrow From Accumulator'),  # SBC dp, X
+    0xF7: ('SBC', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b11000010, 2, 6, 'Subtract With Borrow From Accumulator'),  # SBC [dp], Y
+    0xF9: ('SBC', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b11000010, 3, 4, 'Subtract With Borrow From Accumulator'),  # SBC addr, Y
+    0xFD: ('SBC', Mode.ABSOLUTE_INDEXED_WITH_X,     0b11000010, 3, 4, 'Subtract With Borrow From Accumulator'),  # SBC addr, X
+    0xFF: ('SBC', Mode.ABSOLUTE_INDEXED_LONG_X,     0b11000010, 4, 5, 'Subtract With Borrow From Accumulator'),  # SBC long, X
+
+    0x38: ('SEC', Mode.IMPLIED,                     0b00000001, 1, 2, 'Set Carry Flag'), # SEC
+    0xF8: ('SED', Mode.IMPLIED,                     0b00001000, 1, 2, 'Set Decimal Flag'), # SED
+    0x78: ('SEI', Mode.IMPLIED,                     0b00000100, 1, 2, 'Set Interrupt Disable Flag'), # SEI
+    0xE2: ('SEP', Mode.IMMEDIATE_8BIT,              0b11111111, 2, 3, 'Reset Processor Status Bits'), # SEP # const
+
+    0x81: ('STA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b00000000, 2, 6, 'Store Accumulator To Memory'),# STA (dp, X)
+    0x83: ('STA', Mode.STACK_RELATIVE,              0b00000000, 2, 4, 'Store Accumulator To Memory'),  # STA sr, S
+    0x85: ('STA', Mode.DIRECT,                      0b00000000, 2, 3, 'Store Accumulator To Memory'),  # STA dp
+    0x87: ('STA', Mode.DIRECT_INDIRECT_LONG,        0b00000000, 2, 6, 'Store Accumulator To Memory'),  # STA [dp]
+    0x8D: ('STA', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Accumulator To Memory'),  # STA addr
+    0x8F: ('STA', Mode.ABSOLUTE_LONG,               0b00000000, 4, 5, 'Store Accumulator To Memory'),  # STA long
+    0x91: ('STA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b00000000, 2, 6, 'Store Accumulator To Memory'), # STA (dp), Y
+    0x92: ('STA', Mode.DIRECT_INDIRECT,             0b00000000, 2, 5, 'Store Accumulator To Memory'),  # STA (dp)
+    0x93: ('STA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b00000000, 2, 7, 'Store Accumulator To Memory'), # STA (sr, S), Y
+    0x95: ('STA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b00000000, 2, 4, 'Store Accumulator To Memory'), # STA dp, X
+    0x97: ('STA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b00000000, 2, 6, 'Store Accumulator To Memory'), # STA [dp], Y
+    0x99: ('STA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b00000000, 3, 5, 'Store Accumulator To Memory'), # STA addr, Y
+    0x9D: ('STA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b00000000, 3, 5, 'Store Accumulator To Memory'), # STA addr, X
+    0x9F: ('STA', Mode.ABSOLUTE_INDEXED_LONG_X,     0b00000000, 4, 5, 'Store Accumulator To Memory'), # STA long, X
+
+    0xDB: ('STP', Mode.IMPLIED,                     0b00000000, 1, 3, 'Stop Processor'), # STP
+
+    0x86: ('STX', Mode.DIRECT,                      0b00000000, 2, 3, 'Store Index Register X to Memorry'), # STX dp
+    0x8E: ('STX', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Index Register X to Memorry'), # STX addr
+    0x96: ('STX', Mode.DIRECT_INDEXED_WITH_Y,       0b00000000, 2, 4, 'Store Index Register X to Memorry'), # STX dp, Y
+    0x84: ('STY', Mode.DIRECT,                      0b00000000, 2, 3, 'Store Index Register Y to Memorry'), # STY dp
+    0x8C: ('STY', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Index Register Y to Memorry'), # STY addr
+    0x94: ('STY', Mode.DIRECT_INDEXED_WITH_X,       0b00000000, 2, 4, 'Store Index Register Y to Memorry'), # STY dp, X
+
+    0x64: ('STZ', Mode.DIRECT,                      0b00000000, 2, 3, 'Store Zero to Memory'), # STZ dp
+    0x74: ('STZ', Mode.DIRECT_INDEXED_WITH_X,       0b00000000, 2, 4, 'Store Zero to Memory'), # STZ dp, X
+    0x9C: ('STZ', Mode.ABSOLUTE,                    0b00000000, 3, 4, 'Store Zero to Memory'), # STZ addr
+    0x9E: ('STZ', Mode.ABSOLUTE_INDEXED_WITH_X,     0b00000000, 3, 5, 'Store Zero to Memory'), # STZ addr, X
+
+    0xAA: ('TAX', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Accumulator To Index Register X'), # TAX
+    0xA8: ('TAY', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Accumulator To Index Register Y'), # TAY
+    0x5B: ('TCD', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer 16-bit Accumulator to Direct Page Register'), # TCD
+    0x1B: ('TCS', Mode.IMPLIED,                     0b00000000, 1, 2, 'Transfer 16-bit Accumulator to Stack Pointer'), # TCS
+    0x7B: ('TDC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Direct Page Register to 16-bit Accumulator'), # TDC
+
+    0x14: ('TRB', Mode.DIRECT,                      0b00000010, 2, 5, 'Test and Reset Memory Bits Against Accumulator'), # TRB dp
+    0x1C: ('TRB', Mode.ABSOLUTE,                    0b00000010, 3, 6, 'Test and Reset Memory Bits Against Accumulator'), # TRB addr
+    0x04: ('TSB', Mode.DIRECT,                      0b00000010, 2, 5, 'Test and Set Memory Bits Against Accumulator'), # TSB ap
+    0x0C: ('TSB', Mode.ABSOLUTE,                    0b00000010, 3, 6, 'Test and Set Memory Bits Against Accumulator'), # TSB addr
+
+    0x3B: ('TSC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Stack Pointer to 16-bit Accumulator'), # TSC
+    0xBA: ('TSX', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Stack Pointer to Index Register X'), # TSX
+    0x8A: ('TXA', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Index Register X to Accumulator'), # TXA
+    0x9A: ('TXS', Mode.IMPLIED,                     0b00000000, 1, 2, 'Transfer Index Register X to Stack Pointer'), # TXS
+    0x9B: ('TXY', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Index Register X to Index Register Y'), # TXY
+    0x98: ('TYA', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Index Register Y to Accumulator'), # TYA
+    0xBB: ('TYX', Mode.IMPLIED,                     0b10000010, 1, 2, 'Transfer Index Register Y to Index Register X'), # TYX
+
+    0xCB: ('WAI', Mode.IMPLIED,                     0b00000000, 1, 3, 'Wait for Interrupt'), # WAI
+    0x42: ('WDM', Mode.IMPLIED,                     0b00000000, 2, 0, 'Reserved for Future Expansion'), # WDM
+
+    0xEB: ('XBA', Mode.IMPLIED,                     0b10000010, 1, 3, 'Exchange B and A 8-bit Accumulators'), # XBA
+    0xFB: ('XCE', Mode.IMPLIED,                     0b00110011, 1, 2, 'Exchange Carry and Emulation Flags') # XCE
 }

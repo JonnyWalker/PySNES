@@ -9,6 +9,6 @@ git push -u origin master
 01.08.2018 - 03 Stunden: Disassembler/Exec: ADC Opcodes, AND Opcodes, ASL Opcodes, Branch Opcodes, Bit Opcodes
 02.08.2018 - 02 Stunden: Disassembler/Exec: Branch Opcodes, Interrupt Opcodes
 03.08.2018 - 03 Stunden: Disassembler/Exec: CMP, CPX, CPY, DEC, EOR, INC, LDA, LDX, LDY
-04.08.2018 - 01 Stunden: Disassembler/Exec: Load, Push, Pop
+04.08.2018 - 03 Stunden: Disassembler/Exec: Load, Push, Pop, ROL, ROR, SBC
 
 Total Time: 35 Stunden

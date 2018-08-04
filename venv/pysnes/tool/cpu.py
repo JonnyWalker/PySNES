@@ -19,7 +19,9 @@ class CPU65816(object):
         # ADC #const
         if opcode == 0x69:
             const = self.fetch_byte(code)
-            self.A = self.A + const
+            result = self.A + const
+            self.compute_flags(result)
+            self.A = result
             if self.isC():
                 self.A += 1
             self.cycles += 2
@@ -63,10 +65,10 @@ class CPU65816(object):
                 self.PC = self.PC + 1
         # BIT dp
         elif opcode == 0x24:
-            if self.DP & 0b10000000 != 0:
+            if self.DP & 0b1000000000000000 != 0:
                 self.setN()
             # use if second highest bit is set
-            if self.DP & 0b01000000 != 0:
+            if self.DP & 0b0100000000000000 != 0:
                 self.setV()
             if self.DP & self.A != 0:
                 self.setZ()
@@ -266,6 +268,61 @@ class CPU65816(object):
             self.A = self.pop_stack()
             self.cycles += 3
             self.PC = self.PC + 1
+        # ROL A
+        elif opcode == 0x2A:
+            result = self.A << 1
+            if self.isC():
+                result = result & 0b1111111111111111
+            else:
+                result = result & 0b1111111111111110
+            self.compute_flags(result)
+            if self.A & 0b10000000 != 0:
+                self.setC()
+            else:
+                self.clearC()
+            self.A = result
+        # ROR A
+        elif opcode == 0x6A:
+            result = self.A >> 1
+            if self.isC():
+                result = result & 0b1111111111111111
+            else:
+                result = result & 0b0111111111111111
+            self.compute_flags(result)
+            if self.A & 0b00000001 != 0:
+                self.setC()
+            else:
+                self.clearC()
+            self.A = result
+        # SBC #const #TODO: v and c
+        if opcode == 0xE9:
+            const = self.fetch_byte(code)
+            result = self.A - const - 1
+            self.compute_flags(result)
+            self.A = result
+            if self.isC():
+                self.A += 1
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # SEC
+        if opcode == 0x38:
+            self.setC()
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # SED
+        if opcode == 0xF8:
+            self.setD()
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # SEI
+        if opcode == 0x78:
+            self.setI()
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # TAX
+        if opcode == 0x78:
+            self.compute_flags(self.A)
+            self.X = self.A
 
     def fetch_byte(self, code):
         self.PC = self.PC + 1
@@ -295,7 +352,9 @@ class CPU65816(object):
     def compute_flags(self, value):
         if value == 0:
             self.setZ()
-        if value & 0b10000000 != 0:
+        if self.isM() and value & 0b10000000 != 0: # 8 Bit Mode
+            self.setN()
+        if not self.isM() and value & 0b1000000000000000 != 0: # 16 Bit Mode
             self.setN()
 
     # True = Negative
