@@ -289,7 +289,7 @@ class HiROMMemoryMapper(object):
         elif offset>= 0x2000 and offset <= 0x2FFF: # maybe 21FF is correct
             # TODO: PPU, APU, Hardware Registers
             # 0x2100 - 0x213F PPU (or PPU2 ?)
-            # 0x2180 - 0x2183 (insde RAM?)
+            # 0x2180 - 0x2183 (inside RAM?)
             raise NotImplementedError()
         elif offset >= 0x3000 and offset <= 0x3FFF:
             # TODO: Super-FX, DSP
