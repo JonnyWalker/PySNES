@@ -1,0 +1,4 @@
+*.pyc
+*.smc
+*.sfc
+.pytest_cache
