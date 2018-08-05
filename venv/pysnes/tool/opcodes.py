@@ -159,8 +159,8 @@ opcode_map = {
     0x7C: ('JMP', Mode.ABSOLUTE_INDEXED_INDIRECT,   0b00000000, 3, 6, 'Jump'), # JMP (addr, X)
     0xDC: ('JMP', Mode.ABSOLUTE_INDIRECT_LONG,      0b00000000, 3, 6, 'Jump'), # JMP [addr]
     0x20: ('JSR', Mode.ABSOLUTE,                    0b00000000, 3, 6, 'Jump to Subroutine'), # JSR addr
-    0x22: ('JSR', Mode.ABSOLUTE_LONG,               0b00000000, 4, 8, 'Jump to Subroutine'),  # JSR long
-    0xFC: ('JSR', Mode.ABSOLUTE_INDEXED_INDIRECT,   0b00000000, 3, 8, 'Jump to Subroutine'),  # JSR (addr, X)
+    0x22: ('JSR', Mode.ABSOLUTE_LONG,               0b00000000, 4, 8, 'Jump to Subroutine'), # JSR long
+    0xFC: ('JSR', Mode.ABSOLUTE_INDEXED_INDIRECT,   0b00000000, 3, 8, 'Jump to Subroutine'), # JSR (addr, X)
 
     0xA1: ('LDA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA (dp, X)
     0xA3: ('LDA', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA sr, S

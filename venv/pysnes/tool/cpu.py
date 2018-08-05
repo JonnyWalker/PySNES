@@ -1,18 +1,20 @@
+# TODO: the CPU is a 5A22 which is a superset of the 65816
 class CPU65816(object):
     def __init__(self, memory):
-        self.A = 0   # Accumulator
-        self.X = 0   # Index Register
-        self.Y = 0   # Index Register
-        self.SP = 0  # Stack Pointer
-        self.DBR = 0 # Data Bank Register    (also called B)
-        self.DP = 0  # Direct Page Register  (also called D)
-        self.PBR = 0 # Program Bank Register (also called K)
-        self.P = 0   # Flag Register
-        self.PC = 0  # Program Counter
+        self.A = 0   # Accumulator           - 8 or 16 Bit (also called A(8Bit) and B(next 8Bit))
+        self.X = 0   # Index Register        - 8 or 16 Bit
+        self.Y = 0   # Index Register        - 8 or 16 Bit
+        self.SP = 0  # Stack Pointer         - 16 Bit
+        self.DBR = 0 # Data Bank Register    - 8 Bit (also called B)
+        self.DP = 0  # Direct Page Register  - 16 Bit (also called D)
+        self.PBR = 0 # Program Bank Register - 8 Bit (also called K)
+        self.P = 0   # Flag Register         - 8 Bit
+        self.PC = 0  # Program Counter       - 16 Bit
         self.memory = memory
         self.cycles = 0
 
     def fetch_decode_execute(self, code):
+        # TODO: use PBR
         opcode = code[self.PC]
         # TODO: cycles are longer e.g. if M
         # TODO: ignore Emulation mode for now...fix this some day
@@ -325,11 +327,13 @@ class CPU65816(object):
             self.X = self.A
 
     def fetch_byte(self, code):
+        # TODO: use PBR
         self.PC = self.PC + 1
         return code[self.PC]
 
-
+    # little endian
     def fetch_twobyte(self, code):
+        # TODO: use PBR
         self.PC = self.PC + 1
         addr = code[self.PC]
         self.PC = self.PC + 1
@@ -367,6 +371,7 @@ class CPU65816(object):
     def isV(self):
         return self.P & 0b01000000 != 0
 
+    # FIXME: maybe wrong comment?
     # True = Emulation on (8 Bit Mode)
     # False = Emulation off (16 Bit Mode)
     def isM(self):
