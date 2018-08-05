@@ -226,14 +226,14 @@ class CPU65816(object):
                 value = self.read_momory(addr + self.DP)
                 self.compute_flags(value)
                 self.A = value
-                self.cycles += 3
+                self.cycles += 4 - self.m() + self.w()
                 self.PC = self.PC + 1
             else:
                 addr = self.fetch_byte(code)
                 value = self.read_momory(addr + self.DP)
                 self.compute_flags(value)
                 self.A = value
-                self.cycles += 4
+                self.cycles += 4 - self.m() + self.w()
                 self.PC = self.PC + 1
         # LDA #const
         elif opcode == 0xA9:
@@ -242,15 +242,32 @@ class CPU65816(object):
                 result = const
                 self.compute_flags(result)
                 self.A = result
-                self.cycles += 2
+                self.cycles += 3 - self.m()
                 self.PC = self.PC + 1
             else:
                 const = self.fetch_twobyte(code)
                 result = const
                 self.compute_flags(result)
                 self.A = result
-                self.cycles += 3
+                self.cycles += 3 - self.m()
                 self.PC = self.PC + 1
+        # LDA abs
+        elif opcode == 0xAD:
+            if self.isM():
+                addr = self.fetch_twobyte(code)
+                value = self.read_momory((self.DBR << 16) + addr)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 5 - self.m()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_twobyte(code)
+                value = self.read_momory((self.DBR << 16) + addr)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 5 - self.m()
+                self.PC = self.PC + 1
+        # LDA long
         elif opcode == 0xAF:
             addr = self.fetch_threebyte(code)
             value = self.read_momory(addr)
@@ -261,6 +278,24 @@ class CPU65816(object):
             else:
                 self.cycles += 6
             self.PC = self.PC + 1
+        # LDA (dp), Y
+        elif opcode == 0xB1:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                addr2 = self.read_momory(addr + self.DP)
+                value = self.read_momory((self.DBR << 16) + addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 4 - self.m() + self.w() - self.x() + self.x() * self.p()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                addr2 = self.read_momory(addr + self.DP)
+                value = self.read_momory((self.DBR << 16) + addr2 + self.Y)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 4 - self.m() + self.w()  - self.x() + self.x() * self.p()
+                self.PC = self.PC + 1
         # LDX #const
         elif opcode == 0xA2:
             const = self.fetch_byte(code)
@@ -452,6 +487,28 @@ class CPU65816(object):
             self.setN()
         if not self.isM() and value & 0b1000000000000000 != 0: # 16 Bit Mode
             self.setN()
+
+    def w(self):
+        if self.DP & 0x00FF != 0:
+            return 1
+        else:
+            return 0
+
+    def m(self):
+        if self.isM():
+            return 1
+        else:
+            return 0
+
+    # TODO: 1 if page boundary is crossed, 0 otherwise
+    def p(self):
+        return 0
+
+    def x(self):
+        if self.isX():
+            return 1
+        else:
+            return 0
 
     # True = Negative
     # False = Positive
