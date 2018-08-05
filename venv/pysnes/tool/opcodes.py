@@ -60,7 +60,7 @@ opcode_map = {
     0x31: ('AND', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'AND Accumulator With Memory'), # AND (dp), Y
     0x32: ('AND', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'AND Accumulator With Memory'), # AND (dp)
     0x33: ('AND', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'AND Accumulator With Memory'), # AND (sr, S), Y
-    0x35: ('AND', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'AND Accumulator With Memory'), # AND dp, X
+    0x35: ('AND', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'AND Accumulator With Memory'), # AND dp, X
     0x37: ('AND', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'AND Accumulator With Memory'), # AND [dp], Y
     0x39: ('AND', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'AND Accumulator With Memory'), # AND addr, Y
     0x3D: ('AND', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'AND Accumulator With Memory'), # AND addr, X
@@ -139,7 +139,7 @@ opcode_map = {
     0x51: ('EOR', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'XOR Accumulator With Memory'), # EOR (dp), Y
     0x52: ('EOR', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'XOR Accumulator With Memory'), # EOR (dp)
     0x53: ('EOR', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'XOR Accumulator With Memory'), # EOR (sr, S), Y
-    0x55: ('EOR', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'XOR Accumulator With Memory'), # EOR dp, X
+    0x55: ('EOR', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'XOR Accumulator With Memory'), # EOR dp, X
     0x57: ('EOR', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'XOR Accumulator With Memory'), # EOR [dp], Y
     0x59: ('EOR', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'XOR Accumulator With Memory'), # EOR addr, Y
     0x5D: ('EOR', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'XOR Accumulator With Memory'), # EOR addr, X
@@ -172,7 +172,7 @@ opcode_map = {
     0xB1: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp), Y
     0xB2: ('LDA', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp)
     0xB3: ('LDA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'Load Accumulator With Memory'), # LDA (sr, S), Y
-    0xB5: ('LDA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA dp, X
+    0xB5: ('LDA', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA dp, X
     0xB7: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA [dp], Y
     0xB9: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, Y
     0xBD: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, X
@@ -209,7 +209,7 @@ opcode_map = {
     0x11: ('ORA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'OR Accumulator With Memory'),  # ORA (dp), Y
     0x12: ('ORA', Mode.DIRECT_INDIRECT,             0b10000010, 2, 5, 'OR Accumulator With Memory'),  # ORA (dp)
     0x13: ('ORA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b10000010, 2, 7, 'OR Accumulator With Memory'),# ORA (sr, S), Y
-    0x15: ('ORA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 4, 'OR Accumulator With Memory'),  # ORA dp, X
+    0x15: ('ORA', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'OR Accumulator With Memory'),  # ORA dp, X
     0x17: ('ORA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b10000010, 2, 6, 'OR Accumulator With Memory'),  # ORA [dp], Y
     0x19: ('ORA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'OR Accumulator With Memory'),  # ORA addr, Y
     0x1D: ('ORA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'OR Accumulator With Memory'),  # ORA addr, X
@@ -258,7 +258,7 @@ opcode_map = {
     0xF1: ('SBC', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b11000010, 2, 5, 'Subtract With Borrow From Accumulator'),  # SBC (dp), Y
     0xF2: ('SBC', Mode.DIRECT_INDIRECT,             0b11000010, 2, 5, 'Subtract With Borrow From Accumulator'),  # SBC (dp)
     0xF3: ('SBC', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b11000010, 2, 7, 'Subtract With Borrow From Accumulator'), # SBC (sr, S), Y
-    0xF5: ('SBC', Mode.DIRECT_INDEXED_INDIRECT_X,   0b11000010, 2, 4, 'Subtract With Borrow From Accumulator'),  # SBC dp, X
+    0xF5: ('SBC', Mode.DIRECT_INDEXED_WITH_X,       0b11000010, 2, 4, 'Subtract With Borrow From Accumulator'),  # SBC dp, X
     0xF7: ('SBC', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b11000010, 2, 6, 'Subtract With Borrow From Accumulator'),  # SBC [dp], Y
     0xF9: ('SBC', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b11000010, 3, 4, 'Subtract With Borrow From Accumulator'),  # SBC addr, Y
     0xFD: ('SBC', Mode.ABSOLUTE_INDEXED_WITH_X,     0b11000010, 3, 4, 'Subtract With Borrow From Accumulator'),  # SBC addr, X
@@ -278,7 +278,7 @@ opcode_map = {
     0x91: ('STA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b00000000, 2, 6, 'Store Accumulator To Memory'), # STA (dp), Y
     0x92: ('STA', Mode.DIRECT_INDIRECT,             0b00000000, 2, 5, 'Store Accumulator To Memory'),  # STA (dp)
     0x93: ('STA', Mode.STACK_RELATIVE_INDIRECT_INDEXED_Y,   0b00000000, 2, 7, 'Store Accumulator To Memory'), # STA (sr, S), Y
-    0x95: ('STA', Mode.DIRECT_INDEXED_INDIRECT_X,   0b00000000, 2, 4, 'Store Accumulator To Memory'), # STA dp, X
+    0x95: ('STA', Mode.DIRECT_INDEXED_WITH_X,       0b00000000, 2, 4, 'Store Accumulator To Memory'), # STA dp, X
     0x97: ('STA', Mode.DIRECT_INDIRECT_INDEXED_LONG_Y,      0b00000000, 2, 6, 'Store Accumulator To Memory'), # STA [dp], Y
     0x99: ('STA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b00000000, 3, 5, 'Store Accumulator To Memory'), # STA addr, Y
     0x9D: ('STA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b00000000, 3, 5, 'Store Accumulator To Memory'), # STA addr, X

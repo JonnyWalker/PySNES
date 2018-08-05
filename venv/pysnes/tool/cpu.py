@@ -219,23 +219,75 @@ class CPU65816(object):
             label = self.fetch_twobyte(code)
             self.cycles += 3
             self.PC = label
-        # LDA dp
+        # LDA (dp, X) #TODO:  & 0xFFFF
+        elif opcode == 0xA1:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_2bytes(addr + self.DP + self.X)
+                value = self.read_memory_for_A((self.DBR << 16) + addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 7 - self.m() + self.w()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_2bytes(addr + self.DP + self.X)
+                value = self.read_memory_for_A((self.DBR << 16) + addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 7 - self.m() + self.w()
+                self.PC = self.PC + 1
+        # LDA stk, S #TODO:  & 0xFFFF
+        elif opcode == 0xA3:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                value = self.read_memory_for_A(addr + self.SP)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 5 - self.m()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                value = self.read_memory_for_A(addr + self.SP)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 5 - self.m()
+                self.PC = self.PC + 1
+        # LDA dp #TODO:  & 0xFFFF
         elif opcode == 0xA5:
             if self.isM():
                 addr = self.fetch_byte(code)
-                value = self.read_momory(addr + self.DP)
+                value = self.read_memory_for_A(addr + self.DP)
                 self.compute_flags(value)
                 self.A = value
                 self.cycles += 4 - self.m() + self.w()
                 self.PC = self.PC + 1
             else:
                 addr = self.fetch_byte(code)
-                value = self.read_momory(addr + self.DP)
+                value = self.read_memory_for_A(addr + self.DP)
                 self.compute_flags(value)
                 self.A = value
                 self.cycles += 4 - self.m() + self.w()
                 self.PC = self.PC + 1
-        # LDA #const
+        # LDA [dp], Y #TODO:  & 0xFFFF
+        elif opcode == 0xA7:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_3bytes(addr + self.DP)
+                value = self.read_memory_for_A(addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 7 - self.m() + self.w()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_3bytes(addr + self.DP)
+                value = self.read_memory_for_A(addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 7 - self.m() + self.w()
+                self.PC = self.PC + 1
+        # LDA #const #TODO:  & 0xFFFF
         elif opcode == 0xA9:
             if self.isM():
                 const = self.fetch_byte(code)
@@ -251,51 +303,165 @@ class CPU65816(object):
                 self.A = result
                 self.cycles += 3 - self.m()
                 self.PC = self.PC + 1
-        # LDA abs
+        # LDA abs #TODO:  & 0xFFFF
         elif opcode == 0xAD:
             if self.isM():
                 addr = self.fetch_twobyte(code)
-                value = self.read_momory((self.DBR << 16) + addr)
+                value = self.read_memory_for_A((self.DBR << 16) + addr)
                 self.compute_flags(value)
                 self.A = value
                 self.cycles += 5 - self.m()
                 self.PC = self.PC + 1
             else:
                 addr = self.fetch_twobyte(code)
-                value = self.read_momory((self.DBR << 16) + addr)
+                value = self.read_memory_for_A((self.DBR << 16) + addr)
                 self.compute_flags(value)
                 self.A = value
                 self.cycles += 5 - self.m()
                 self.PC = self.PC + 1
-        # LDA long
+        # LDA long #TODO:  & 0xFFFF
         elif opcode == 0xAF:
             addr = self.fetch_threebyte(code)
-            value = self.read_momory(addr)
+            value = self.read_memory_for_A(addr)
             self.compute_flags(value)
             self.A = value
             if self.isM():
-                self.cycles += 5
+                self.cycles += 6 - self.m()
             else:
-                self.cycles += 6
+                self.cycles += 6 - self.m()
             self.PC = self.PC + 1
-        # LDA (dp), Y
+        # LDA (dp), Y #TODO:  & 0xFFFF
         elif opcode == 0xB1:
             if self.isM():
                 addr = self.fetch_byte(code)
-                addr2 = self.read_momory(addr + self.DP)
-                value = self.read_momory((self.DBR << 16) + addr2)
+                addr2 = self.read_memory_2bytes(addr + self.DP)
+                value = self.read_memory_for_A((self.DBR << 16) + addr2 + self.Y)
                 self.compute_flags(value)
                 self.A = value
-                self.cycles += 4 - self.m() + self.w() - self.x() + self.x() * self.p()
+                self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
                 self.PC = self.PC + 1
             else:
                 addr = self.fetch_byte(code)
-                addr2 = self.read_momory(addr + self.DP)
-                value = self.read_momory((self.DBR << 16) + addr2 + self.Y)
+                addr2 = self.read_memory_2bytes(addr + self.DP)
+                value = self.read_memory_for_A((self.DBR << 16) + addr2 + self.Y)
                 self.compute_flags(value)
                 self.A = value
-                self.cycles += 4 - self.m() + self.w()  - self.x() + self.x() * self.p()
+                self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
                 self.PC = self.PC + 1
+        # LDA (dp) #TODO:  & 0xFFFF
+        elif opcode == 0xB2:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_2bytes(addr + self.DP)
+                value = self.read_memory_for_A((self.DBR << 16) + addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 6 - self.m() + self.w()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_2bytes(addr + self.DP)
+                value = self.read_memory_for_A((self.DBR << 16) + addr2)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 6 - self.m() + self.w()
+                self.PC = self.PC + 1
+        # LDA (stk, S), Y #TODO:  & 0xFFFF
+        elif opcode == 0xB3:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_2bytes((addr + self.SP) & 0xFFFF)
+                effective_addr = (addr2 + self.Y) & 0XFFFF
+                value = self.read_memory_for_A(((self.DBR << 16) + effective_addr) & 0xFFFFFF)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 8 - self.m()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_2bytes((addr + self.SP) & 0xFFFF)
+                effective_addr = (addr2 + self.Y) & 0XFFFF
+                value = self.read_memory_for_A(((self.DBR << 16) + effective_addr) & 0xFFFFFF)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 8 - self.m()
+                self.PC = self.PC + 1
+        # LDA dp, X #TODO:  & 0xFFFF
+        elif opcode == 0xB5:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                value = self.read_memory_for_A(addr + self.DP + self.X)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 5 - self.m() + self.w()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                value = self.read_memory_for_A(addr + self.DP + self.X)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 5 - self.m() + self.w()
+                self.PC = self.PC + 1
+        # LDA [dp], Y #TODO:  & 0xFFFF
+        elif opcode == 0xB7:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_3bytes(addr + self.DP)
+                value = self.read_memory_for_A(addr2 + self.Y)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 7 - self.m() + self.w()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                addr2 = self.read_memory_3bytes(addr + self.DP)
+                value = self.read_memory_for_A(addr2 + self.Y)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 7 - self.m() + self.w()
+                self.PC = self.PC + 1
+        # LDA abs, Y #TODO:  & 0xFFFF
+        elif opcode == 0xB9:
+            if self.isM():
+                addr = self.fetch_twobyte(code)
+                value = self.read_memory_for_A((self.DBR << 16) + addr + self.Y)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_twobyte(code)
+                value = self.read_memory_for_A((self.DBR << 16) + addr + self.Y)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+        # LDA abs, X #TODO:  & 0xFFFF
+        elif opcode == 0xBD:
+            if self.isM():
+                addr = self.fetch_twobyte(code)
+                value = self.read_memory_for_A((self.DBR << 16) + addr + self.X)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_twobyte(code)
+                value = self.read_memory_for_A((self.DBR << 16) + addr + self.X)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+                self.PC = self.PC + 1
+        # LDA long, X #TODO:  & 0xFFFF
+        elif opcode == 0xBF:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory_for_A(addr + self.X)
+            self.compute_flags(value)
+            self.A = value
+            if self.isM():
+                self.cycles += 6 - self.m()
+            else:
+                self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
         # LDX #const
         elif opcode == 0xA2:
             const = self.fetch_byte(code)
@@ -459,13 +625,24 @@ class CPU65816(object):
         addr = addr + (code[self.PC] << 16)
         return addr
 
-    def read_momory(self, addr):
-        if self.isM(): # 8 Bit
+    def read_memory_for_A(self, addr):
+        if self.isM(): # 8 Bit A/M
             return self.memory.read(addr)
-        else:
+        else: # 16 Bit A/M
             byte0 = self.memory.read(addr)
             byte1 = self.memory.read(addr+1)
             return byte0 + (byte1 << 8)
+
+    def read_memory_2bytes(self, addr):
+        byte0 = self.memory.read(addr)
+        byte1 = self.memory.read(addr + 1)
+        return byte0 + (byte1 << 8)
+
+    def read_memory_3bytes(self, addr):
+        byte0 = self.memory.read(addr)
+        byte1 = self.memory.read(addr + 1)
+        byte2 = self.memory.read(addr + 2)
+        return byte0 + (byte1 << 8) + (byte2 << 16)
 
     def push_stack(self, value):
         self.memory.write(self.SP, value & 0x00FF)
