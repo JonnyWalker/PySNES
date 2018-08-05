@@ -8,7 +8,7 @@ class CPU65816(object):
         self.DBR = 0 # Data Bank Register    - 8 Bit (also called B)
         self.DP = 0  # Direct Page Register  - 16 Bit (also called D)
         self.PBR = 0 # Program Bank Register - 8 Bit (also called K)
-        self.P = 0   # Flag Register         - 8 Bit
+        self.P = 0   # Flag Register         - 8 Bit #TODO check if init ok
         self.PC = 0  # Program Counter       - 16 Bit
         self.memory = memory
         self.cycles = 0
@@ -219,13 +219,47 @@ class CPU65816(object):
             label = self.fetch_twobyte(code)
             self.cycles += 3
             self.PC = label
+        # LDA dp
+        elif opcode == 0xA5:
+            if self.isM():
+                addr = self.fetch_byte(code)
+                value = self.read_momory(addr + self.DP)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 3
+                self.PC = self.PC + 1
+            else:
+                addr = self.fetch_byte(code)
+                value = self.read_momory(addr + self.DP)
+                self.compute_flags(value)
+                self.A = value
+                self.cycles += 4
+                self.PC = self.PC + 1
         # LDA #const
         elif opcode == 0xA9:
-            const = self.fetch_byte(code)
-            result = const
-            self.compute_flags(result)
-            self.A = result
-            self.cycles += 2
+            if self.isM():
+                const = self.fetch_byte(code)
+                result = const
+                self.compute_flags(result)
+                self.A = result
+                self.cycles += 2
+                self.PC = self.PC + 1
+            else:
+                const = self.fetch_twobyte(code)
+                result = const
+                self.compute_flags(result)
+                self.A = result
+                self.cycles += 3
+                self.PC = self.PC + 1
+        elif opcode == 0xAF:
+            addr = self.fetch_threebyte(code)
+            value = self.read_momory(addr)
+            self.compute_flags(value)
+            self.A = value
+            if self.isM():
+                self.cycles += 5
+            else:
+                self.cycles += 6
             self.PC = self.PC + 1
         # LDX #const
         elif opcode == 0xA2:
@@ -354,6 +388,11 @@ class CPU65816(object):
             else:
                 self.clearC()
             self.e = c
+            if self.e == 1:
+                self.setM()
+                self.setX()
+                self.X = self.X & 0x00FF
+                self.Y = self.Y & 0x00FF
             self.cycles += 2
             self.PC = self.PC + 1
         else:
@@ -373,6 +412,25 @@ class CPU65816(object):
         self.PC = self.PC + 1
         addr = addr + (code[self.PC] << 8)
         return addr
+
+    # little endian
+    def fetch_threebyte(self, code):
+        # TODO: use PBR
+        self.PC = self.PC + 1
+        addr = code[self.PC]
+        self.PC = self.PC + 1
+        addr = addr + (code[self.PC] << 8)
+        self.PC = self.PC + 1
+        addr = addr + (code[self.PC] << 16)
+        return addr
+
+    def read_momory(self, addr):
+        if self.isM(): # 8 Bit
+            return self.memory.read(addr)
+        else:
+            byte0 = self.memory.read(addr)
+            byte1 = self.memory.read(addr+1)
+            return byte0 + (byte1 << 8)
 
     def push_stack(self, value):
         self.memory.write(self.SP, value & 0x00FF)
@@ -405,9 +463,8 @@ class CPU65816(object):
     def isV(self):
         return self.P & 0b01000000 != 0
 
-    # FIXME: maybe wrong comment?
-    # True = Emulation on (8 Bit Mode)
-    # False = Emulation off (16 Bit Mode)
+    # True = Emulation on (8 Bit Mode) Accumulator and Memory
+    # False = Emulation off (16 Bit Mode) Accumulator and Memory
     def isM(self):
         return self.P & 0b00100000 != 0
 
@@ -488,7 +545,7 @@ class CPU65816(object):
     def clearD(self):
         self.P = self.P & 0b11110111
 
-    # IRQ enable?
+    # IRQ enable
     def clearI(self):
         self.P = self.P & 0b11111011
 

@@ -133,7 +133,7 @@ def test_XCE1():
     cpu.e = 1
     cpu.run_code([0xFB])
     assert cpu.e == 1
-    assert cpu.P == 0b00000001
+    assert cpu.P == 0b00110001
 
 def test_XCE2():
     cpu = CPU65816(None)
@@ -141,4 +141,4 @@ def test_XCE2():
     cpu.e = 0
     cpu.run_code([0xFB])
     assert cpu.e == 1
-    assert cpu.P == 0b00000000
+    assert cpu.P == 0b00110000
