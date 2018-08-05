@@ -229,7 +229,8 @@ class LoROMMemoryMapper(object):
         if   bank >= (0x00+0x80) and bank <= (0x3F+0x80):
             self.write_system(bank-0x80, offset, value)
         elif bank >= (0x40+0x80) and bank <= (0x6F+0x80):
-            self.write_ROM(bank-0x80, offset, value)
+            # write ROM
+            raise CanNotWriteROMExcpetion()
         elif bank >= (0x70+0x80) and bank <= (0x7D+0x80):
             self.write_SRAM_ROM(bank-0x80, offset, value)
         elif bank >= (0x7E+0x80) and bank <= (0x7F+0x80):
