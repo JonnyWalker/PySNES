@@ -12,6 +12,11 @@ class CPU65816(object):
         self.PC = 0  # Program Counter       - 16 Bit
         self.memory = memory
         self.cycles = 0
+        self.e = 1  # e-flag = 0 (native) e-lfag = 1 (emulation)
+
+    def run_code(self, code):
+        while self.PC < len(code):
+            self.fetch_decode_execute(code)
 
     def fetch_decode_execute(self, code):
         # TODO: use PBR
@@ -19,6 +24,7 @@ class CPU65816(object):
         # TODO: cycles are longer e.g. if M
         # TODO: ignore Emulation mode for now...fix this some day
         # ADC #const
+        print("iam:"+hex(opcode))
         if opcode == 0x69:
             const = self.fetch_byte(code)
             result = self.A + const
@@ -46,7 +52,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isC():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BCS nearlabel
@@ -54,7 +60,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isC():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BEQ nearlabel
@@ -62,7 +68,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isZ():
-                self.PC = nearlabel
+                self.PC += nearlabel
             else:
                 self.PC = self.PC + 1
         # BIT dp
@@ -270,6 +276,13 @@ class CPU65816(object):
             self.A = self.pop_stack()
             self.cycles += 3
             self.PC = self.PC + 1
+        # REP
+        elif opcode == 0xC2:
+            const = self.fetch_byte(code)
+            nconst = ~const
+            self.P = self.P & nconst
+            self.cycles += 3
+            self.PC = self.PC + 1
         # ROL A
         elif opcode == 0x2A:
             result = self.A << 1
@@ -297,7 +310,7 @@ class CPU65816(object):
                 self.clearC()
             self.A = result
         # SBC #const #TODO: v and c
-        if opcode == 0xE9:
+        elif opcode == 0xE9:
             const = self.fetch_byte(code)
             result = self.A - const - 1
             self.compute_flags(result)
@@ -307,24 +320,45 @@ class CPU65816(object):
             self.cycles += 2
             self.PC = self.PC + 1
         # SEC
-        if opcode == 0x38:
+        elif opcode == 0x38:
             self.setC()
             self.cycles += 2
             self.PC = self.PC + 1
         # SED
-        if opcode == 0xF8:
+        elif opcode == 0xF8:
             self.setD()
             self.cycles += 2
             self.PC = self.PC + 1
-        # SEI
-        if opcode == 0x78:
+        # SEI (Disable Interrupts) Set I to 1
+        elif opcode == 0x78:
             self.setI()
             self.cycles += 2
             self.PC = self.PC + 1
+        # SEP #const
+        elif opcode == 0xE2:
+            const = self.fetch_byte(code)
+            self.P = self.P | const;
+            self.cycles += 3
+            self.PC = self.PC + 1
         # TAX
-        if opcode == 0x78:
+        elif opcode == 0x78:
             self.compute_flags(self.A)
             self.X = self.A
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # XCE
+        elif opcode == 0xFB:
+            c = self.P & 0b00000001
+            if self.e == 1:
+                self.setC()
+            else:
+                self.clearC()
+            self.e = c
+            self.cycles += 2
+            self.PC = self.PC + 1
+        else:
+            print("unkown opcode:", opcode)
+            raise NotImplementedError()
 
     def fetch_byte(self, code):
         # TODO: use PBR

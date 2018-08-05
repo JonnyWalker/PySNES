@@ -2,5 +2,6 @@ class IllegalAddressExcpetion(Exception):
     pass
 
 
-class CanNotWriteROMExcpetion(Exception):
+class CanNotWriteROMException(Exception):
     '''Internal error: can not write ROM!'''
+    pass

@@ -1,5 +1,5 @@
 from cartrige import CartrigeType
-from exceptions import CanNotWriteROMExcpetion, IllegalAddressExcpetion
+from exceptions import CanNotWriteROMException, IllegalAddressExcpetion
 
 # When the CPU puts a signal on its address bus some bytes can be
 # read or written from/to "somewhere" (e.g. ROM, RAM, SRAM or other) via the data bus.

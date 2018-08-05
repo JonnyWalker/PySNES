@@ -5,8 +5,8 @@ import sys
 
 ba = open_as_byte_array(sys.argv[1])
 print(len(ba))
-#print_hex_dump(ba)
+#print_hex_dump(ba)[0:32]
 header = ROMHeader(ba)
 header.dump()
 d = Disassembler()
-d.print_assembler(ba, 0, 129)
+d.print_assembler(ba, 0, 130)
