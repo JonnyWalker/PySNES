@@ -12,7 +12,7 @@ class CPU65816(object):
         self.PC = 0  # Program Counter       - 16 Bit
         self.memory = memory
         self.cycles = 0
-        self.e = 1  # e-flag = 0 (native) e-lfag = 1 (emulation)
+        self.e = 1  # e-flag = 0 (native 16 Bit) e-flag = 1 (emulation 8 Bit)
 
     def run_code(self, code):
         while self.PC < len(code):
@@ -23,8 +23,9 @@ class CPU65816(object):
         opcode = code[self.PC]
         # TODO: cycles are longer e.g. if M
         # TODO: ignore Emulation mode for now...fix this some day
+        #print("iam:"+hex(opcode))
         # ADC #const
-        print("iam:"+hex(opcode))
+        # TODO: use BCD sub if D Flag is set
         if opcode == 0x69:
             const = self.fetch_byte(code)
             result = self.A + const
@@ -290,14 +291,14 @@ class CPU65816(object):
         # LDA #const
         elif opcode == 0xA9:
             if self.isM():
-                const = self.fetch_byte(code)
+                const = self.fetch_byte(code) # M=1 -> 8 Bit A -> one byte
                 result = const
                 self.compute_flags(result)
                 self.A = result
                 self.cycles += 3 - self.m()
                 self.PC = self.PC + 1
             else:
-                const = self.fetch_twobyte(code)
+                const = self.fetch_twobyte(code) # M=0 -> 16 Bit A -> two byte
                 result = const
                 self.compute_flags(result)
                 self.A = result
@@ -516,6 +517,8 @@ class CPU65816(object):
             const = self.fetch_byte(code)
             nconst = ~const
             self.P = self.P & nconst
+            if self.e: # if e is one, m and x will always be 1
+                self.P = self.P | 0b00110000
             self.cycles += 3
             self.PC = self.PC + 1
         # ROL A
@@ -544,6 +547,7 @@ class CPU65816(object):
             else:
                 self.clearC()
             self.A = result
+        # TODO: use BCD sub if D Flag is set
         # SBC #const #TODO: v and c
         elif opcode == 0xE9:
             const = self.fetch_byte(code)
@@ -589,9 +593,9 @@ class CPU65816(object):
             else:
                 self.clearC()
             self.e = c
-            if self.e == 1:
-                self.setM()
-                self.setX()
+            if self.e == 1: # 8 Bit 6502 Emu-mode
+                self.setM() # 8 Bit A/M
+                self.setX() # 8 Bit X/M
                 self.X = self.X & 0x00FF
                 self.Y = self.Y & 0x00FF
             self.cycles += 2
@@ -707,8 +711,11 @@ class CPU65816(object):
 
     # True = X and Y 8 Bit
     # False = X and Y 16 Bit
-    # or Break in Emulation-Mode
     def isX(self):
+        return self.P & 0b00010000 != 0
+
+    # Break in Emulation-Mode
+    def isB(self):
         return self.P & 0b00010000 != 0
 
     # True = use binary arithmetic

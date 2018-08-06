@@ -18,6 +18,9 @@ class Disassembler(object):
                 symbolic.append(mnemonic)
             index = index + 1
             # TODO: Use 65816 synatax like dp, [byte], etc...
+            # FIXME: Some opcodes have variable length.
+            #       E.g. ADC has the length 2 or 3 depending on the M flag
+            #       so basically, this code is wrong :'(
             if length == 2:
                 immediate8bit = byte_array[index]
                 symbolic.append(hex(immediate8bit))

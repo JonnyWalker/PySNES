@@ -12,5 +12,6 @@ git push -u origin master
 04.08.2018 - 03 Stunden: Disassembler/Exec: Load, Push, Pop, ROL, ROR, SBC
 05.08.2018 - 05+05 Stunden: (Zwei Personen) CPU impl, lda, XCE
 05.08.2018 - 02 Stunden: Alle LDA Versionen
+06.08.2018 - 01 Stunden: Test debuggen
 
 Total Time: 47 Stunden
