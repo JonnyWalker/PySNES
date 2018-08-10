@@ -1,7 +1,7 @@
-from tool.cartrige import CartrigeType
-from tool.memory import MemoryMapper
+from pysnes.cartrige import CartrigeType
+from pysnes.memory import MemoryMapper
 
-
+# .../PySNES/venv/$ py.test pysnes/test/
 RAM  = [0] * (2 ** 17 - 1)  # 128 KB
 ROM  = [0] * (2 ** 22 - 1)  # 4 MB
 SRAM = [0] * 0x7FFF         # 32 KB

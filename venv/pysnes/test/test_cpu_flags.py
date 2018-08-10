@@ -1,5 +1,6 @@
-from tool.cpu import CPU65816
+from pysnes.cpu import CPU65816
 
+# .../PySNES/venv/$ py.test pysnes/test/
 def test_NOP():
     cpu = CPU65816(None)
     assert cpu.P == 0b00000000

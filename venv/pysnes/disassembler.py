@@ -1,4 +1,4 @@
-from opcodes import Mode, opcode_map
+from opcodes import opcode_map
 
 class Disassembler(object):
     def disassemble(self, byte_array, add_new_line=False, add_descr=False, add_addr=False):
