@@ -160,7 +160,7 @@ class LoROMMemoryMapper(object):
         if   bank >= 0x00 and bank <= 0x3F:
             self.write_system(bank, offset, value)
         elif bank >= 0x40 and bank <= 0x6F:
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         elif bank >= 0x70 and bank <= 0x7D:
             self.write_SRAM_ROM(bank, offset, value)
         elif bank >= 0x7E and bank <= 0x7F:
@@ -198,7 +198,7 @@ class LoROMMemoryMapper(object):
             raise NotImplementedError()
         elif offset >= 0x8000:
             # write ROM
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         else:
             raise IllegalAddressExcpetion()
 
@@ -210,7 +210,7 @@ class LoROMMemoryMapper(object):
             self.SRAM[offset % self.SRAM_size] = value
         elif offset >= 0x8000 and offset <= 0xFFFF:
             # write ROM
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         else:
             raise IllegalAddressExcpetion()
 
@@ -230,7 +230,7 @@ class LoROMMemoryMapper(object):
             self.write_system(bank-0x80, offset, value)
         elif bank >= (0x40+0x80) and bank <= (0x6F+0x80):
             # write ROM
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         elif bank >= (0x70+0x80) and bank <= (0x7D+0x80):
             self.write_SRAM_ROM(bank-0x80, offset, value)
         elif bank >= (0x7E+0x80) and bank <= (0x7F+0x80):
@@ -245,7 +245,7 @@ class LoROMMemoryMapper(object):
                 self.SRAM[offset] = value
             elif offset >= 0x8000 and offset <= 0xFFFF:
                 # write ROM
-                raise CanNotWriteROMExcpetion()
+                raise CanNotWriteROMException()
             else:
                 raise IllegalAddressExcpetion()
         elif bank == 0xFF:
@@ -253,7 +253,7 @@ class LoROMMemoryMapper(object):
                 self.SRAM[offset] = value
             elif offset >= 0x8000 and offset <= 0xFFFF:
                 # write ROM
-                raise CanNotWriteROMExcpetion()
+                raise CanNotWriteROMException()
             else:
                 raise IllegalAddressExcpetion()
         else:
@@ -397,7 +397,7 @@ class HiROMMemoryMapper(object):
         elif bank >= 0x20 and bank <= 0x3F:
             self.write_system2(bank, offset, value)
         elif bank >= 0x40 and bank <= 0x7D:
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         elif bank >= 0x7E and bank <= 0x7F:
             self.write_RAM(bank, offset, value)
         elif bank >= 0x80 and bank <= 0xFF:
@@ -434,7 +434,7 @@ class HiROMMemoryMapper(object):
             raise NotImplementedError()
         elif offset >= 0x8000:
             # write ROM
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         else:
             raise IllegalAddressExcpetion()
 
@@ -469,7 +469,7 @@ class HiROMMemoryMapper(object):
             self.SRAM[SRAM_page % self.SRAM_size] = value
         elif offset >= 0x8000:
             # write ROM
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         else:
             raise IllegalAddressExcpetion()
 
@@ -491,9 +491,9 @@ class HiROMMemoryMapper(object):
         elif bank >= (0x20 + 0x80) and bank <= (0x3F + 0x80):
             self.write_system2(bank - 0x80, offset, value)
         elif bank >= (0x40 + 0x80) and bank <= (0x7D + 0x80):
-            raise CanNotWriteROMExcpetion()
+            raise CanNotWriteROMException()
         elif bank >= (0x7E + 0x80) and bank <= (0x7F + 0x80):
-            raise CanNotWriteROMExcpetion() # different to self.write
+            raise CanNotWriteROMException() # different to self.write
         else:
             raise IllegalAddressExcpetion()
 

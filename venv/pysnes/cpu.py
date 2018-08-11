@@ -1,4 +1,3 @@
-# TODO: the CPU is a 5A22 which is a superset of the 65816
 class CPU65816(object):
     def __init__(self, memory):
         self.A = 0   # Accumulator           - 8 or 16 Bit (also called A(8Bit) and B(next 8Bit))
@@ -22,11 +21,7 @@ class CPU65816(object):
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
         opcode = code[(self.PBR << 16) +self.PC]
-        # TODO: only emulation mode: wrapping at page boundary: see manual 5.1.1
         # this meean every address > 0xFF will be wrapped. E.g. 0xFF +1 == 0x00
-        # TODO: cycles are longer e.g. if M
-        # TODO: ignore Emulation mode for now...fix this some day
-        #print("iam:"+hex(opcode))
         # ADC #const
         # TODO: use BCD sub if D Flag is set
         if opcode == 0x69:

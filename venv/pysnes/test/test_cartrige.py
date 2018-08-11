@@ -32,3 +32,13 @@ def test_parse_header2():
     assert hex(header.addr) == '0x101c0'
     assert hex(header.makeup) == '0x31'
     assert header.reset_int_addr == '8000'
+
+
+def test_parse_header3():
+    ROM_NAME = 'ca65.smc'
+    ba = open_as_byte_array(ROM_DIR + ROM_NAME)
+    header = ROMHeader(ba)
+    assert header.name == 'CA65 EXAMPLE\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    assert hex(header.addr) == '0x7fc0'
+    assert hex(header.makeup) == '0x30'
+    assert header.reset_int_addr == '8000'

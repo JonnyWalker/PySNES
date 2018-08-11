@@ -11,8 +11,6 @@ class MemoryMock(object):
     def write(self, address, value):
         self.ram[address] = value
 
-#TODO: Write 8 Bit Tests (M=1)
-
 def test_LDA_long():
     mem = MemoryMock()
     cpu = CPU65816(mem)
