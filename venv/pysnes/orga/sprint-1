@@ -1,0 +1,28 @@
+12.08.2018. Anwesend: Sebastian, Thiemo, John
+Start 14 Uhr Ende 15 Uhr
+
+(Mein) Ziel: SNES verstehen und Lehrmaterial erstellen (z.B. Youtube Video)
+Was ist eure Motivation?
+
+Sonstiges:
+- Technik: Python 2.7.X wegen PyPy JIT, Qualität über Tests, Grafik über RSDL ?
+- Koordination über Tickets: Jeder hat ein Ticket, an diesem Thema arbeitet dann Niemand anderes.
+  Wollen zwei Personen ein Ticket zusammen machen, so sprechen sie sich selbst ab.
+- Besprecheung einmal die Woche: Ziel ist Orga und Wissensaustausch über SNES und letzte Woche.
+  Rückblick auf Tickets, Einführung für neue Team-Mitglieder und Erstellung neuer Tickets
+  Online-Besprechung von c.a. 30 Minuten
+  Bei vielen Teilnehmern auch ein Live Treffen.
+- Whatsapp Gruppe nur für Orga (möglichst wenig Nachrichten).
+- Andere Teilnehmer: Gern neue Leute zum Projekt einladen, aber bitte angenehme Persönlichkeiten die nicht nerven ;-)
+- Doku zu implementieren Sachen schreib ich im Ordner doc. Alles dort ist noch unfertig und teilweise unverständlich
+- Tests über Homebrew ROMs . KEINE ILLEGALEN ROMS hochladen!
+
+TODO:
+1. GitHub - Account erstellen, John added
+2. Installation von Python 2
+3. Installation von py.test via 'pip install pytest'
+4. Optional: Pycharm Installation
+5. Checkout von PySNES von Github
+6. Eigenen Code via Pull Request und mit Ticketnummer in Commitnachricht
+  (Um später Probleme besser nachverfolgen zu können - z.B. wo Bugs rein kamen)
+7. Download von ca65 für Homebrew Roms (siehe Homebrew.pdf)
