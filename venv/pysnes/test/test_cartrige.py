@@ -2,7 +2,7 @@ from pysnes.cartrige import ROMHeader
 from pysnes.helper import open_as_byte_array
 
 # .../PySNES/venv/$ py.test pysnes/test/
-ROM_DIR = 'pysnes/rom/'
+ROM_DIR = 'rom/'
 
 def test_parse_header0():
     ROM_NAME = 'DonkeyKongCountry.smc'
