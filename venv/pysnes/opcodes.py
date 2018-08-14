@@ -26,11 +26,13 @@ class Mode(object): # Addressing modes
     ABSOLUTE_INDEXED_INDIRECT = 23
     IMPLIED_ACCUMULATOR = 24
     BLOCK_MOVE = 25
+    IMMEDIATE_MINUS_X = 26
+    IMMEDIATE_MINUS_M = 27
 
 # The opcode map:
 # HEX: (MNEMONIC, Mode, Flags(may be set afterwards), Byte-Num, Cycles, Doc )
 # FLAGs NVMXDIZC (Negative, Overflow, A-Size, XY-Size, Decimal, IRQ Disable, Zero, Carry)
-# Native Mode A-Size = 16, X-Size = 16, Y-Size = 16
+# Native Mode A-Size = 16 or 8 , X-Size/Y-Size = 16 or 8
 # Emulation Mode A-Size = 8, X-Size = 8, Y-Size = 8
 #
 opcode_map = {
@@ -38,7 +40,7 @@ opcode_map = {
     0x63: ('ADC', Mode.STACK_RELATIVE,              0b11000011, 2, 4, 'Add With Carry'), # ADC sr, S
     0x65: ('ADC', Mode.DIRECT,                      0b11000011, 2, 3, 'Add With Carry'), # ADC dp
     0x67: ('ADC', Mode.DIRECT_INDIRECT_LONG,        0b11000011, 2, 6, 'Add With Carry'), # ADC [dp]
-    0x69: ('ADC', Mode.IMMEDIATE_8BIT,              0b11000011, 2, 2, 'Add With Carry'), # ADC #const
+    0x69: ('ADC', Mode.IMMEDIATE_MINUS_M,           0b11000011, 3, 2, 'Add With Carry'), # ADC #const
     0x6D: ('ADC', Mode.ABSOLUTE,                    0b11000011, 3, 2, 'Add With Carry'), # ADC addr
     0x6F: ('ADC', Mode.ABSOLUTE_LONG,               0b11000011, 4, 5, 'Add With Carry'), # ADC long
     0x71: ('ADC', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b11000011, 2, 5, 'Add With Carry'), # ADC (dp), Y
@@ -54,7 +56,7 @@ opcode_map = {
     0x23: ('AND', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'AND Accumulator With Memory'), # AND sr, S
     0x25: ('AND', Mode.DIRECT,                      0b10000010, 2, 3, 'AND Accumulator With Memory'), # AND dp
     0x27: ('AND', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'AND Accumulator With Memory'), # AND [dp]
-    0x29: ('AND', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'AND Accumulator With Memory'), # AND #const
+    0x29: ('AND', Mode.IMMEDIATE_MINUS_M,           0b10000010, 3, 2, 'AND Accumulator With Memory'), # AND #const
     0x2D: ('AND', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'AND Accumulator With Memory'), # AND addr
     0x2F: ('AND', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'AND Accumulator With Memory'), # AND long
     0x31: ('AND', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'AND Accumulator With Memory'), # AND (dp), Y
@@ -80,7 +82,7 @@ opcode_map = {
     0x2C: ('BIT', Mode.ABSOLUTE,                    0b11000010, 3, 4, 'Bit Test'), # BIT addr
     0x34: ('BIT', Mode.DIRECT_INDEXED_WITH_X,       0b11000010, 2, 4, 'Bit Test'), # Bit dp, X
     0x3C: ('BIT', Mode.ABSOLUTE_INDEXED_WITH_X,     0b11000010, 3, 4, 'Bit Test'), # Bit addr, X
-    0x89: ('BIT', Mode.IMMEDIATE_8BIT,              0b00000010, 2, 2, 'Bit Test'), # Bit #const
+    0x89: ('BIT', Mode.IMMEDIATE_MINUS_M,           0b00000010, 3, 2, 'Bit Test'), # Bit #const
 
     0x30: ('BMI', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Minus'), # BMI nearlabel
     0xD0: ('BNE', Mode.RELATIVE,                    0b00000000, 2, 2, 'Branch if Not Eqaul'), # BNE nearlabel
@@ -100,7 +102,7 @@ opcode_map = {
     0xC3: ('CMP', Mode.STACK_RELATIVE,              0b10000011, 2, 4, 'Compare Accumulator With Meomry'), # CMP sr, S
     0xC5: ('CMP', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Accumulator With Meomry'), # CMP dp
     0xC7: ('CMP', Mode.DIRECT_INDIRECT_LONG,        0b10000011, 2, 6, 'Compare Accumulator With Meomry'), # CMP [dp]
-    0xC9: ('CMP', Mode.IMMEDIATE_8BIT,              0b10000011, 2, 2, 'Compare Accumulator With Meomry'), # CMP #const
+    0xC9: ('CMP', Mode.IMMEDIATE_MINUS_M,           0b10000011, 3, 2, 'Compare Accumulator With Meomry'), # CMP #const
     0xCD: ('CMP', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Accumulator With Meomry'), # CMP addr
     0xCF: ('CMP', Mode.ABSOLUTE_LONG,               0b10000011, 4, 5, 'Compare Accumulator With Meomry'), # CMP long
     0xD1: ('CMP', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000011, 2, 5, 'Compare Accumulator With Meomry'), # CMP (dp), Y
@@ -114,10 +116,10 @@ opcode_map = {
 
     0x02: ('COP', Mode.IMPLIED,                     0b00001100, 2, 7, 'Co-Processor Enable'), # COP #const
 
-    0xE0: ('CPX', Mode.IMMEDIATE_8BIT,              0b10000011, 2, 2, 'Compare Index Register X With Memory'), # CPX #const
+    0xE0: ('CPX', Mode.IMMEDIATE_MINUS_X,           0b10000011, 3, 2, 'Compare Index Register X With Memory'), # CPX #const
     0xE4: ('CPX', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Index Register X With Memory'), # CPX dp
     0xEC: ('CPX', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Index Register X With Memory'), # CPX addr
-    0xC0: ('CPY', Mode.IMMEDIATE_8BIT,              0b10000011, 2, 2, 'Compare Index Register Y With Memory'), # CPY #const
+    0xC0: ('CPY', Mode.IMMEDIATE_MINUS_X,           0b10000011, 3, 2, 'Compare Index Register Y With Memory'), # CPY #const
     0xC4: ('CPY', Mode.DIRECT,                      0b10000011, 2, 3, 'Compare Index Register Y With Memory'), # CPY dp
     0xCC: ('CPY', Mode.ABSOLUTE,                    0b10000011, 3, 4, 'Compare Index Register Y With Memory'), # CPY addr
 
@@ -126,14 +128,14 @@ opcode_map = {
     0xCE: ('DEC', Mode.ABSOLUTE,                    0b10000010, 3, 6, 'Decrecment'), # DEC addr
     0xD6: ('DEC', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 6, 'Decrecment'), # DEC dp, X
     0xDE: ('DEC', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 7, 'Decrecment'), # DEC addr, X
-    0xCA: ('DEC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEX
-    0x88: ('DEC', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEY
+    0xCA: ('DEX', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEX
+    0x88: ('DEY', Mode.IMPLIED,                     0b10000010, 1, 2, 'Decrecment'), # DEY
 
     0x41: ('EOR', Mode.DIRECT_INDEXED_INDIRECT_X,   0b10000010, 2, 6, 'XOR Accumulator With Memory'), # EOR (dp, X)
     0x43: ('EOR', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'XOR Accumulator With Memory'), # EOR sr, S
     0x45: ('EOR', Mode.DIRECT,                      0b10000010, 2, 3, 'XOR Accumulator With Memory'), # EOR dp
     0x47: ('EOR', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'XOR Accumulator With Memory'), # EOR [dp]
-    0x49: ('EOR', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'XOR Accumulator With Memory'), # EOR #const
+    0x49: ('EOR', Mode.IMMEDIATE_MINUS_M,           0b10000010, 3, 2, 'XOR Accumulator With Memory'), # EOR #const
     0x4D: ('EOR', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'XOR Accumulator With Memory'), # EOR addr
     0x4F: ('EOR', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'XOR Accumulator With Memory'), # EOR long
     0x51: ('EOR', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'XOR Accumulator With Memory'), # EOR (dp), Y
@@ -166,7 +168,7 @@ opcode_map = {
     0xA3: ('LDA', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'Load Accumulator With Memory'),  # LDA sr, S
     0xA5: ('LDA', Mode.DIRECT,                      0b10000010, 2, 3, 'Load Accumulator With Memory'),  # LDA dp
     0xA7: ('LDA', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'Load Accumulator With Memory'),  # LDA [dp]
-    0xA9: ('LDA', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Accumulator With Memory'),  # LDA #const
+    0xA9: ('LDA', Mode.IMMEDIATE_MINUS_M,           0b10000010, 3, 2, 'Load Accumulator With Memory'),  # LDA #const
     0xAD: ('LDA', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr
     0xAF: ('LDA', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'Load Accumulator With Memory'),  # LDA long
     0xB1: ('LDA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'Load Accumulator With Memory'),  # LDA (dp), Y
@@ -177,12 +179,12 @@ opcode_map = {
     0xB9: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, Y
     0xBD: ('LDA', Mode.ABSOLUTE_INDEXED_WITH_X,     0b10000010, 3, 4, 'Load Accumulator With Memory'),  # LDA addr, X
     0xBF: ('LDA', Mode.ABSOLUTE_INDEXED_LONG_X,     0b10000010, 4, 5, 'Load Accumulator With Memory'),  # LDA long, X
-    0xA2: ('LDX', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Index Register X from Memory'), # LDX # const
+    0xA2: ('LDX', Mode.IMMEDIATE_MINUS_X,           0b10000010, 3, 2, 'Load Index Register X from Memory'), # LDX # const
     0xA6: ('LDX', Mode.DIRECT,                      0b10000010, 2, 3, 'Load Index Register X from Memory'), # LDX dp
     0xAE: ('LDX', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'Load Index Register X from Memory'), # LDX addr
     0xB6: ('LDX', Mode.DIRECT_INDEXED_WITH_Y,       0b10000010, 2, 4, 'Load Index Register X from Memory'), # LDX dp, Y
     0xBE: ('LDX', Mode.ABSOLUTE_INDEXED_WITH_Y,     0b10000010, 3, 4, 'Load Index Register X from Memory'), # LDX addr, Y
-    0xA0: ('LDY', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'Load Index Register Y from Memory'),  # LDY # const
+    0xA0: ('LDY', Mode.IMMEDIATE_MINUS_X,           0b10000010, 3, 2, 'Load Index Register Y from Memory'),  # LDY # const
     0xA4: ('LDY', Mode.DIRECT,                      0b10000010, 2, 3, 'Load Index Register Y from Memory'),  # LDY dp
     0xAC: ('LDY', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'Load Index Register Y from Memory'),  # LDY addr
     0xB4: ('LDY', Mode.DIRECT_INDEXED_WITH_X,       0b10000010, 2, 4, 'Load Index Register Y from Memory'),  # LDY dp, Y
@@ -203,7 +205,7 @@ opcode_map = {
     0x03: ('ORA', Mode.STACK_RELATIVE,              0b10000010, 2, 4, 'OR Accumulator With Memory'),  # ORA sr, S
     0x05: ('ORA', Mode.DIRECT,                      0b10000010, 2, 3, 'OR Accumulator With Memory'),  # ORA dp
     0x07: ('ORA', Mode.DIRECT_INDIRECT_LONG,        0b10000010, 2, 6, 'OR Accumulator With Memory'),  # ORA [dp]
-    0x09: ('ORA', Mode.IMMEDIATE_8BIT,              0b10000010, 2, 2, 'OR Accumulator With Memory'),  # ORA #const
+    0x09: ('ORA', Mode.IMMEDIATE_MINUS_M,           0b10000010, 3, 2, 'OR Accumulator With Memory'),  # ORA #const
     0x0D: ('ORA', Mode.ABSOLUTE,                    0b10000010, 3, 4, 'OR Accumulator With Memory'),  # ORA addr
     0x0F: ('ORA', Mode.ABSOLUTE_LONG,               0b10000010, 4, 5, 'OR Accumulator With Memory'),  # ORA long
     0x11: ('ORA', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b10000010, 2, 5, 'OR Accumulator With Memory'),  # ORA (dp), Y
@@ -252,7 +254,7 @@ opcode_map = {
     0xE3: ('SBC', Mode.STACK_RELATIVE,              0b11000010, 2, 4, 'Subtract With Borrow From Accumulator'),  # SBC sr, S
     0xE5: ('SBC', Mode.DIRECT,                      0b11000010, 2, 3, 'Subtract With Borrow From Accumulator'),  # SBC dp
     0xE7: ('SBC', Mode.DIRECT_INDIRECT_LONG,        0b11000010, 2, 6, 'Subtract With Borrow From Accumulator'),  # SBC [dp]
-    0xE9: ('SBC', Mode.IMMEDIATE_8BIT,              0b11000010, 2, 2, 'Subtract With Borrow From Accumulator'),  # SBC #const
+    0xE9: ('SBC', Mode.IMMEDIATE_MINUS_M,           0b11000010, 3, 2, 'Subtract With Borrow From Accumulator'),  # SBC #const
     0xED: ('SBC', Mode.ABSOLUTE,                    0b11000010, 3, 4, 'Subtract With Borrow From Accumulator'),  # SBC addr
     0xEF: ('SBC', Mode.ABSOLUTE_LONG,               0b11000010, 4, 5, 'Subtract With Borrow From Accumulator'),  # SBC long
     0xF1: ('SBC', Mode.DIRECT_INDIRECT_INDEXED_Y,   0b11000010, 2, 5, 'Subtract With Borrow From Accumulator'),  # SBC (dp), Y
