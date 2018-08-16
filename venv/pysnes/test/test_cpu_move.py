@@ -1639,6 +1639,285 @@ def test_STY_DP_indexed_X_wrapping_8BIT():
     assert cpu.P == 0b00010000 # no change
 
 
+def test_STZ_DP():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.e = 0
+    mem.write(0x001234, 0xAB)
+    mem.write(0x001235, 0xCD)
+    cpu.DP = 0x1200
+
+    cpu.fetch_decode_execute([0x64, 0x34])
+    assert cpu.cycles in (4, 5)
+    assert mem.read(0x001234) == 0x00
+    assert mem.read(0x001235) == 0x00
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_DP_8Bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000  # 8 Bit mode
+    cpu.e = 0
+    mem.write(0x001234, 0xAB)
+    mem.write(0x001235, 0xCD)
+    cpu.DP = 0x1200
+
+    cpu.fetch_decode_execute([0x64, 0x34])
+    assert cpu.cycles in (3, 4)
+    assert mem.read(0x001234) == 0x00
+    assert mem.read(0x001235) == 0xCD
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_DP_wrapping():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.e = 0
+    mem.write(0x000000, 0xCD)
+    mem.write(0x00FFFF, 0xAB)
+    mem.write(0x010000, 0xEF)
+    cpu.DP = 0xFF00
+
+    cpu.fetch_decode_execute([0x64, 0xFF])
+    assert cpu.cycles in (4, 5)
+    assert mem.read(0x000000) == 0x00
+    assert mem.read(0x00FFFF) == 0x00 # zero bank wrapping!
+    assert mem.read(0x010000) == 0xEF # Bug if this is zero
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_DP_wrapping_8Bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000  # 8 Bit mode
+    cpu.e = 0
+    mem.write(0x000000, 0xCD)
+    mem.write(0x00FFFF, 0xAB)
+    mem.write(0x010000, 0xEF)
+    cpu.DP = 0xFF00
+
+    cpu.fetch_decode_execute([0x64, 0xFF])
+    assert cpu.cycles in (3, 4)
+    assert mem.read(0x000000) == 0xCD
+    assert mem.read(0x00FFFF) == 0x00 # zero bank wrapping!
+    assert mem.read(0x010000) == 0xEF # Bug if this is zero
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_DP_indexed_X():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80  # should have no effect
+    cpu.DP = 0x0020
+    cpu.X = 0x0004
+
+    mem.write(0x000054, 0xAB)
+    mem.write(0x000055, 0xCD)
+    cpu.fetch_decode_execute([0x74, 0x30])
+    assert cpu.cycles in (5, 6)
+    assert mem.read(0x000054) == 0x00
+    assert mem.read(0x000055) == 0x00
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_DP_indexed_X_8BIT():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000 # 8 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80  # should have no effect
+    cpu.DP = 0x0020
+    cpu.X = 0x0004
+
+    mem.write(0x000054, 0xAB)
+    mem.write(0x000055, 0xCD)
+    cpu.fetch_decode_execute([0x74, 0x30])
+    assert cpu.cycles in (4, 5)
+    assert mem.read(0x000054) == 0x00
+    assert mem.read(0x000055) == 0xCD
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_DP_indexed_X_wrapped():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80 # should have no effect
+    cpu.DP = 0xFF00
+    cpu.X = 0x000A
+
+    mem.write(0x000008, 0xAB)
+    mem.write(0x000009, 0xCD)
+    cpu.fetch_decode_execute([0x74, 0xFE])
+    assert cpu.cycles in (5, 6)
+    assert mem.read(0x000008) == 0x00
+    assert mem.read(0x000009) == 0x00
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_DP_indexed_X_wrapped_8Bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000 # 8 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80 # should have no effect
+    cpu.DP = 0xFF00
+    cpu.X = 0x000A
+
+    mem.write(0x000008, 0xAB)
+    mem.write(0x000009, 0xCD)
+    cpu.fetch_decode_execute([0x74, 0xFE])
+    assert cpu.cycles in (4, 5)
+    assert mem.read(0x000008) == 0x00
+    assert mem.read(0x000009) == 0xCD
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_absolute():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x123456, 0xAB)
+    mem.write(0x123457, 0xCD)
+
+    cpu.fetch_decode_execute([0x9C, 0x56, 0x34])
+
+    assert cpu.cycles == 5
+    assert mem.read(0x123456) == 0x00
+    assert mem.read(0x123457) == 0x00
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_absolute_8Bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x123456, 0xAB)
+    mem.write(0x123457, 0xCD)
+
+    cpu.fetch_decode_execute([0x9C, 0x56, 0x34])
+
+    assert cpu.cycles == 4
+    assert mem.read(0x123456) == 0x00
+    assert mem.read(0x123457) == 0xCD
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_absolute_no_wrapping():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x12FFFF, 0xAB)
+    mem.write(0x130000, 0xCD)
+
+    cpu.fetch_decode_execute([0x9C, 0xFF, 0xFF])
+
+    assert cpu.cycles == 5
+    assert mem.read(0x12FFFF) == 0x00 # no wrapping
+    assert mem.read(0x130000) == 0x00
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_absolute_no_wrapping_8BIT():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000  # 8 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x12FFFF, 0xAB)
+    mem.write(0x130000, 0xCD)
+
+    cpu.fetch_decode_execute([0x9C, 0xFF, 0xFF])
+
+    assert cpu.cycles == 4
+    assert mem.read(0x12FFFF) == 0x00  # no wrapping
+    assert mem.read(0x130000) == 0xCD
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_abs_indexed_X():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80
+    cpu.X = 0x0001
+    mem.write(0x808001, 0xAB)
+    mem.write(0x808002, 0xCD)
+
+    cpu.fetch_decode_execute([0x9E, 0x00, 0x80])
+    assert cpu.cycles == 6
+    assert mem.read(0x808001) == 0x00 # no wrapping
+    assert mem.read(0x808002) == 0x00
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_abs_indexed_X_8BIT():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80
+    cpu.X = 0x0001
+    mem.write(0x808001, 0xAB)
+    mem.write(0x808002, 0xCD)
+
+    cpu.fetch_decode_execute([0x9E, 0x00, 0x80])
+
+    assert cpu.cycles == 5
+    assert mem.read(0x808001) == 0x00 # no wrapping
+    assert mem.read(0x808002) == 0xCD
+    assert cpu.P == 0b00100000
+
+
+def test_STZ_abs_indexed_X_no_wrapping():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    cpu.X = 0x000A
+    mem.write(0x130008, 0xAB)
+    mem.write(0x130009, 0xCD)
+
+    cpu.fetch_decode_execute([0x9E, 0xFE, 0xFF])
+
+    assert mem.read(0x130008) == 0x00 # no wrapping
+    assert mem.read(0x130009) == 0x00
+    assert cpu.cycles == 6
+    assert cpu.P == 0b00000000
+
+
+def test_STZ_abs_indexed_X_no_wrapping_8BIT():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00100000 # 8 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    cpu.X = 0x000A
+    mem.write(0x130008, 0xAB)
+    mem.write(0x130009, 0xCD)
+
+    cpu.fetch_decode_execute([0x9E, 0xFE, 0xFF])
+
+    assert mem.read(0x130008) == 0x00 # no wrapping
+    assert mem.read(0x130009) == 0xCD
+    assert cpu.cycles == 5
+    assert cpu.P == 0b00100000
+
+
 def test_LDA_long():
     mem = MemoryMock()
     cpu = CPU65816(mem)
