@@ -687,7 +687,8 @@ class CPU65816(object):
         # STA (stk, S), Y
         elif opcode == 0x93:
             addr = self.fetch_byte(code)
-            addr2 = self.read_memory((addr + self.SP) & 0xFFFF, byte_num=2)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2)
             wrapped_addr = self.compute_wrapped_addr(addr2 + self.Y)
             self.write_memory((self.DBR << 16) + wrapped_addr, self.A, byte_num = 2 - self.m())
             self.cycles += 8 - self.m()
@@ -763,6 +764,31 @@ class CPU65816(object):
             self.write_memory(wrapped_addr, self.Y, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
+        # STZ dp
+        elif opcode == 0x64:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP) # direct page wrapping
+            self.write_memory(wrapped_addr, 0x00, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            self.cycles += 4 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # STZ dp, X
+        elif opcode == 0x74:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
+            self.write_memory(wrapped_addr, 0x00, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            self.cycles += 5 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # STZ abs
+        elif opcode == 0x9C:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            self.write_memory((self.DBR << 16) + addr, 0x00, byte_num=2 - self.m())
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # STZ abs, X
+        elif opcode == 0x9E:
+            addr = self.fetch_twobyte(code) # no wrapping
+            self.write_memory((self.DBR << 16) + addr + self.X, 0x00,  byte_num = 2 - self.m())
+            self.cycles += 6 - self.m()
         # TAX
         elif opcode == 0x78:
             self.compute_flags(self.A, self.isM())
