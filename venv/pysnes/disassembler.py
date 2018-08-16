@@ -1,7 +1,7 @@
-from opcodes import opcode_map
+from opcodes import opcode_map, Mode
 
 class Disassembler(object):
-    def disassemble(self, byte_array, add_new_line=False, add_descr=False, add_addr=False):
+    def disassemble(self, byte_array, add_new_line=False, add_descr=False, add_addr=False, M=False, X=False):
         index = 0
         symbolic = []
         while index < len(byte_array):
@@ -25,6 +25,28 @@ class Disassembler(object):
                 immediate8bit = byte_array[index]
                 symbolic.append(hex(immediate8bit))
                 index = index + 1
+            elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_M:
+                if M:
+                    immediate8bit = byte_array[index]
+                    symbolic.append(hex(immediate8bit))
+                    index = index + 1
+                else:
+                    addr = byte_array[index]
+                    index = index + 1
+                    addr = addr + (byte_array[index] << 8)
+                    index = index + 1
+                    symbolic.append(hex(addr))
+            elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_X:
+                if X:
+                    immediate8bit = byte_array[index]
+                    symbolic.append(hex(immediate8bit))
+                    index = index + 1
+                else:
+                    addr = byte_array[index]
+                    index = index + 1
+                    addr = addr + (byte_array[index] << 8)
+                    index = index + 1
+                    symbolic.append(hex(addr))
             elif length == 3:
                 addr = byte_array[index]
                 index = index + 1
@@ -51,7 +73,7 @@ class Disassembler(object):
         return symbolic
 
     def print_assembler(self, ba, start, end):
-        symbolic_code = self.disassemble(ba[start:end], True, True, True)
+        symbolic_code = self.disassemble(ba[start:end], True, True, True, True, False)
         i = 0
         print
         print("Assembly:")
