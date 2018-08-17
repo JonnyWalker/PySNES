@@ -206,22 +206,60 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # DEC A
         elif opcode == 0x3A:
-            result = self.A -1
+            result = self.sub_twos_complement(self.A, 1, is8BitMode = self.isM())
             self.compute_flags(result, self.isM())
             self.A = result
             self.cycles += 2
             self.PC = self.PC + 1
+        # DEC dp
+        elif opcode == 0xC6:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP) # direct page wrapping
+            mem_value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            result = self.sub_twos_complement(mem_value, 1, is8BitMode = self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory(wrapped_addr, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
+            self.cycles += 7 - self.m()*2 + self.w()
+            self.PC = self.PC + 1
+        # DEC abs
+        elif opcode == 0xCE:
+            addr = self.fetch_twobyte(code) # no wrapping
+            mem_value = self.read_memory((self.DBR << 16) + addr, byte_num = 2 - self.m()) # no wrapping
+            result = self.sub_twos_complement(mem_value, 1, is8BitMode = self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory((self.DBR << 16) + addr, result, byte_num = 2 - self.m()) # no wrapping
+            self.cycles += 8 - self.m() * 2
+            self.PC = self.PC + 1
+        # DEC dp, X
+        elif opcode == 0xD6:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X) # direct page wrapping
+            mem_value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            result = self.sub_twos_complement(mem_value, 1, is8BitMode = self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory(wrapped_addr, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
+            self.cycles += 8 - self.m() * 2 + self.w()
+            self.PC = self.PC + 1
+        # DEC abs, X
+        elif opcode == 0xDE:
+            addr = self.fetch_twobyte(code) # no wrapping
+            mem_value = self.read_memory((self.DBR << 16) + (addr + self.X), byte_num = 2 - self.m())
+            result = self.sub_twos_complement(mem_value, 1, is8BitMode=self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory((self.DBR << 16) + (addr + self.X), result, byte_num = 2 - self.m())
+            self.cycles += 9 - self.m() * 2
+            self.PC = self.PC + 1
         # DEX
         elif opcode == 0xCA:
-            result = self.X -1
-            self.compute_flags(result, self.isM())
+            result = self.sub_twos_complement(self.X, 1, is8BitMode = self.isX())
+            self.compute_flags(result, self.isX())
             self.X = result
             self.cycles += 2
             self.PC = self.PC + 1
         # DEY
         elif opcode == 0x88:
-            result = self.Y -1
-            self.compute_flags(result, self.isM())
+            result = self.sub_twos_complement(self.Y, 1, is8BitMode = self.isX())
+            self.compute_flags(result, self.isX())
             self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
@@ -815,6 +853,18 @@ class CPU65816(object):
         else:
             print("unkown opcode:", opcode)
             raise NotImplementedError()
+
+
+    # compute twos complement by hand.
+    def sub_twos_complement(self, value, arg, is8BitMode):
+        if value - arg < 0:
+            if is8BitMode:
+                result = 0xFF - arg + 1
+            else:
+                result = 0xFFFF - arg + 1
+        else:
+            result = value - arg
+        return result
 
 
     # some addresses are wrapped at the bank XX boundery (64 KB - 16 Bit addr)
