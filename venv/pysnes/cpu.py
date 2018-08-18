@@ -273,9 +273,61 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # INC A
         elif opcode == 0x1A:
-            result = self.A + 1
+            result = self.add_twos_complement(self.A, 1, is8BitMode = self.isM())
             self.compute_flags(result, self.isM())
             self.A = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # INC dp
+        elif opcode == 0xE6:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP) # direct page wrapping
+            mem_value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            result = self.add_twos_complement(mem_value, 1, is8BitMode = self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory(wrapped_addr, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
+            self.cycles += 7 - self.m()*2 + self.w()
+            self.PC = self.PC + 1
+        # INC abs
+        elif opcode == 0xEE:
+            addr = self.fetch_twobyte(code) # no wrapping
+            mem_value = self.read_memory((self.DBR << 16) + addr, byte_num = 2 - self.m()) # no wrapping
+            result = self.add_twos_complement(mem_value, 1, is8BitMode = self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory((self.DBR << 16) + addr, result, byte_num = 2 - self.m()) # no wrapping
+            self.cycles += 8 - self.m() * 2
+            self.PC = self.PC + 1
+        # INC dp, X
+        elif opcode == 0xF6:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X) # direct page wrapping
+            mem_value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            result = self.add_twos_complement(mem_value, 1, is8BitMode = self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory(wrapped_addr, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
+            self.cycles += 8 - self.m() * 2 + self.w()
+            self.PC = self.PC + 1
+        # INC abs, X
+        elif opcode == 0xFE:
+            addr = self.fetch_twobyte(code) # no wrapping
+            mem_value = self.read_memory((self.DBR << 16) + (addr + self.X), byte_num = 2 - self.m())
+            result = self.add_twos_complement(mem_value, 1, is8BitMode=self.isM())
+            self.compute_flags(result, self.isM())
+            self.write_memory((self.DBR << 16) + (addr + self.X), result, byte_num = 2 - self.m())
+            self.cycles += 9 - self.m() * 2
+            self.PC = self.PC + 1
+        # INX
+        elif opcode == 0xE8:
+            result = self.add_twos_complement(self.X, 1, is8BitMode = self.isX())
+            self.compute_flags(result, self.isX())
+            self.X = result
+            self.cycles += 2
+            self.PC = self.PC + 1
+        # INY
+        elif opcode == 0xC8:
+            result = self.add_twos_complement(self.Y, 1, is8BitMode = self.isX())
+            self.compute_flags(result, self.isX())
+            self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
         # JMP addr
@@ -857,15 +909,24 @@ class CPU65816(object):
 
     # compute twos complement by hand.
     def sub_twos_complement(self, value, arg, is8BitMode):
-        if value - arg < 0:
-            if is8BitMode:
-                result = 0xFF - arg + 1
-            else:
-                result = 0xFFFF - arg + 1
+        if is8BitMode:
+            result = (value + -arg) & 0x0000FF
         else:
-            result = value - arg
+            result = (value + -arg) & 0x00FFFF
         return result
 
+
+    # compute twos complement by hand.
+    def add_twos_complement(self, value, arg, is8BitMode):
+        if is8BitMode:
+            if value <= 0x7F and value + arg > 0x7F: # MAX_INT
+                self.setV() # Overflow Flag
+            result = (value + arg) & 0x0000FF
+        else:
+            if value <= 0x7FFF and value + arg > 0x7FFF: # MAX_INT
+                self.setV()  # Overflow Flag
+            result = (value + arg) & 0x00FFFF
+        return result
 
     # some addresses are wrapped at the bank XX boundery (64 KB - 16 Bit addr)
     # so if you read two bytes from XXFFFF the second byte will be read
