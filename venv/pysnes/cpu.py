@@ -51,10 +51,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isC():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BCS nearlabel
@@ -62,10 +59,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isC():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BEQ nearlabel
@@ -73,10 +67,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isZ():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BIT dp
@@ -95,10 +86,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if self.isN():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BNE nearlabel
@@ -106,10 +94,7 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isZ():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BPL nearlabel
@@ -117,20 +102,14 @@ class CPU65816(object):
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
             if not self.isN():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BRA nearlabel
         elif opcode == 0x80:
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
-            if nearlabel & 0b10000000 == 0:
-                self.PC += nearlabel
-            else:
-                self.PC = (self.PC - nearlabel) & 0xFFFF
+            self.PC = self.computeBXX(nearlabel)
          # BRL label
         elif opcode == 0x82:
             label = self.fetch_twobyte(code)
@@ -140,22 +119,16 @@ class CPU65816(object):
         elif opcode == 0x50:
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
-            if self.isV():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+            if not self.isV():
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # BVS nearlabel
         elif opcode == 0x70:
             nearlabel = self.fetch_byte(code)
             self.cycles += 2
-            if not self.isV():
-                if nearlabel & 0b10000000 == 0:
-                    self.PC += nearlabel
-                else:
-                    self.PC = (self.PC - nearlabel) & 0xFFFF
+            if self.isV():
+                self.PC = self.computeBXX(nearlabel)
             else:
                 self.PC = self.PC + 1
         # CLC
@@ -907,6 +880,17 @@ class CPU65816(object):
             raise NotImplementedError()
 
 
+    # used by BXX opcodes.
+    def computeBXX(self, nearlabel):
+        self.cycles += 1  # branch is taken
+        if 0x80 <= nearlabel and nearlabel <= 0xFF:
+            nextPC = self.PC - 255 + nearlabel
+        else:
+            nextPC = self.PC + 1 + nearlabel
+        if self.e == 1:
+            self.cycles += self.p(self.PC + 1, nextPC)  # page boundary check
+        return nextPC
+
     # compute twos complement by hand.
     def sub_twos_complement(self, value, arg, is8BitMode):
         if is8BitMode:
@@ -1042,8 +1026,11 @@ class CPU65816(object):
         else:
             return 0
 
-    # TODO: 1 if page boundary is crossed, 0 otherwise
-    def p(self):
+    # TODO: what is old and new page in instructions like LDA? Remove 0x0 hack
+    # 1 if page boundary is crossed, 0 otherwise
+    def p(self, old_page=0x0, new_page=0x0):
+        if not (old_page & 0x00FF00) == (new_page & 0x00FF00):
+            return 1
         return 0
 
     def x(self):
