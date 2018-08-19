@@ -308,6 +308,57 @@ class CPU65816(object):
             label = self.fetch_twobyte(code)
             self.cycles += 3
             self.PC = label
+        # JMP long
+        elif opcode == 0x5C:
+            label = self.fetch_twobyte(code)
+            bank = self.fetch_byte(code)
+            self.PBR = bank
+            self.cycles += 4
+            self.PC = label
+        # JMP (addr)
+        elif opcode == 0x6C:
+            addr = self.fetch_twobyte(code)
+            label = self.read_memory((0x0 << 16) + addr, byte_num = 2, wrapp=True) # zero bank wrapping!
+            self.cycles += 5
+            self.PC = label
+        # JMP (addr, X)
+        elif opcode == 0x7C:
+            addr = self.fetch_twobyte(code)
+            wrapped_addr = (addr + self.X) & 0xFFFF
+            label = self.read_memory((self.DBR << 16) + wrapped_addr, byte_num = 2, wrapp=True) # zero bank wrapping!
+            self.cycles += 6
+            self.PC = label
+        # JMP [addr]
+        elif opcode == 0xDC:
+            addr = self.fetch_twobyte(code)
+            label = self.read_memory((0x0 << 16) + addr, byte_num = 3, wrapp=True) # zero bank wrapping!
+            self.PBR = (label & 0xFF0000) >> 16
+            self.cycles += 6
+            self.PC = label & 0x00FFFF
+        # JSL long
+        elif opcode == 0x22:
+            self.memory.write(self.SP, self.PBR)
+            self.SP = self.SP - 1
+            self.push_stack(self.PC + 2)  # save return addr
+            label = self.fetch_twobyte(code)
+            bank = self.fetch_byte(code)
+            self.PBR = bank
+            self.cycles += 8
+            self.PC = label
+        # JSR addr
+        elif opcode == 0x20:
+            self.push_stack(self.PC + 2) # save return addr
+            label = self.fetch_twobyte(code)
+            self.cycles += 6
+            self.PC = label
+        # JSR (addr, X)
+        elif opcode == 0xFC:
+            self.push_stack(self.PC + 2)  # save return addr
+            addr = self.fetch_twobyte(code)
+            wrapped_addr = (addr + self.X) & 0xFFFF
+            label = self.read_memory((self.DBR << 16) + wrapped_addr, byte_num = 2, wrapp=True) # zero bank wrapping!
+            self.cycles += 8
+            self.PC = label
         # LDA (dp, X)
         elif opcode == 0xA1:
             addr = self.fetch_byte(code)
@@ -869,38 +920,35 @@ class CPU65816(object):
         return addr & 0x00FFFF
 
     def fetch_byte(self, code):
-        # TODO: use PBR
         self.PC = self.PC + 1
-        return code[self.PC]
+        return code[(self.PBR << 16) +self.PC]
 
     # little endian
     def fetch_twobyte(self, code):
-        # TODO: use PBR
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = code[self.PC]
+        addr = code[(self.PBR << 16) +self.PC]
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = addr + (code[self.PC] << 8)
+        addr = addr + (code[(self.PBR << 16) +self.PC] << 8)
         return addr
 
     # little endian
     def fetch_threebyte(self, code):
-        # TODO: use PBR
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = code[self.PC]
+        addr = code[(self.PBR << 16) +self.PC]
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = addr + (code[self.PC] << 8)
+        addr = addr + (code[(self.PBR << 16) +self.PC] << 8)
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = addr + (code[self.PC] << 16)
+        addr = addr + (code[(self.PBR << 16) +self.PC] << 16)
         return addr
 
     def read_memory(self, address, byte_num, wrapp=False):
@@ -939,9 +987,9 @@ class CPU65816(object):
                 self.memory.write(address + 1, (value & 0xFF00) >> 8)
 
     def push_stack(self, value):
-        self.memory.write(self.SP, value & 0x00FF)
-        self.SP = self.SP - 1
         self.memory.write(self.SP, (value & 0xFF00) >> 8)
+        self.SP = self.SP - 1
+        self.memory.write(self.SP, value & 0x00FF)
         self.SP = self.SP - 1
 
     def pop_stack(self):
