@@ -710,7 +710,7 @@ def test_STA_stack_relative_indirect_indexed_Y():
     cpu.e = 0
     cpu.SP = 0xFF10
     cpu.Y = 0x50
-    cpu.DBR = 0x13
+    cpu.DBR = 0x12
     mem.write(0x00000A, 0xF0) # 0x1000A becomes 0x000A
     mem.write(0x00000B, 0xFF) # 0x1000B becomes 0x000B
     mem.write(0x130040, 0x00)
@@ -733,7 +733,7 @@ def test_STA_stack_relative_indirect_indexed_Y_8BIT():
     cpu.e = 0
     cpu.SP = 0xFF10
     cpu.Y = 0x50
-    cpu.DBR = 0x13
+    cpu.DBR = 0x12
     mem.write(0x00000A, 0xF0) # 0x1000A becomes 0x000A
     mem.write(0x00000B, 0xFF) # 0x1000B becomes 0x000B
     mem.write(0x130040, 0x00)
@@ -2484,7 +2484,7 @@ def test_LDA_stack_relative_indirect_indexed_Y():
     cpu.e = 0
     cpu.SP = 0xFF10
     cpu.Y = 0x50
-    cpu.DBR = 0x13
+    cpu.DBR = 0x12
 
     mem.write(0x00000A, 0xF0) # 0x1000A becomes 0x000A
     mem.write(0x00000B, 0xFF) # 0x1000B becomes 0x000B

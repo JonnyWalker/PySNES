@@ -398,8 +398,7 @@ class CPU65816(object):
             addr = self.fetch_byte(code)
             wrapped_stack_addr = self.compute_wrapped_addr(addr + self.SP)
             addr2 = self.read_memory(wrapped_stack_addr, byte_num=2)
-            wrapped_addr = self.compute_wrapped_addr(addr2 + self.Y)
-            value = self.read_memory((self.DBR << 16) + wrapped_addr, byte_num = 2 - self.m())
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 8 - self.m()
@@ -699,8 +698,7 @@ class CPU65816(object):
             addr = self.fetch_byte(code)
             wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
             addr2 = self.read_memory(wrapped_addr, byte_num=2)
-            wrapped_addr = self.compute_wrapped_addr(addr2 + self.Y)
-            self.write_memory((self.DBR << 16) + wrapped_addr, self.A, byte_num = 2 - self.m())
+            self.write_memory((self.DBR << 16) + addr2 + self.Y, self.A, byte_num = 2 - self.m())
             self.cycles += 8 - self.m()
             self.PC = self.PC + 1
         # STA dp, X
