@@ -9,7 +9,7 @@ class ROMHeader(object):
         32: "LoROM",            # 0x20
         33: "HiROM",            # 0x21
         35: "SA-1ROM",          # 0x23
-        48: "LiROM / FastROM",  # 0x30
+        48: "LoROM / FastROM",  # 0x30
         49: "HiROM / FastROM",  # 0x31
         50: "ExLoROM",          # 0x32
         53: "ExHiROM"           # 0x35
