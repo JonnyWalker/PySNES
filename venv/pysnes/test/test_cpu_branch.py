@@ -2,6 +2,11 @@ from pysnes.cpu import CPU65816
 
 # .../PySNES/venv/$ py.test pysnes/test/
 
+# cycles = 2+t+t*e*p
+# t = branch taken
+# e = emulation mode
+# p = page crossed
+
 # jump if C==0 to PC + 2 + OFFSET
 def test_BCC_forward():
     cpu = CPU65816(None)
@@ -530,7 +535,8 @@ def test_BRA_wrapped_execution():
     assert cpu.cycles == 3
     assert (cpu.PC & 0xFFFF) == 1 # 65520 + 2 + 16
 
-
+# maybe wrong example at http://www.6502.org/tutorials/65c816opcodes.html#6.2.1.2
+# maybe $C045 must be $0042
 # jump to PC + 3 + OFFSET
 def test_BRL_forward():
     cpu = CPU65816(None)
@@ -539,7 +545,7 @@ def test_BRL_forward():
     cpu.fetch_decode_execute([0x82, 0x05, 0x00])
     assert cpu.P == 0b00000000
     assert cpu.cycles == 4
-    assert cpu.PC == 7 # 0 + 2 + 5
+    assert cpu.PC == 8 # 0 + 3 + 5
 
 
 # jump to PC + 3 + OFFSET
@@ -552,4 +558,4 @@ def test_BRL_wrapped_execution():
     cpu.fetch_decode_execute(nops+[0x82, 0x0F, 0x00]) # branches forward
     assert cpu.P == 0b00000000
     assert cpu.cycles == 4
-    assert (cpu.PC & 0xFFFF) == 1 # 65520 + 2 + 16
+    assert (cpu.PC & 0xFFFF) == 2 # 65520 + 3 + 16
