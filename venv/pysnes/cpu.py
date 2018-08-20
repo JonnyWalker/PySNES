@@ -112,9 +112,9 @@ class CPU65816(object):
             self.PC = self.computeBXX(nearlabel)
          # BRL label
         elif opcode == 0x82:
-            label = self.fetch_twobyte(code)
+            label = self.fetch_twobyte(code) # PC +=2
             self.cycles += 4
-            self.PC += label
+            self.PC += label+1 # instruction length 3
         # BVC nearlabel
         elif opcode == 0x50:
             nearlabel = self.fetch_byte(code)
@@ -339,7 +339,7 @@ class CPU65816(object):
         elif opcode == 0x22:
             self.memory.write(self.SP, self.PBR)
             self.SP = self.SP - 1
-            self.push_stack(self.PC + 2)  # save return addr
+            self.push_stack(self.PC + 3)  # save return addr
             label = self.fetch_twobyte(code)
             bank = self.fetch_byte(code)
             self.PBR = bank
@@ -882,7 +882,7 @@ class CPU65816(object):
         if 0x80 <= nearlabel and nearlabel <= 0xFF:
             nextPC = self.PC - 255 + nearlabel
         else:
-            nextPC = self.PC + 1 + nearlabel
+            nextPC = self.PC + 1 + nearlabel # plus one: fetch has read one byte
         if self.e == 1:
             self.cycles += self.p(self.PC + 1, nextPC)  # page boundary check
         return nextPC
@@ -997,7 +997,7 @@ class CPU65816(object):
         self.SP = self.SP + 1
         high = self.memory.read(self.SP)
         self.SP = self.SP + 1
-        return low + (high << 88)
+        return low + (high << 8)
 
     def compute_flags(self, value, is8BitMode):
         if value == 0:

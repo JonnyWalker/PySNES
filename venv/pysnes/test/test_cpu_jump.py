@@ -78,7 +78,7 @@ def test_JMP_abs_indirect_indexed_X():
     assert cpu.PBR == 0
 
 
-def test_JMP_abs_indirect2():
+def test_JMP_abs_indirect_3byte():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
@@ -150,5 +150,5 @@ def test_JSR_long():
     assert cpu.PBR == 0x12
     assert mem.read(0x0001FF) == 0x06 # old PBR register
     assert mem.read(0x0001FE) == 0x34
-    assert mem.read(0x0001FD) == 0x56 + 2
+    assert mem.read(0x0001FD) == 0x56 + 3
     assert cpu.SP == 0x01FC
