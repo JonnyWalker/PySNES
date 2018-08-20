@@ -2496,3 +2496,307 @@ def test_LDA_stack_relative_indirect_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+
+
+def test_LDX_const16Bit():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xA2, 0x34, 0x12])
+    assert cpu.cycles == 3
+    assert cpu.X == 0x1234
+    assert cpu.P == 0b00000000
+
+
+def test_LDX_const8Bit():
+    cpu = CPU65816(None)
+    cpu.P = 0b00010000 # 8 Bit mode
+    cpu.e = 1
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xA2, 0x34])
+    assert cpu.cycles == 2
+    assert cpu.X == 0x34
+    assert cpu.P == 0b00010000
+
+
+def test_LDX_DP():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.e = 0
+    mem.write(0x001234, 0xAB)
+    cpu.DP = 0x1200
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xA6, 0x34])
+    assert cpu.cycles in (3, 4, 5)
+    assert cpu.X == 0x00AB
+    assert cpu.P == 0b00000000
+
+
+def test_LDX_DP2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.e = 0
+    mem.write(0x000000, 0xCD)
+    mem.write(0x00FFFF, 0xAB) # zero bank wrapping!
+    mem.write(0x010000, 0xEF) # Bug if this is read
+    cpu.DP = 0xFF00
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xA6, 0xFF])
+    assert cpu.cycles in (3, 4, 5)
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDX_absolute():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x123456, 0xAB)
+    mem.write(0x123457, 0xCD)
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xAE, 0x56, 0x34])
+    assert cpu.cycles == 5
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDX_absolute2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x12FFFF, 0xAB) # no wrapping
+    mem.write(0x130000, 0xCD)
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xAE, 0xFF, 0xFF])
+    assert cpu.cycles == 5
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDX_DP_indexed_Y():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80  # should have no effect
+    cpu.DP = 0x0020
+    cpu.Y = 0x0004
+
+    mem.write(0x000054, 0xAB)
+    mem.write(0x000055, 0xCD)
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xB6, 0x30])
+    assert cpu.cycles in (5, 6)
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDX_DP_indexed_Y2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80 # should have no effect
+    cpu.DP = 0xFF00
+    cpu.Y = 0x000A
+
+    mem.write(0x000008, 0xAB)
+    mem.write(0x000009, 0xCD)
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xB6, 0xFE])
+    assert cpu.cycles in (5, 6)
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDX_abs_indexed_Y():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80
+    cpu.Y = 0x0001
+
+    mem.write(0x808001, 0xAB) # no wrapping
+    mem.write(0x808002, 0xCD)
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xBE, 0x00, 0x80])
+    assert cpu.cycles >= 6
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDX_abs_indexed_Y2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    cpu.Y = 0x000A
+
+    mem.write(0x130008, 0xAB) # no wrapping
+    mem.write(0x130009, 0xCD)
+    assert cpu.X == 0
+    cpu.fetch_decode_execute([0xBE, 0xFE, 0xFF])
+    assert cpu.cycles >= 6
+    assert cpu.X == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_const16Bit():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xA0, 0x34, 0x12])
+    assert cpu.cycles == 3
+    assert cpu.Y == 0x1234
+    assert cpu.P == 0b00000000
+
+
+def test_LDY_const8Bit():
+    cpu = CPU65816(None)
+    cpu.P = 0b00010000 # 8 Bit mode
+    cpu.e = 1
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xA0, 0x34])
+    assert cpu.cycles == 2
+    assert cpu.Y == 0x34
+    assert cpu.P == 0b00010000
+
+
+def test_LDY_DP():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.e = 0
+    mem.write(0x001234, 0xAB)
+    cpu.DP = 0x1200
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xA4, 0x34])
+    assert cpu.cycles in (3, 4, 5)
+    assert cpu.Y == 0x00AB
+    assert cpu.P == 0b00000000
+
+
+def test_LDY_DP2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.e = 0
+    mem.write(0x000000, 0xCD)
+    mem.write(0x00FFFF, 0xAB) # zero bank wrapping!
+    mem.write(0x010000, 0xEF) # Bug if this is read
+    cpu.DP = 0xFF00
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xA4, 0xFF])
+    assert cpu.cycles in (3, 4, 5)
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_absolute():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x123456, 0xAB)
+    mem.write(0x123457, 0xCD)
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xAC, 0x56, 0x34])
+    assert cpu.cycles == 5
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_absolute2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    mem.write(0x12FFFF, 0xAB) # no wrapping
+    mem.write(0x130000, 0xCD)
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xAC, 0xFF, 0xFF])
+    assert cpu.cycles == 5
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_DP_indexed_X():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80  # should have no effect
+    cpu.DP = 0x0020
+    cpu.X = 0x0004
+
+    mem.write(0x000054, 0xAB)
+    mem.write(0x000055, 0xCD)
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xB4, 0x30])
+    assert cpu.cycles in (5, 6)
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_DP_indexed_X2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80 # should have no effect
+    cpu.DP = 0xFF00
+    cpu.X = 0x000A
+
+    mem.write(0x000008, 0xAB)
+    mem.write(0x000009, 0xCD)
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xB4, 0xFE])
+    assert cpu.cycles in (5, 6)
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_abs_indexed_X():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x80
+    cpu.X = 0x0001
+
+    mem.write(0x808001, 0xAB) # no wrapping
+    mem.write(0x808002, 0xCD)
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xBC, 0x00, 0x80])
+    assert cpu.cycles >= 6
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
+
+
+def test_LDY_abs_indexed_X2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000 # 16 Bit mode
+    cpu.e = 0
+    cpu.DBR = 0x12
+    cpu.X = 0x000A
+
+    mem.write(0x130008, 0xAB) # no wrapping
+    mem.write(0x130009, 0xCD)
+    assert cpu.Y == 0
+    cpu.fetch_decode_execute([0xBC, 0xFE, 0xFF])
+    assert cpu.cycles >= 6
+    assert cpu.Y == 0xCDAB
+    assert cpu.P == 0b10000000
