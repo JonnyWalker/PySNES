@@ -19,7 +19,10 @@ John:
 12.08.2018 - 01 Stunden: Skype Meeting: sprint 1
 13.08.2018 - 09 Stunden: Einführung Florian/Thiemo, Assembler Bug (ISSUE 34), LDX, LDY (Issue 20), STA (ISSUE 21)
 13.08.2018 - 02 Stunden: Assembler Bug, LDX, LDY (ISSUE 20)
-16.08.2018 - 02 Stunden: STZ (ISSUE 21), Refactoring and Meger (ISSUE 20/21)
+16.08.2018 - 02 Stunden: STZ (ISSUE 21), Refactoring and Merge (ISSUE 20/21)
+18.08.2018 - 06 Stunden: DEC/INC (ISSUE 15)
+19.08.2018 - 03 Stunden: Branch opcodes
+20.08.2018 - 04 Stunden: Branch Jump Bugfix
 
 Sebastian:
 05.08.2018 - 05 Stunden: PU impl, lda, XCE

@@ -921,6 +921,8 @@ class CPU65816(object):
 
     def fetch_byte(self, code):
         self.PC = self.PC + 1
+        # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
+        self.PC = self.PC & 0xFFFF
         return code[(self.PBR << 16) +self.PC]
 
     # little endian
@@ -1042,8 +1044,8 @@ class CPU65816(object):
     def isV(self):
         return self.P & 0b01000000 != 0
 
-    # True = Emulation on (8 Bit Mode) Accumulator and Memory
-    # False = Emulation off (16 Bit Mode) Accumulator and Memory
+    # True  = 8 Bit Accumulator and Memory
+    # False = 16 Bit Accumulator and Memory
     def isM(self):
         return self.P & 0b00100000 != 0
 
@@ -1084,11 +1086,11 @@ class CPU65816(object):
     def setV(self):
         self.P = self.P | 0b01000000
 
-    # switch to A 16 Bit
+    # switch to A 8 Bit
     def setM(self):
         self.P = self.P | 0b00100000
 
-    # switch X/Y to 16 Bit
+    # switch X/Y to 8 Bit
     def setX(self):
         self.P = self.P | 0b00010000
 
@@ -1116,11 +1118,11 @@ class CPU65816(object):
     def clearV(self):
         self.P = self.P & 0b10111111
 
-    # switch to A 8 Bit
+    # switch to A 16 Bit
     def clearM(self):
         self.P = self.P & 0b11011111
 
-    # switch X/Y to 8 Bit
+    # switch X/Y to 16 Bit
     def clearX(self):
         self.P = self.P & 0b11101111
 
