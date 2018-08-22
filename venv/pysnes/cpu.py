@@ -1,3 +1,5 @@
+import address_computation_helper as compute_addr
+
 class CPU65816(object):
     def __init__(self, memory):
         self.A = 0   # Accumulator           - 8 or 16 Bit (also called A(8Bit) and B(next 8Bit))
@@ -619,38 +621,39 @@ class CPU65816(object):
             self.PC = label
         # LDA (dp, X)
         elif opcode == 0xA1:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
-            value = self.read_memory((self.DBR << 16) + addr2, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
         # LDA stk, S
         elif opcode == 0xA3:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
-            value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping
+            byte = self.fetch_byte(code)
+            address = compute_addr.stack(byte, self.SP)
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
         # LDA dp
         elif opcode == 0xA5:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)   # direct page wrapping
-            value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 4 - self.m() + self.w()
             self.PC = self.PC + 1
         # LDA [dp]
         elif opcode == 0xA7:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)   # direct page wrapping
-            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True) # zero bank wrapping!
-            value = self.read_memory(addr2, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            address = self.read_memory(address_pointer, byte_num=3, wrapp=True) # zero bank wrapping!
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w()
@@ -668,89 +671,97 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # LDA abs
         elif opcode == 0xAD:
-            addr = self.fetch_twobyte(code) # no wrapping
-            value = self.read_memory((self.DBR << 16) + addr, byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code) # no wrapping
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
         # LDA long
         elif opcode == 0xAF:
-            addr = self.fetch_threebyte(code)
-            value = self.read_memory(addr, byte_num = 2 - self.m()) # no wrapping
+            address = self.fetch_threebyte(code)
+            value = self.read_memory(address, byte_num = 2 - self.m()) # no wrapping
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # LDA (dp), Y
         elif opcode == 0xB1:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
-            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
             self.PC = self.PC + 1
         # LDA (dp)
         elif opcode == 0xB2:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
-            value = self.read_memory((self.DBR << 16) + addr2, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m() + self.w()
             self.PC = self.PC + 1
         # LDA (stk, S), Y
         elif opcode == 0xB3:
-            addr = self.fetch_byte(code)
-            wrapped_stack_addr = self.compute_wrapped_addr(addr + self.SP)
-            addr2 = self.read_memory(wrapped_stack_addr, byte_num=2)
-            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.stack(byte, self.SP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 8 - self.m()
             self.PC = self.PC + 1
         # LDA dp, X
         elif opcode == 0xB5:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            value = self.read_memory(wrapped_addr,  byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 5 - self.m() + self.w()
             self.PC = self.PC + 1
         # LDA [dp], Y
         elif opcode == 0xB7:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)
-            value = self.read_memory(addr2 + self.Y, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=3, wrapp=True) # zero bank wrapping!
+            address = compute_addr.long_y(bytes, self.Y, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
         # LDA abs, Y
         elif opcode == 0xB9:
-            addr = self.fetch_twobyte(code) # no wrapping
-            value = self.read_memory((self.DBR << 16) + addr + self.Y,  byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
             self.PC = self.PC + 1
         # LDA abs, X
         elif opcode == 0xBD:
-            addr = self.fetch_twobyte(code) # no wrapping
-            value = self.read_memory((self.DBR << 16) + (addr + self.X), byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
             self.PC = self.PC + 1
         # LDA long, X
         elif opcode == 0xBF:
-            addr = self.fetch_threebyte(code)
-            value = self.read_memory(addr + self.X, byte_num = 2 - self.m()) # no wrapping
+            bytes = self.fetch_threebyte(code)
+            address = compute_addr.long_x(bytes, self.X, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m()
@@ -768,42 +779,44 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # LDX dp
         elif opcode == 0xA6:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)  # direct page wrapping
-            value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.compute_flags(value, self.isX())
             self.X = value
             self.cycles += 4 - self.x() + self.w()
             self.PC = self.PC + 1
         # LDX abs
         elif opcode == 0xAE:
-            addr = self.fetch_twobyte(code) # no wrapping
-            value = self.read_memory((self.DBR << 16) + addr, byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isX())
             self.X = value
             self.cycles += 5 - self.x()
             self.PC = self.PC + 1
         # LDX dp, Y
         elif opcode == 0xB6:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.Y)
-            value = self.read_memory(wrapped_addr,  byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.Y, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.compute_flags(value, self.isX())
             self.X = value
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
         # LDX abs, Y
         elif opcode == 0xBE:
-            addr = self.fetch_twobyte(code) # no wrapping
-            value = self.read_memory((self.DBR << 16) + addr + self.Y,  byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isX())
             self.X = value
             self.cycles += 6 - 2 * self.x() + self.x() * self.p()
         # LDY #const
         elif opcode == 0xA0:
             if self.isX():  # 8 Bit Y/X
-                const = self.fetch_byte(code)  # X=1 -> 8 Bit Y -> one byte
-            else:  # 16 Bit X/Y
+                const = self.fetch_byte(code)     # X=1 ->  8 Bit Y -> one byte
+            else:           # 16 Bit X/Y
                 const = self.fetch_twobyte(code)  # X=0 -> 16 Bit Y -> two byte
             result = const
             self.compute_flags(result, self.isX())
@@ -812,34 +825,36 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # LDY dp
         elif opcode == 0xA4:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)   # direct page wrapping
-            value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.compute_flags(value, self.isX())
             self.Y = value
             self.cycles += 4 - self.x() + self.w()
             self.PC = self.PC + 1
         # LDY abs
         elif opcode == 0xAC:
-            addr = self.fetch_twobyte(code)  # no wrapping
-            value = self.read_memory((self.DBR << 16) + addr, byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isX())
             self.Y = value
             self.cycles += 5 - self.x()
             self.PC = self.PC + 1
         # LDY dp, X
         elif opcode == 0xB4:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            value = self.read_memory(wrapped_addr, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.compute_flags(value, self.isX())
             self.Y = value
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
         # LDY abs, X
         elif opcode == 0xBC:
-            addr = self.fetch_twobyte(code)  # no wrapping
-            value = self.read_memory((self.DBR << 16) + addr + self.X, byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
+            value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isX())
             self.Y = value
             self.cycles += 6 - 2 * self.x() + self.x() * self.p()
@@ -1075,165 +1090,178 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # STA (dp, X)
         elif opcode == 0x81:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
-            self.write_memory((self.DBR << 16) + addr2, self.A, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs(bytes, self.DBR)
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA stk, S
         elif opcode == 0x83:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
-            self.write_memory(wrapped_addr, self.A, byte_num = 2 - self.m(), wrapp=True) # ISSUE #38
+            byte = self.fetch_byte(code)
+            address = compute_addr.stack(byte, self.SP)
+            self.write_memory(address, self.A, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
         # STA dp
         elif opcode == 0x85:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)  # direct page wrapping
-            self.write_memory(wrapped_addr, self.A, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            self.write_memory(address, self.A, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.cycles += 4 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA [dp]
         elif opcode == 0x87:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)  # direct page wrapping
-            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True) # zero bank wrapping!
-            self.write_memory(addr2, self.A, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            address = self.read_memory(address_pointer, byte_num=3, wrapp=True) # zero bank wrapping!
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA abs
         elif opcode == 0x8D:
-            addr = self.fetch_twobyte(code) # no wrapping
-            self.write_memory((self.DBR << 16) + addr, self.A, byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
         # STA long
         elif opcode == 0x8F:
-            addr = self.fetch_threebyte(code)
-            self.write_memory(addr, self.A, byte_num = 2 - self.m()) # no wrapping
+            address = self.fetch_threebyte(code)
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # STA (dp), Y
         elif opcode == 0x91:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
-            self.write_memory((self.DBR << 16) + addr2 + self.Y, self.A, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA (dp)
         elif opcode == 0x92:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
-            self.write_memory((self.DBR << 16) + addr2, self.A,  byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs(bytes, self.DBR)
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA (stk, S), Y
         elif opcode == 0x93:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=2)
-            self.write_memory((self.DBR << 16) + addr2 + self.Y, self.A, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.stack(byte, self.SP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 8 - self.m()
             self.PC = self.PC + 1
         # STA dp, X
         elif opcode == 0x95:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            self.write_memory(wrapped_addr, self.A, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA [dp], Y
         elif opcode == 0x97:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
-            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)
-            self.write_memory(addr2 + self.Y, self.A, byte_num = 2 - self.m())
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=3, wrapp=True)
+            address = compute_addr.long_y(bytes, self.Y, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
         # STA abs, Y
         elif opcode == 0x99:
-            addr = self.fetch_twobyte(code) # no wrapping
-            self.write_memory((self.DBR << 16) + addr + self.Y, self.A,  byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.Y, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
         # STA abs, X
         elif opcode == 0x9D:
-            addr = self.fetch_twobyte(code) # no wrapping
-            self.write_memory((self.DBR << 16) + addr + self.X, self.A,  byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
         # STA long, X
         elif opcode == 0x9F:
-            addr = self.fetch_threebyte(code)
-            self.write_memory(addr + self.X, self.A, byte_num = 2 - self.m()) # no wrapping
+            bytes = self.fetch_threebyte(code)
+            address = compute_addr.long_x(bytes, self.X, self.isX())
+            self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # STX dp
         elif opcode == 0x86:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)  # direct page wrapping
-            self.write_memory(wrapped_addr, self.X, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            self.write_memory(address, self.X, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
             self.cycles += 4 - self.x() + self.w()
             self.PC = self.PC + 1
         # STX abs
         elif opcode == 0x8E:
-            addr = self.fetch_twobyte(code) # no wrapping
-            self.write_memory((self.DBR << 16) + addr, self.X, byte_num = 2 - self.x())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            self.write_memory(address, self.X, byte_num = 2 - self.x())
             self.cycles += 5 - self.x()
             self.PC = self.PC + 1
         # STX dp, Y
         elif opcode == 0x96:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.Y)
-            self.write_memory(wrapped_addr, self.X, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.Y, self.isX())
+            self.write_memory(address, self.X, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
         # STY dp
         elif opcode == 0x84:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP) # direct page wrapping
-            self.write_memory(wrapped_addr, self.Y, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            self.write_memory(address, self.Y, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
             self.cycles += 4 - self.x() + self.w()
             self.PC = self.PC + 1
         # STY abs
         elif opcode == 0x8C:
-            addr = self.fetch_twobyte(code) # no wrapping
-            self.write_memory((self.DBR << 16) + addr, self.Y, byte_num = 2 - self.x())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            self.write_memory(address, self.Y, byte_num = 2 - self.x())
             self.cycles += 5 - self.x()
             self.PC = self.PC + 1
         # STY dp, X
         elif opcode == 0x94:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            self.write_memory(wrapped_addr, self.Y, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            self.write_memory(address, self.Y, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
         # STZ dp
         elif opcode == 0x64:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP) # direct page wrapping
-            self.write_memory(wrapped_addr, 0x00, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            self.write_memory(address, 0x00, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.cycles += 4 - self.m() + self.w()
             self.PC = self.PC + 1
         # STZ dp, X
         elif opcode == 0x74:
-            addr = self.fetch_byte(code)
-            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
-            self.write_memory(wrapped_addr, 0x00, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            self.write_memory(address, 0x00, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.m() + self.w()
             self.PC = self.PC + 1
         # STZ abs
         elif opcode == 0x9C:
-            addr = self.fetch_twobyte(code)  # no wrapping
-            self.write_memory((self.DBR << 16) + addr, 0x00, byte_num=2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            self.write_memory(address, 0x00, byte_num = 2 - self.m())
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
         # STZ abs, X
         elif opcode == 0x9E:
-            addr = self.fetch_twobyte(code) # no wrapping
-            self.write_memory((self.DBR << 16) + addr + self.X, 0x00,  byte_num = 2 - self.m())
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
+            self.write_memory(address, 0x00, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
         # TAX
         elif opcode == 0x78:
