@@ -33,13 +33,142 @@ class CPU65816(object):
                 self.A += 1
             self.cycles += 2
             self.PC = self.PC + 1
+        # AND (dp, X)
+        elif opcode == 0x21:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp = True)
+            value = self.read_memory((self.DBR << 16) + addr2, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # AND stk, S
+        elif opcode == 0x23:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
+            value = self.read_memory(wrapped_addr, byte_num=2- self.m(), wrapp=True)  # zero bank wrapping
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # AND dp
+        elif opcode == 0x25:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
+            value = self.read_memory(wrapped_addr, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 4 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # AND [dp]
+        elif opcode == 0x27:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)  # direct page wrapping
+            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)  # zero bank wrapping
+            value = self.read_memory(addr2, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
         # AND #const
         elif opcode == 0x29:
-            const = self.fetch_byte(code)
-            result = self.A & const
-            self.compute_flags(result, self.isM())
+            if self.isM():
+                const = self.fetch_byte(code)
+            else:
+                const = self.fetch_twobyte(code)
+            result = self.compute_logic_operation(const, self.land)
             self.A = result
-            self.cycles += 2
+            self.cycles += 3-self.isM()
+            self.PC = self.PC + 1
+        # AND abs
+        elif opcode == 0x2D:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # AND long
+        elif opcode == 0x2F:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory(addr, byte_num=2 - self.m())  # no wrapping
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
+        # AND (dp), Y
+        elif opcode == 0x31:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)  # direct page wrapping
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num = 2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # AND (dp)
+        elif opcode == 0x32:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
+            value = self.read_memory((self.DBR << 16) + addr2, byte_num=2-self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 6 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # AND (stk, S), Y
+        elif opcode == 0x33:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.SP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2)
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 8 - self.m()
+            self.PC = self.PC + 1
+        # AND dp, X
+        elif opcode == 0x35:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr + self.X)
+            value = self.read_memory(wrapped_addr, byte_num=2 - self.m(), wrapp=True)  # zero bank wrap
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 5-self.m() + self.w()
+            self.PC = self.PC + 1
+        # AND [dp], Y
+        elif opcode == 0x37:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)
+            value = self.read_memory(addr2 + self.Y, byte_num=2-self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # AND abs, Y
+        elif opcode == 0x39:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr + self.Y, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # AND abs, X
+        elif opcode == 0x3D:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr + self.X, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # AND long, X
+        elif opcode == 0x3F:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory(addr + self.X, byte_num=2 - self.m())  # no wrapping
+            result = self.compute_logic_operation(value, self.land)
+            self.A = result
+            self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # ASL A
         elif opcode == 0x0A:
@@ -236,13 +365,142 @@ class CPU65816(object):
             self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
+        # EOR (dp, X)
+        elif opcode == 0x41:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp = True)
+            value = self.read_memory((self.DBR << 16) + addr2, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # EOR stk, S
+        elif opcode == 0x43:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
+            value = self.read_memory(wrapped_addr, byte_num=2- self.m(), wrapp=True)  # zero bank wrapping
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # EOR dp
+        elif opcode == 0x45:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
+            value = self.read_memory(wrapped_addr, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 4 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # EOR [dp]
+        elif opcode == 0x47:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)  # direct page wrapping
+            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)  # zero bank wrapping
+            value = self.read_memory(addr2, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
         # EOR #const
         elif opcode == 0x49:
-            const = self.fetch_byte(code)
-            result = self.A ^ const
-            self.compute_flags(result, self.isM())
+            if self.isM():
+                const = self.fetch_byte(code)
+            else:
+                const = self.fetch_twobyte(code)
+            result = self.compute_logic_operation(const, self.lxor)
             self.A = result
-            self.cycles += 2
+            self.cycles += 3-self.isM()
+            self.PC = self.PC + 1
+        # EOR abs
+        elif opcode == 0x4D:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # EOR long
+        elif opcode == 0x4F:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory(addr, byte_num=2 - self.m())  # no wrapping
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
+        # EOR (dp), Y
+        elif opcode == 0x51:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)  # direct page wrapping
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num = 2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # EOR (dp)
+        elif opcode == 0x52:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
+            value = self.read_memory((self.DBR << 16) + addr2, byte_num=2-self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 6 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # EOR (stk, S), Y
+        elif opcode == 0x53:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.SP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2)
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 8 - self.m()
+            self.PC = self.PC + 1
+        # EOR dp, X
+        elif opcode == 0x55:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr + self.X)
+            value = self.read_memory(wrapped_addr, byte_num=2 - self.m(), wrapp=True)  # zero bank wrap
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 5-self.m() + self.w()
+            self.PC = self.PC + 1
+        # EOR [dp], Y
+        elif opcode == 0x57:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)
+            value = self.read_memory(addr2 + self.Y, byte_num=2-self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # EOR abs, Y
+        elif opcode == 0x59:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr + self.Y, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # EOR abs, X
+        elif opcode == 0x5D:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr + self.X, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # EOR long, X
+        elif opcode == 0x5F:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory(addr + self.X, byte_num=2 - self.m())  # no wrapping
+            result = self.compute_logic_operation(value, self.lxor)
+            self.A = result
+            self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # INC A
         elif opcode == 0x1A:
@@ -601,13 +859,142 @@ class CPU65816(object):
         elif opcode == 0xEA:
             self.cycles += 2
             self.PC = self.PC + 1
+        # ORA (dp, X)
+        elif opcode == 0x01:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP + self.X)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp = True)
+            value = self.read_memory((self.DBR << 16) + addr2, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # ORA stk, S
+        elif opcode == 0x03:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.SP)
+            value = self.read_memory(wrapped_addr, byte_num=2- self.m(), wrapp=True)  # zero bank wrapping
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # ORA dp
+        elif opcode == 0x05:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(addr + self.DP)
+            value = self.read_memory(wrapped_addr, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 4 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # ORA [dp]
+        elif opcode == 0x07:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)  # direct page wrapping
+            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)  # zero bank wrapping
+            value = self.read_memory(addr2, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
         # ORA #const
         elif opcode == 0x09:
-            const = self.fetch_byte(code)
-            result = self.A | const
-            self.compute_flags(result, self.isM())
+            if self.isM():
+                const = self.fetch_byte(code)
+            else:
+                const = self.fetch_twobyte(code)
+            result = self.compute_logic_operation(const, self.lor)
             self.A = result
-            self.cycles += 2
+            self.cycles += 3-self.isM()
+            self.PC = self.PC + 1
+        # ORA abs
+        elif opcode == 0x0D:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # ORA long
+        elif opcode == 0x0F:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory(addr, byte_num=2 - self.m())  # no wrapping
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
+        # ORA (dp), Y
+        elif opcode == 0x11:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)  # direct page wrapping
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num = 2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # ORA (dp)
+        elif opcode == 0x12:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2, wrapp=True)
+            value = self.read_memory((self.DBR << 16) + addr2, byte_num=2-self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 6 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # ORA (stk, S), Y
+        elif opcode == 0x13:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.SP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=2)
+            value = self.read_memory((self.DBR << 16) + addr2 + self.Y, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 8 - self.m()
+            self.PC = self.PC + 1
+        # ORA dp, X
+        elif opcode == 0x15:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr + self.X)
+            value = self.read_memory(wrapped_addr, byte_num=2 - self.m(), wrapp=True)  # zero bank wrap
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 5-self.m() + self.w()
+            self.PC = self.PC + 1
+        # ORA [dp], Y
+        elif opcode == 0x17:
+            addr = self.fetch_byte(code)
+            wrapped_addr = self.compute_wrapped_addr(self.DP + addr)
+            addr2 = self.read_memory(wrapped_addr, byte_num=3, wrapp=True)
+            value = self.read_memory(addr2 + self.Y, byte_num=2-self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # ORA abs, Y
+        elif opcode == 0x19:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr + self.Y, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # ORA abs, X
+        elif opcode == 0x1D:
+            addr = self.fetch_twobyte(code)  # no wrapping
+            value = self.read_memory((self.DBR << 16) + addr + self.X, byte_num=2 - self.m())
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # ORA long, X
+        elif opcode == 0x1F:
+            addr = self.fetch_threebyte(code)
+            value = self.read_memory(addr + self.X, byte_num=2 - self.m())  # no wrapping
+            result = self.compute_logic_operation(value, self.lor)
+            self.A = result
+            self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # PHA
         elif opcode == 0x48:
@@ -906,6 +1293,24 @@ class CPU65816(object):
             if value <= 0x7FFF and value + arg > 0x7FFF: # MAX_INT
                 self.setV()  # Overflow Flag
             result = (value + arg) & 0x00FFFF
+        return result
+
+    # logic functions:
+    land = lambda self, a, b: a & b
+    
+    lor = lambda self, a, b: a | b
+    
+    lxor = lambda self, a, b: a ^ b
+
+    # compute logic operation with A , operation is passed as argument
+    def compute_logic_operation(self, value, operator):
+        flag_result = result = operator(self.A, value)
+        if self.isM():  # A/M 8 Bit
+            # Assumes that we have to preserve B part of A
+            result = result | (self.A & 0xFF00)
+            # in 8 bit mode only the lower byte sets flags
+            flag_result = flag_result & 0x00FF
+        self.compute_flags(flag_result, self.isM())
         return result
 
     # some addresses are wrapped at the bank XX boundery (64 KB - 16 Bit addr)
