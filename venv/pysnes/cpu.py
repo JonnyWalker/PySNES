@@ -829,7 +829,7 @@ class CPU65816(object):
         # LDX abs, Y
         elif opcode == 0xBE:
             bytes = self.fetch_twobyte(code)
-            address = compute_addr.abs_x(bytes, self.DBR, self.Y, self.isX())
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
             self.compute_flags(value, self.isX())
             self.X = value
@@ -1209,7 +1209,7 @@ class CPU65816(object):
         # STA abs, Y
         elif opcode == 0x99:
             bytes = self.fetch_twobyte(code)
-            address = compute_addr.abs_x(bytes, self.DBR, self.Y, self.isX())
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
         # STA abs, X
@@ -1242,7 +1242,7 @@ class CPU65816(object):
         # STX dp, Y
         elif opcode == 0x96:
             byte = self.fetch_byte(code)
-            address = compute_addr.dp_x(byte, self.DP, self.Y, self.isX())
+            address = compute_addr.dp_y(byte, self.DP, self.Y, self.isX())
             self.write_memory(address, self.X, byte_num = 2 - self.x(), wrapp=True) # zero bank wrapping!
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
