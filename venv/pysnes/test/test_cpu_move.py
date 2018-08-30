@@ -3,7 +3,7 @@ from pysnes.cpu import CPU65816
 # .../PySNES/venv/$ py.test pysnes/test/
 class MemoryMock(object):
     def __init__(self):
-        self.ram = [0x00] * 0xFFFFFF
+        self.ram = {}
 
     def read(self, address):
         return self.ram[address]
@@ -92,8 +92,10 @@ def test_STA_DP_indexed_indirect_X_wrapped():
     mem.write(0x000008, 0xFF) # wrapping: 0x010008 becomes 0x000008
     mem.write(0x000009, 0xFF)
 
+    mem.write(0x120000, 0x00) # empty before
     mem.write(0x12FFFF, 0x00) # empty before
     mem.write(0x130000, 0x00) # empty before
+    mem.write(0x130001, 0x00) # empty before
     cpu.A = 0xCDAB
     cpu.fetch_decode_execute([0x81, 0xFE])
     assert cpu.cycles in (6,7,8)
@@ -117,8 +119,10 @@ def test_STA_DP_indexed_indirect_X_wrapped_8BIT():
     mem.write(0x000008, 0xFF) # wrapping: 0x010008 becomes 0x000008
     mem.write(0x000009, 0xFF)
 
+    mem.write(0x120000, 0x00) # empty before
     mem.write(0x12FFFF, 0x00) # empty before
     mem.write(0x130000, 0x00) # empty before
+    mem.write(0x130001, 0x00) # empty before
     cpu.A = 0xCDAB
     cpu.fetch_decode_execute([0x81, 0xFE])
     assert cpu.cycles in (6,7,8)
@@ -1974,6 +1978,7 @@ def test_LDA_DP():
     cpu.P = 0b00000000  # 16 Bit mode
     cpu.e = 0
     mem.write(0x001234, 0xAB)
+    mem.write(0x001235, 0x00)
     cpu.DP = 0x1200
     assert cpu.A == 0
     cpu.fetch_decode_execute([0xA5, 0x34])
@@ -2526,6 +2531,7 @@ def test_LDX_DP():
     cpu.P = 0b00000000  # 16 Bit mode
     cpu.e = 0
     mem.write(0x001234, 0xAB)
+    mem.write(0x001235, 0x00)
     cpu.DP = 0x1200
     assert cpu.X == 0
     cpu.fetch_decode_execute([0xA6, 0x34])
@@ -2678,6 +2684,7 @@ def test_LDY_DP():
     cpu.P = 0b00000000  # 16 Bit mode
     cpu.e = 0
     mem.write(0x001234, 0xAB)
+    mem.write(0x001235, 0x00)
     cpu.DP = 0x1200
     assert cpu.Y == 0
     cpu.fetch_decode_execute([0xA4, 0x34])
