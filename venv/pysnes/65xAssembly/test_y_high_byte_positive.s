@@ -1,7 +1,7 @@
 ; Displays green when sep/rep reset the high byte of Y
 ;
 ; ca65 test_y_high_byte_positive.s
-; ld65 -C lorom128.cfg -o test_y_high_byte_positive.smc test_y_high_byte_positive.0
+; ld65 -C lorom128.cfg -o test_y_high_byte_positive.smc test_y_high_byte_positive.o
 
 .define ROM_NAME "GREEN"
 .include "lorom128.inc"

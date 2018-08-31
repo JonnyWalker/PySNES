@@ -1,7 +1,7 @@
 ; Displays red to show that x + 1 - 1 is indeed not 0 without switching from 8 bit and back.
 ;
 ; ca65 test_x_high_byte_negative.s
-; ld65 -C lorom128.cfg -o test_x_high_byte_negative.smc test_x_high_byte_negative.0
+; ld65 -C lorom128.cfg -o test_x_high_byte_negative.smc test_x_high_byte_negative.o
 
 .define ROM_NAME "GREEN"
 .include "lorom128.inc"
