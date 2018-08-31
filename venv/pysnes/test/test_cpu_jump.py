@@ -3,7 +3,7 @@ from pysnes.cpu import CPU65816
 # .../PySNES/venv/$ py.test pysnes/test/
 class MemoryMock(object):
     def __init__(self):
-        self.ram = [0x00] * 0xFFFFFF
+        self.ram = {}
 
     def read(self, address):
         return self.ram[address]
