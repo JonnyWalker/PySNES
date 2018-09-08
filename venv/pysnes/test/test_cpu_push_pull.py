@@ -32,7 +32,7 @@ def test_PHK():
 def test_PHB():
     mem = MemoryMock()
     cpu = CPU65816(mem)
-    cpu.DBR = 0x12 # K
+    cpu.DBR = 0x12 # B
     cpu.SP = 0x01FF
     cpu.P = 0b00000000
 
