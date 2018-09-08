@@ -29,7 +29,7 @@ class CPU65816(object):
         if opcode == 0x69:
             const = self.fetch_byte(code)
             result = self.A + const
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.A = result
             if self.isC():
                 self.A += 1
@@ -295,7 +295,7 @@ class CPU65816(object):
         elif opcode == 0xC9:
             const = self.fetch_byte(code)
             result = self.A - const
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             if self.A >= const:
                 self.setC()
             self.cycles += 2
@@ -304,7 +304,7 @@ class CPU65816(object):
         elif opcode == 0xE0:
             const = self.fetch_byte(code)
             result = self.X - const
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             if self.X >= const:
                 self.setC()
             self.PC = self.PC + 1
@@ -312,7 +312,7 @@ class CPU65816(object):
         elif opcode == 0xC0:
             const = self.fetch_byte(code)
             result = self.Y - const
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             if self.Y >= const:
                 self.setC()
             self.cycles += 2
@@ -320,7 +320,7 @@ class CPU65816(object):
         # DEC A
         elif opcode == 0x3A:
             result = self.sub_twos_complement(self.A, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.A = result
             self.cycles += 2
             self.PC = self.PC + 1
@@ -330,7 +330,7 @@ class CPU65816(object):
             address = compute_addr.dp(byte, self.DP)
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             result = self.sub_twos_complement(value, 1, is8BitMode=self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
             self.cycles += 7 - self.m()*2 + self.w()
             self.PC = self.PC + 1
@@ -340,7 +340,7 @@ class CPU65816(object):
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
             result = self.sub_twos_complement(value, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m()) # no wrapping
             self.cycles += 8 - self.m() * 2
             self.PC = self.PC + 1
@@ -350,7 +350,7 @@ class CPU65816(object):
             address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             result = self.sub_twos_complement(value, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
             self.cycles += 8 - self.m() * 2 + self.w()
             self.PC = self.PC + 1
@@ -360,21 +360,21 @@ class CPU65816(object):
             address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
             result = self.sub_twos_complement(value, 1, is8BitMode=self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m())
             self.cycles += 9 - self.m() * 2
             self.PC = self.PC + 1
         # DEX
         elif opcode == 0xCA:
             result = self.sub_twos_complement(self.X, 1, is8BitMode = self.isX())
-            self.compute_flags(result, self.isX())
+            self.compute_NZflags(result, self.isX())
             self.X = result
             self.cycles += 2
             self.PC = self.PC + 1
         # DEY
         elif opcode == 0x88:
             result = self.sub_twos_complement(self.Y, 1, is8BitMode = self.isX())
-            self.compute_flags(result, self.isX())
+            self.compute_NZflags(result, self.isX())
             self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
@@ -527,7 +527,7 @@ class CPU65816(object):
         # INC A
         elif opcode == 0x1A:
             result = self.add_twos_complement(self.A, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.A = result
             self.cycles += 2
             self.PC = self.PC + 1
@@ -537,7 +537,7 @@ class CPU65816(object):
             address = compute_addr.dp(byte, self.DP)
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             result = self.add_twos_complement(value, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
             self.cycles += 7 - self.m()*2 + self.w()
             self.PC = self.PC + 1
@@ -547,7 +547,7 @@ class CPU65816(object):
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
             result = self.add_twos_complement(value, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m()) # no wrapping
             self.cycles += 8 - self.m() * 2
             self.PC = self.PC + 1
@@ -557,7 +557,7 @@ class CPU65816(object):
             address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
             result = self.add_twos_complement(value, 1, is8BitMode = self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m(), wrapp=True)  # zero bank wrapping!
             self.cycles += 8 - self.m() * 2 + self.w()
             self.PC = self.PC + 1
@@ -567,21 +567,21 @@ class CPU65816(object):
             address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
             result = self.add_twos_complement(value, 1, is8BitMode=self.isM())
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.write_memory(address, result, byte_num = 2 - self.m())
             self.cycles += 9 - self.m() * 2
             self.PC = self.PC + 1
         # INX
         elif opcode == 0xE8:
             result = self.add_twos_complement(self.X, 1, is8BitMode = self.isX())
-            self.compute_flags(result, self.isX())
+            self.compute_NZflags(result, self.isX())
             self.X = result
             self.cycles += 2
             self.PC = self.PC + 1
         # INY
         elif opcode == 0xC8:
             result = self.add_twos_complement(self.Y, 1, is8BitMode = self.isX())
-            self.compute_flags(result, self.isX())
+            self.compute_NZflags(result, self.isX())
             self.Y = result
             self.cycles += 2
             self.PC = self.PC + 1
@@ -648,7 +648,7 @@ class CPU65816(object):
             bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
@@ -657,7 +657,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.stack(byte, self.SP)
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
@@ -666,7 +666,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.dp(byte, self.DP)
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 4 - self.m() + self.w()
             self.PC = self.PC + 1
@@ -676,7 +676,7 @@ class CPU65816(object):
             address_pointer = compute_addr.dp(byte, self.DP)
             address = self.read_memory(address_pointer, byte_num=3, wrapp=True) # zero bank wrapping!
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
@@ -687,7 +687,7 @@ class CPU65816(object):
             else:  # 16 Bit A/M
                 const = self.fetch_twobyte(code)  # M=0 -> 16 Bit A -> two byte
             result = const
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.A = result
             self.cycles += 3 - self.m()
             self.PC = self.PC + 1
@@ -696,7 +696,7 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code) # no wrapping
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 5 - self.m()
             self.PC = self.PC + 1
@@ -704,7 +704,7 @@ class CPU65816(object):
         elif opcode == 0xAF:
             address = self.fetch_threebyte(code)
             value = self.read_memory(address, byte_num = 2 - self.m()) # no wrapping
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
@@ -715,7 +715,7 @@ class CPU65816(object):
             bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
             address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
             self.PC = self.PC + 1
@@ -726,7 +726,7 @@ class CPU65816(object):
             bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m() + self.w()
             self.PC = self.PC + 1
@@ -737,7 +737,7 @@ class CPU65816(object):
             bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True) # zero bank wrapping!
             address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 8 - self.m()
             self.PC = self.PC + 1
@@ -746,7 +746,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 5 - self.m() + self.w()
             self.PC = self.PC + 1
@@ -757,7 +757,7 @@ class CPU65816(object):
             bytes = self.read_memory(address_pointer, byte_num=3, wrapp=True) # zero bank wrapping!
             address = compute_addr.long_y(bytes, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 7 - self.m() + self.w()
             self.PC = self.PC + 1
@@ -766,7 +766,7 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
             self.PC = self.PC + 1
@@ -775,7 +775,7 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
             self.PC = self.PC + 1
@@ -784,7 +784,7 @@ class CPU65816(object):
             bytes = self.fetch_threebyte(code)
             address = compute_addr.long_x(bytes, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isM())
+            self.compute_NZflags(value, self.isM())
             self.A = value
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
@@ -795,7 +795,7 @@ class CPU65816(object):
             else:  # 16 Bit X/Y
                 const = self.fetch_twobyte(code)  # X=0 -> 16 Bit X -> two byte
             result = const
-            self.compute_flags(result, self.isX())
+            self.compute_NZflags(result, self.isX())
             self.X = result
             self.cycles += 3 - self.x()
             self.PC = self.PC + 1
@@ -804,7 +804,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.dp(byte, self.DP)
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.X = value
             self.cycles += 4 - self.x() + self.w()
             self.PC = self.PC + 1
@@ -813,7 +813,7 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.X = value
             self.cycles += 5 - self.x()
             self.PC = self.PC + 1
@@ -822,7 +822,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.dp_y(byte, self.DP, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.X = value
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
@@ -831,7 +831,7 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.X = value
             self.cycles += 6 - 2 * self.x() + self.x() * self.p()
         # LDY #const
@@ -841,7 +841,7 @@ class CPU65816(object):
             else:           # 16 Bit X/Y
                 const = self.fetch_twobyte(code)  # X=0 -> 16 Bit Y -> two byte
             result = const
-            self.compute_flags(result, self.isX())
+            self.compute_NZflags(result, self.isX())
             self.Y = result
             self.cycles += 3 - self.x()
             self.PC = self.PC + 1
@@ -850,7 +850,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.dp(byte, self.DP)
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.Y = value
             self.cycles += 4 - self.x() + self.w()
             self.PC = self.PC + 1
@@ -859,7 +859,7 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs(bytes, self.DBR)
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.Y = value
             self.cycles += 5 - self.x()
             self.PC = self.PC + 1
@@ -868,7 +868,7 @@ class CPU65816(object):
             byte = self.fetch_byte(code)
             address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.Y = value
             self.cycles += 5 - self.x() + self.w()
             self.PC = self.PC + 1
@@ -877,14 +877,14 @@ class CPU65816(object):
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
             value = self.read_memory(address, byte_num = 2 - self.m())
-            self.compute_flags(value, self.isX())
+            self.compute_NZflags(value, self.isX())
             self.Y = value
             self.cycles += 6 - 2 * self.x() + self.x() * self.p()
             self.PC = self.PC + 1
         # LSR A
         elif opcode == 0x4A:
             result = self.A >> 1
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             if self.A & 0b1 == 1:
                 self.setC()
             else:
@@ -1047,11 +1047,52 @@ class CPU65816(object):
             self.push_stack(self.A)
             self.cycles += 3
             self.PC = self.PC + 1
+        # PHB
+        elif opcode == 0x8B:
+            self.push_stack_8bit(self.DBR)
+            self.cycles += 3
+            self.PC = self.PC + 1
+        # PHD
+        elif opcode == 0x0B:
+            self.push_stack(self.DP)
+            self.cycles += 4
+            self.PC = self.PC + 1
+        # PHK
+        elif opcode == 0x4B:
+            self.push_stack_8bit(self.PBR)
+            self.cycles += 3
+            self.PC = self.PC + 1
+        # PHP
+        elif opcode == 0x08:
+            self.push_stack_8bit(self.P)
+            self.cycles += 3
+            self.PC = self.PC + 1
         # PLA
         elif opcode == 0x68:
             self.A = self.pop_stack()
             self.cycles += 3
             self.PC = self.PC + 1
+        # PLB
+        elif opcode == 0xAB:
+            result = self.pop_stack_8bit()
+            self.compute_NZflags(result, True)
+            self.DBR = result
+            self.cycles += 4
+            self.PC += 1
+        # PLD
+        elif opcode == 0x2B:
+            result = self.pop_stack()
+            self.compute_NZflags(result, False)
+            self.DP = result
+            self.cycles += 5
+            self.PC += 1
+        # PLP
+        elif opcode == 0x28:
+            self.P = self.pop_stack_8bit()
+            if self.e:
+                self.P = self.P | 0b00110000
+            self.cycles += 4
+            self.PC += 1
         # REP
         elif opcode == 0xC2:
             const = self.fetch_byte(code)
@@ -1068,7 +1109,7 @@ class CPU65816(object):
                 result = result & 0b1111111111111111
             else:
                 result = result & 0b1111111111111110
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             if self.A & 0b10000000 != 0:
                 self.setC()
             else:
@@ -1081,7 +1122,7 @@ class CPU65816(object):
                 result = result & 0b1111111111111111
             else:
                 result = result & 0b0111111111111111
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             if self.A & 0b00000001 != 0:
                 self.setC()
             else:
@@ -1092,7 +1133,7 @@ class CPU65816(object):
         elif opcode == 0xE9:
             const = self.fetch_byte(code)
             result = self.A - const - 1
-            self.compute_flags(result, self.isM())
+            self.compute_NZflags(result, self.isM())
             self.A = result
             if self.isC():
                 self.A += 1
@@ -1296,7 +1337,7 @@ class CPU65816(object):
             self.cycles += 6 - self.m()
         # TAX
         elif opcode == 0x78:
-            self.compute_flags(self.A, self.isM())
+            self.compute_NZflags(self.A, self.isM())
             self.X = self.A
             self.cycles += 2
             self.PC = self.PC + 1
@@ -1397,7 +1438,7 @@ class CPU65816(object):
             result = result | (self.A & 0xFF00)
             # in 8 bit mode only the lower byte sets flags
             flag_result = flag_result & 0x00FF
-        self.compute_flags(flag_result, self.isM())
+        self.compute_NZflags(flag_result, self.isM())
         return result
 
     def fetch_byte(self, code):
@@ -1475,20 +1516,41 @@ class CPU65816(object):
         self.memory.write(self.SP, value & 0x00FF)
         self.SP = self.SP - 1
 
+    def push_stack_8bit(self, value):
+        self.memory.write(self.SP, value & 0x00FF)
+        self.SP = self.SP - 1
+
     def pop_stack(self):
+        self.SP = self.SP + 1
         low = self.memory.read(self.SP)
         self.SP = self.SP + 1
         high = self.memory.read(self.SP)
-        self.SP = self.SP + 1
         return low + (high << 8)
 
-    def compute_flags(self, value, is8BitMode):
-        if value == 0:
-            self.setZ()
-        if is8BitMode and value & 0b10000000 != 0: # 8 Bit Mode
-            self.setN()
-        if not is8BitMode and value & 0b1000000000000000 != 0: # 16 Bit Mode
-            self.setN()
+    def pop_stack_8bit(self):
+        self.SP = self.SP + 1
+        byte = self.memory.read(self.SP)
+        return byte
+
+    def compute_NZflags(self, value, is8BitMode):
+        if is8BitMode:
+            if value & 0b10000000 != 0: # 8 Bit Mode
+                self.setN()
+            else:
+                self.clearN()
+            if value & 0x00FF == 0:
+                self.setZ()
+            else:
+                self.clearZ()
+        if not is8BitMode:
+            if value & 0b1000000000000000 != 0: # 16 Bit Mode
+                self.setN()
+            else:
+                self.clearN()
+            if value & 0xFFFF == 0:
+                self.setZ()
+            else:
+                self.clearZ()
 
     def w(self):
         if self.DP & 0x00FF != 0:
