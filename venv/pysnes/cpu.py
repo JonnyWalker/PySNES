@@ -1871,6 +1871,78 @@ class CPU65816(object):
             self.A = (AL << 8) + AH
             self.cycles += 3
             self.PC = self.PC + 1
+        # TAX
+        elif opcode == 0xAA:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.A & 255)
+            else:
+                self.X = self.A
+            self.compute_flags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TAY
+        elif opcode == 0xA8:
+            if self.isX():
+                self.Y = (self.Y & 0xFF00) | (self.A & 255)
+            else:
+                self.Y = self.A
+            self.compute_flags(self.Y, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TSX
+        elif opcode == 0xBA:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.SP & 255)
+            else:
+                self.X = self.SP
+            self.compute_flags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TXA
+        elif opcode == 0x8A:
+            if self.isX():
+                self.A = self.X & 255
+            else:
+                self.A = self.X
+            self.compute_flags(self.A, self.isM())
+            self.cycles += 2
+            self.PC += 1
+        # TXS
+        elif opcode == 0x9A:
+            if self.isX():
+                self.SP = (self.SP & 0xFF00) | (self.X & 255)
+            else:
+                self.SP = self.X
+            # Flags are not set
+            self.cycles += 2
+            self.PC += 1
+        # TXY
+        elif opcode == 0x9B:
+            if self.isX():
+                self.Y = (self.Y & 0xFF00) | (self.X & 255)
+            else:
+                self.Y = self.X
+            self.compute_flags(self.Y, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TYA
+        elif opcode == 0x98:
+            if self.isX():
+                self.A = self.Y & 255
+            else:
+                self.A = self.Y
+            self.compute_flags(self.A, self.isM())
+            self.cycles += 2
+            self.PC += 1
+        # TYX
+        elif opcode == 0xBB:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.Y & 255)
+            else:
+                self.X = self.Y
+            self.compute_flags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
         # XCE
         elif opcode == 0xFB:
             c = self.P & 0b00000001
