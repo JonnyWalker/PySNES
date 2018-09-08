@@ -1300,6 +1300,33 @@ class CPU65816(object):
             self.X = self.A
             self.cycles += 2
             self.PC = self.PC + 1
+        # TCD
+        elif opcode == 0x5B:
+            self.compute_flags(self.A, self.isM())
+            self.DP = self.A
+            self.cycles += 2
+            self.PC += 1
+        # TCS
+        elif opcode == 0x1B:
+            self.compute_flags(self.A, self.isM())
+            if self.e:
+                self.SP = (self.SP & 0xFF00) | (self.A & 0x00FF)
+            else:
+                self.SP = self.A
+            self.cycles += 2
+            self.PC += 1
+        # TDC
+        elif opcode == 0x7B:
+            self.compute_flags(self.DP, False) # DP is always 16 bit
+            self.A = self.DP
+            self.cycles += 2
+            self.PC += 1
+        # TSC
+        elif opcode == 0x3B:
+            self.compute_flags(self.SP, False) # SP is always 16 bit
+            self.A = self.SP
+            self.cycles += 2
+            self.PC +=1
         # XCE
         elif opcode == 0xFB:
             c = self.P & 0b00000001
