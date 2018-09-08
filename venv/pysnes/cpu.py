@@ -1318,7 +1318,8 @@ class CPU65816(object):
             self.cycles += 2
             self.PC = self.PC + 1
         else:
-            print("unkown opcode:", opcode)
+            from opcodes import opcode_map
+            print("unkown opcode:", hex(opcode), " maybe:", opcode_map[opcode])
             raise NotImplementedError()
 
 
