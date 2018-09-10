@@ -619,9 +619,8 @@ class CPU65816(object):
             self.PC = label & 0x00FFFF
         # JSL long
         elif opcode == 0x22:
-            self.memory.write(self.SP, self.PBR)
-            self.SP = self.SP - 1
-            self.push_stack(self.PC + 3)  # save return addr
+            self.push_stack_8bit(self.PBR) # save return addr
+            self.push_stack(self.PC + 3)   # save return addr
             label = self.fetch_twobyte(code)
             bank = self.fetch_byte(code)
             self.PBR = bank
@@ -1128,6 +1127,18 @@ class CPU65816(object):
             else:
                 self.clearC()
             self.A = result
+        # RTS
+        elif opcode == 0x60:
+            addr = self.pop_stack() # get return addr
+            self.cycles += 6
+            self.PC = addr
+        # RTL
+        elif opcode == 0x6B:
+            addr = self.pop_stack()      # get return addr
+            bank = self.pop_stack_8bit() # get return addr
+            self.PBR = bank
+            self.cycles += 6
+            self.PC = addr
         # TODO: use BCD sub if D Flag is set
         # SBC #const #TODO: v and c
         elif opcode == 0xE9:

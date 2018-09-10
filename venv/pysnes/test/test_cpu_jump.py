@@ -152,3 +152,41 @@ def test_JSR_long():
     assert mem.read(0x0001FE) == 0x34
     assert mem.read(0x0001FD) == 0x56 + 3
     assert cpu.SP == 0x01FC
+
+
+def test_RTS():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000
+    cpu.PBR = 0x12
+    cpu.SP = 0x01FD
+    mem.write(0x0001FF, 0x34)
+    mem.write(0x0001FE, 0x56)
+    nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
+
+    cpu.fetch_decode_execute(nops+[0x60])
+
+    assert cpu.P == 0b00000000 # no effect
+    assert cpu.cycles == 6
+    assert cpu.PBR == 0x12
+    assert cpu.PC == 0x3456 # the inc to 3456 will be done by the loop
+    assert cpu.SP == 0x01FF
+
+
+def test_RTL():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.P = 0b00000000
+    cpu.PBR = 0x00
+    cpu.SP = 0x01FC
+    mem.write(0x0001FF, 0x12)
+    mem.write(0x0001FE, 0x34)
+    mem.write(0x0001FD, 0x56)
+
+    cpu.fetch_decode_execute([0x6B])
+
+    assert cpu.P == 0b00000000 # no effect
+    assert cpu.cycles == 6
+    assert cpu.PBR == 0x12
+    assert cpu.PC == 0x3456 # the inc to 3456 will be done by the loop
+    assert cpu.SP == 0x01FF
