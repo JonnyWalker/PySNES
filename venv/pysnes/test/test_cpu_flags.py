@@ -165,7 +165,9 @@ def test_XCE():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
     cpu.e = 1
+
     cpu.run_code([0xFB])
+
     assert cpu.e == 0
     assert cpu.P == 0b00000001
     assert cpu.cycles == 2
@@ -175,9 +177,17 @@ def test_XCE1():
     cpu = CPU65816(None)
     cpu.P = 0b00000001
     cpu.e = 1
+    cpu.X = 0x1234
+    cpu.Y = 0x5678
+    cpu.SP = 0x0201
+
     cpu.run_code([0xFB])
+
     assert cpu.e == 1
     assert cpu.P == 0b00110001
+    assert cpu.X == 0x0034
+    assert cpu.Y == 0x0078
+    assert cpu.SP == 0x0101
     assert cpu.cycles == 2
 
 
@@ -185,7 +195,15 @@ def test_XCE2():
     cpu = CPU65816(None)
     cpu.P = 0b00000001
     cpu.e = 0
+    cpu.X = 0x1234
+    cpu.Y = 0x5678
+    cpu.SP = 0x0201
+
     cpu.run_code([0xFB])
+
     assert cpu.e == 1
     assert cpu.P == 0b00110000
+    assert cpu.X == 0x0034
+    assert cpu.Y == 0x0078
+    assert cpu.SP == 0x0101
     assert cpu.cycles == 2
