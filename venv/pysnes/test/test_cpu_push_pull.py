@@ -76,6 +76,198 @@ def test_PHD():
     assert cpu.cycles == 4
 
 
+def test_PHA_8_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.A = 0xAFFE
+    cpu.SP = 0x01FF
+    cpu.P = 0b00100000
+
+    cpu.fetch_decode_execute([0x48])
+
+    assert cpu.SP == 0x01FE
+    assert mem.read(0x0001FF) == 0xFE
+    assert cpu.cycles == 3
+    assert cpu.P == 0b00100000
+
+
+def test_PHA_16_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.A = 0x1337
+    cpu.SP = 0x01FF
+    cpu.P = 0b00000000
+
+    cpu.fetch_decode_execute([0x48])
+
+    assert cpu.SP == 0x01FD
+    assert mem.read(0x0001FF) == 0x13
+    assert mem.read(0x0001FE) == 0x37
+    assert cpu.cycles == 4
+    assert cpu.P == 0b00000000
+
+
+def test_PLA_8_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FE
+    cpu.A = 0xFFFF
+    mem.write(0x0001FF, 0x42)
+    cpu.P = 0b00100000 # set m flag
+
+    cpu.fetch_decode_execute([0x68])
+
+    assert cpu.A == 0xFF42 # in 8 bit mode the high byte of the A register persists
+    assert cpu.SP == 0x01FF
+    assert cpu.cycles == 4
+    assert cpu.P == 0b00100000
+
+
+def test_PLA_16_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FD
+    cpu.P = 0b00000000
+    cpu.A = 0xFFFF
+    mem.write(0x0001FF, 0xCD)
+    mem.write(0x0001FE, 0xAB)
+    
+    cpu.fetch_decode_execute([0x68])
+
+    assert cpu.A == 0xCDAB
+    assert cpu.cycles == 5
+    assert cpu.P == 0b10000000
+    assert cpu.SP == 0x01FF
+
+
+def test_PHX_8_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.X = 0xAFFE
+    cpu.SP = 0x01FF
+    cpu.P = 0b00010000
+
+    cpu.fetch_decode_execute([0xDA])
+
+    assert cpu.SP == 0x01FE
+    assert mem.read(0x0001FF) == 0xFE
+    assert cpu.cycles == 3
+    assert cpu.P == 0b00010000
+
+
+def test_PHX_16_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.X = 0xAFFE
+    cpu.SP = 0x01FF
+    cpu.P = 0b00000000
+
+    cpu.fetch_decode_execute([0xDA])
+
+    assert cpu.SP == 0x01FD
+    assert mem.read(0x0001FF) == 0xAF
+    assert mem.read(0x0001FE) == 0xFE
+    assert cpu.cycles == 4
+    assert cpu.P == 0b00000000
+
+
+def test_PLX_8_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FE
+    cpu.X = 0xFFFF
+    cpu.P = 0b00010000 # set x flag
+    mem.write(0x0001FF, 0xB7)
+
+    cpu.fetch_decode_execute([0xFA])
+
+    assert cpu.SP == 0x01FF
+    assert cpu.P == 0b10010000 # negative flag set
+    assert cpu.cycles == 4
+    assert cpu.X == 0x00B7 # in 8 bit mode the high byte of the X/Y registers is forced to 0
+    
+
+def test_PLX_16_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FD
+    cpu.X = 0xFFFF
+    cpu.P = 0b00000000
+    mem.write(0x0001FF, 0xB0)
+    mem.write(0x0001FE, 0x0B)
+
+    cpu.fetch_decode_execute([0xFA])
+
+    assert cpu.SP == 0x01FF
+    assert cpu.P == 0b10000000 # negative flag set
+    assert cpu.cycles == 5
+    assert cpu.X == 0xB00B
+
+
+def test_PLY_8_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FE
+    cpu.Y = 0xFFFF
+    cpu.P = 0b00010000 # set x flag
+    mem.write(0x0001FF, 0x00)
+
+    cpu.fetch_decode_execute([0x7A])
+
+    assert cpu.SP == 0x01FF
+    assert cpu.P == 0b00010010 # zero flag set
+    assert cpu.cycles == 4
+    assert cpu.Y == 0x0000
+
+
+def test_PLY_16_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FD
+    cpu.Y = 0x1234
+    cpu.P = 0b00000000
+    mem.write(0x0001FF, 0x24)
+    mem.write(0x0001FE, 0x68)
+
+    cpu.fetch_decode_execute([0x7A])
+
+    assert cpu.SP == 0x01FF
+    assert cpu.P == 0b00000000
+    assert cpu.cycles == 5
+    assert cpu.Y == 0x2468
+
+
+def test_PHY_8_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.Y = 0x9001
+    cpu.SP = 0x01FF
+    cpu.P = 0b00010000 # set x flag
+
+    cpu.fetch_decode_execute([0x5A])
+
+    assert cpu.SP == 0x01FE
+    assert mem.read(0x0001FF) == 0x01
+    assert cpu.cycles == 3
+    assert cpu.P == 0b00010000
+
+
+def test_PHY_16_bit():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.Y = 0x9001
+    cpu.SP = 0x01FF
+    cpu.P = 0b00000000
+
+    cpu.fetch_decode_execute([0x5A])
+
+    assert cpu.SP == 0x01FD
+    assert mem.read(0x0001FF) == 0x90
+    assert mem.read(0x0001FE) == 0x01
+    assert cpu.cycles == 4
+    assert cpu.P == 0b00000000
+
+
 def test_PLP_16_bit():
     mem = MemoryMock()
     cpu = CPU65816(mem)
