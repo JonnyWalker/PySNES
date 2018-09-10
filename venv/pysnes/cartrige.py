@@ -1,4 +1,4 @@
-from helper import get_two_bytes_little_endian
+from helper import get_two_bytes_little_endian, pow
 
 LO_ROM_HEADER = "007FC0"
 HI_ROM_HEADER = "00FFC0"
@@ -142,7 +142,7 @@ class ROMHeader(object):
         print("ROM TYPE:           \t"   + hex(self.rom_type) + info)
         info = " (" + ROMHeader.rom_size_map.get(self.rom_size, "UNKNOWN") +  ")"
         print("ROM SIZE:           \t"   + hex(self.rom_size) + info)
-        print("SRAM SIZE:          \t"   + hex(self.sram_size) + " (" + str(2048*2**self.sram_size) +  " BYTE)")
+        print("SRAM SIZE:          \t"   + hex(self.sram_size) + " (" + str(2048*pow(2, self.sram_size)) +  " BYTE)")
         print("LICENCE CODE:       \t0x" + self.licence_code)
         print("VERSION:            \t"   + hex(self.version) + " (1." + str(self.version) +  ")")
         print("CHECKSUM COMPLEMENT:\t0x" + self.checksum_complement + " (NOT CHECKSUM)")
