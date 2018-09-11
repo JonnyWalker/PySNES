@@ -22,7 +22,7 @@ if len(sys.argv) > 3:
 #d.print_assembler(ba, start, end)
 class MemoryMock(object):
     def __init__(self):
-        self.ram = {}
+        self.ram = [0x00] * 16777216 # 2 ** 24
 
     def read(self, address):
         return self.ram[address]

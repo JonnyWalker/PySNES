@@ -35,3 +35,10 @@ def print_hex_dump(rom_byte_array):
         ascii = ascii.replace("\r", " ")
         print(addr + ":\t"+ hex_line + "\t" + ascii)
         a +=16
+
+
+def pow(basis, exp):
+    result = 1
+    for i in range(exp):
+        result *= basis
+    return result
