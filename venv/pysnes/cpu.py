@@ -1368,6 +1368,14 @@ class CPU65816(object):
             self.A = self.SP
             self.cycles += 2
             self.PC +=1
+        # XBA
+        elif opcode == 0xEB:
+            AH = (self.A & 0xFF00) >> 8
+            AL = (self.A & 0x00FF)
+            self.compute_NZflags(AH, True)  # 8 bit
+            self.A = (AL << 8) + AH
+            self.cycles += 3
+            self.PC = self.PC + 1
         # XCE
         elif opcode == 0xFB:
             c = self.P & 0b00000001

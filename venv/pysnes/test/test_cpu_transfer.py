@@ -213,3 +213,39 @@ def test_tsc_negative():
     assert cpu.cycles == 2
     assert cpu.A == 0xF234
     assert cpu.P == 0b10000000  # negative flag
+
+
+def test_xba():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.A = 0x6789
+
+    cpu.fetch_decode_execute([0xEB])
+
+    assert cpu.A == 0x8967
+    assert cpu.P == 0b00000000  # result is based on AL
+    assert cpu.cycles == 3
+
+
+def test_xba2():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.A = 0xF789
+
+    cpu.fetch_decode_execute([0xEB])
+
+    assert cpu.A == 0x89F7
+    assert cpu.P == 0b10000000  # result is based on AL
+    assert cpu.cycles == 3
+
+
+def test_xba3():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000000  # 16 Bit mode
+    cpu.A = 0x0089
+
+    cpu.fetch_decode_execute([0xEB])
+
+    assert cpu.A == 0x8900
+    assert cpu.P == 0b00000010  # result is based on AL
+    assert cpu.cycles == 3
