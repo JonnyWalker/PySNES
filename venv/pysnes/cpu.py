@@ -1042,10 +1042,15 @@ class CPU65816(object):
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # PHA
-        elif opcode == 0x48:
-            self.push_stack(self.A)
-            self.cycles += 3
-            self.PC = self.PC + 1
+        elif opcode == 0x48: 
+            if self.isM():# 8 bit mode
+                self.push_stack_8bit(self.A & 0x00FF)
+                self.cycles += 3
+                self.PC += 1
+            else: # 16 bit mode
+                self.push_stack(self.A)
+                self.cycles += 4
+                self.PC += 1
         # PHB
         elif opcode == 0x8B:
             self.push_stack_8bit(self.DBR)
@@ -1066,11 +1071,40 @@ class CPU65816(object):
             self.push_stack_8bit(self.P)
             self.cycles += 3
             self.PC = self.PC + 1
+        # PHX
+        elif opcode == 0xDA:
+            if self.isX():            
+                self.push_stack_8bit(self.X & 0x00FF)
+                self.cycles += 3
+                self.PC += 1
+            else:
+                self.push_stack(self.X)
+                self.cycles += 4
+                self.PC += 1
+        # PHY
+        elif opcode == 0x5A:
+            if self.isX():# x flag also controls Y register.         
+                self.push_stack_8bit(self.Y & 0x00FF)
+                self.cycles += 3
+                self.PC += 1
+            else:
+                self.push_stack(self.Y)
+                self.cycles += 4
+                self.PC += 1
         # PLA
         elif opcode == 0x68:
-            self.A = self.pop_stack()
-            self.cycles += 3
-            self.PC = self.PC + 1
+            if self.isM(): # 8 bit mode
+                A_low = self.pop_stack_8bit()
+                A_high = self.A & 0xFF00
+                self.A = A_high + A_low # in 8 bit mode the high byte of the A register persists
+                self.compute_NZflags(A_low, True)
+                self.cycles += 4
+                self.PC += 1
+            else: # 16 bit mode
+                self.A = self.pop_stack()
+                self.compute_NZflags(self.A, False)
+                self.cycles += 5
+                self.PC += 1
         # PLB
         elif opcode == 0xAB:
             result = self.pop_stack_8bit()
@@ -1092,6 +1126,29 @@ class CPU65816(object):
                 self.P = self.P | 0b00110000
             self.cycles += 4
             self.PC += 1
+        # PLX
+        elif opcode == 0xFA:
+            if self.isX():
+                self.X = self.pop_stack_8bit() # in 8 bit mode the high byte of X is forced to 0
+                self.compute_NZflags(self.X,True)
+                self.cycles += 4
+                self.PC += 1
+            else:
+                self.X = self.pop_stack()
+                self.compute_NZflags(self.X,False)
+                self.cycles += 5
+                self.PC += 1
+        elif opcode == 0x7A:
+            if self.isX(): # there is no y flag. the x flag controls the Y register.
+                self.Y = self.pop_stack_8bit() # in 8 bit mode the high byte of Y is forced to 0
+                self.compute_NZflags(self.Y,True)
+                self.cycles += 4
+                self.PC += 1
+            else:
+                self.Y = self.pop_stack()
+                self.compute_NZflags(self.Y,False)
+                self.cycles += 5
+                self.PC += 1
         # REP
         elif opcode == 0xC2:
             const = self.fetch_byte(code)
@@ -1565,6 +1622,8 @@ class CPU65816(object):
                 self.setZ()
             else:
                 self.clearZ()
+
+
 
     def w(self):
         if self.DP & 0x00FF != 0:
