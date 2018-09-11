@@ -113,6 +113,22 @@ def test_SED1():
     assert cpu.cycles == 2
 
 
+def test_SEC():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000000
+    cpu.run_code([0x38])
+    assert cpu.P == 0b00000001
+    assert cpu.cycles == 2
+
+
+def test_SEC1():
+    cpu = CPU65816(None)
+    cpu.P = 0b00000001
+    cpu.run_code([0x38])
+    assert cpu.P == 0b00000001
+    assert cpu.cycles == 2
+
+
 def test_CLD():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
