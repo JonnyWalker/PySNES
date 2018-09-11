@@ -2,6 +2,7 @@ from cartrige import ROMHeader
 from helper import open_as_byte_array
 from disassembler import Disassembler
 from cpu import CPU65816
+from opcodes import opcode_map
 import sys
 
 if len(sys.argv) <= 1:
@@ -13,13 +14,7 @@ ba = open_as_byte_array(sys.argv[1])
 header = ROMHeader(ba)
 header.dump()
 d = Disassembler()
-start = 0
-end = len(ba)-2
-if len(sys.argv) > 2:
-    start = int(sys.argv[2])
-if len(sys.argv) > 3:
-    end = int(sys.argv[3])
-#d.print_assembler(ba, start, end)
+
 class MemoryMock(object):
     def __init__(self):
         self.ram = [0x00] * 16777216 # 2 ** 24
@@ -32,6 +27,11 @@ class MemoryMock(object):
 
 c = CPU65816(MemoryMock())
 while True:
+    instr_str = d.disassemble_single_opcode(ba, c.PC, add_new_line=False,
+                                  add_descr=False, add_addr=False, M=c.isM(), X=c.isX())
+    cpu_status = "\t A:"+hex(c.A)+" X:"+hex(c.X)+" Y:"+hex(c.Y)+" DP:"+hex(c.DP)+ \
+                 " SP:"+hex(c.SP)+" P:"+bin(c.P)+" e:"+bin(c.e)
+    print(instr_str+cpu_status)
     # FIXME:
     if c.cycles > 10000:
         break
