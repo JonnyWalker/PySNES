@@ -291,14 +291,211 @@ class CPU65816(object):
             self.clearV()
             self.cycles += 2
             self.PC = self.PC + 1
+        # CMP (dir, X)
+        elif opcode == 0xC1:
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True)  # zero bank wrapping!
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # CMP stk, S
+        elif opcode == 0xC3:
+            byte = self.fetch_byte(code)
+            address = compute_addr.stack(byte, self.SP)
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # CMP dir
+        elif opcode == 0xC5:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping!
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 4 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # CMP [dir]
+        elif opcode == 0xC7:
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            address = self.read_memory(address_pointer, byte_num=3, wrapp=True)  # zero bank wrapping!
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
         # CMP #const
         elif opcode == 0xC9:
-            const = self.fetch_byte(code)
+            if self.isM():
+                const = self.fetch_byte(code)
+            else:
+                const = self.fetch_twobyte(code)
             result = self.A - const
             self.compute_NZflags(result, self.isM())
             if self.A >= const:
                 self.setC()
-            self.cycles += 2
+            else:
+                self.clearC()
+            self.cycles += 3 - self.m()
+            self.PC = self.PC + 1
+        # CMP abs
+        elif opcode == 0xCD:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # CMP long
+        elif opcode == 0xCF:
+            address = self.fetch_threebyte(code)
+            value = self.read_memory(address, byte_num=2 - self.m())  # no wrapping
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
+        # CMP (dir), Y
+        elif opcode == 0xD1:
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True)  # zero bank wrapping!
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 7 - self.m() + self.w() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # CMP (dir)
+        elif opcode == 0xD2:
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True)  # zero bank wrapping!
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 6 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # CMP (stk, S), Y
+        elif opcode == 0xD3:
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.stack(byte, self.SP)
+            bytes = self.read_memory(address_pointer, byte_num=2, wrapp=True)  # zero bank wrapping!
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 8 - self.m()
+            self.PC = self.PC + 1
+        # CMP dir, X
+        elif opcode == 0xD5:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping!
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 5 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # CMP [dir], Y
+        elif opcode == 0xD7:
+            byte = self.fetch_byte(code)
+            address_pointer = compute_addr.dp(byte, self.DP)
+            bytes = self.read_memory(address_pointer, byte_num=3, wrapp=True)  # zero bank wrapping!
+            address = compute_addr.long_y(bytes, self.Y, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 7 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # CMP abs, Y
+        elif opcode == 0xD9:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # CMP abs, X
+        elif opcode == 0xDD:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # CMP long, X
+        elif opcode == 0xDF:
+            bytes = self.fetch_threebyte(code)
+            address = compute_addr.long_x(bytes, self.X, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.A - value
+            self.compute_NZflags(result, self.isM())
+            if self.A >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # CPX #const
         elif opcode == 0xE0:
@@ -307,6 +504,35 @@ class CPU65816(object):
             self.compute_NZflags(result, self.isM())
             if self.X >= const:
                 self.setC()
+            else:
+                self.clearC()
+            self.cycles += 3 - self.x()
+            self.PC = self.PC + 1
+        # CPX dir
+        elif opcode == 0xE4:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping!
+            result = self.X - value
+            self.compute_NZflags(result, self.isX())
+            if self.X >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 4 - self.x() + self.w()
+            self.PC = self.PC + 1
+        # CPX abs
+        elif opcode == 0xEC:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.X - value
+            self.compute_NZflags(result, self.isM())
+            if self.X >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 5 - self.x()
             self.PC = self.PC + 1
         # CPY #const
         elif opcode == 0xC0:
@@ -315,7 +541,35 @@ class CPU65816(object):
             self.compute_NZflags(result, self.isM())
             if self.Y >= const:
                 self.setC()
-            self.cycles += 2
+            else:
+                self.clearC()
+            self.cycles += 3 - self.x()
+            self.PC = self.PC + 1
+        # CPY dir
+        elif opcode == 0xC4:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping!
+            result = self.Y - value
+            self.compute_NZflags(result, self.isX())
+            if self.Y >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 4 - self.x() + self.w()
+            self.PC = self.PC + 1
+        # CPY abs
+        elif opcode == 0xCC:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num=2 - self.m())
+            result = self.Y - value
+            self.compute_NZflags(result, self.isM())
+            if self.Y >= value:
+                self.setC()
+            else:
+                self.clearC()
+            self.cycles += 5 - self.x()
             self.PC = self.PC + 1
         # DEC A
         elif opcode == 0x3A:
