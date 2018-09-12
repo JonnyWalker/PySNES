@@ -833,6 +833,7 @@ class CPU65816(object):
             self.compute_NZflags(value, self.isX())
             self.X = value
             self.cycles += 6 - 2 * self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
         # LDY #const
         elif opcode == 0xA0:
             if self.isX():  # 8 Bit Y/X
@@ -1171,6 +1172,7 @@ class CPU65816(object):
             else:
                 self.clearC()
             self.A = result
+            self.PC = self.PC + 1
         # ROR A
         elif opcode == 0x6A:
             result = self.A >> 1
@@ -1184,6 +1186,7 @@ class CPU65816(object):
             else:
                 self.clearC()
             self.A = result
+            self.PC = self.PC + 1
         # RTS
         elif opcode == 0x60:
             addr = self.pop_stack() # get return addr
@@ -1321,12 +1324,14 @@ class CPU65816(object):
             address = compute_addr.abs_y(bytes, self.DBR, self.Y, self.isX())
             self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
         # STA abs, X
         elif opcode == 0x9D:
             bytes = self.fetch_twobyte(code)
             address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
             self.write_memory(address, self.A, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
         # STA long, X
         elif opcode == 0x9F:
             bytes = self.fetch_threebyte(code)
@@ -1403,6 +1408,7 @@ class CPU65816(object):
             address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
             self.write_memory(address, 0x00, byte_num = 2 - self.m())
             self.cycles += 6 - self.m()
+            self.PC = self.PC + 1
         # TAX
         elif opcode == 0x78:
             self.compute_NZflags(self.A, self.isM())

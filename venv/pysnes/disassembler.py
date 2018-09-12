@@ -1,6 +1,60 @@
 from opcodes import opcode_map, Mode
 
 class Disassembler(object):
+    def disassemble_single_opcode(self, byte_array, index, add_new_line=False,
+                                  add_descr=False, add_addr=False, M=False, X=False):
+        opcode = byte_array[index]
+        opcode_info = opcode_map[opcode]
+        mnemonic = opcode_info[0]
+        addr_mode = opcode_info[1]
+        flags = opcode_info[2]
+        length = opcode_info[3]
+        cycles = opcode_info[4]
+        descr = opcode_info[5]
+        result = ""
+        if add_addr:
+            result += hex(index)+":"
+        result += hex(opcode)+":"+mnemonic+" "
+        index = index + 1
+        if length == 2:
+            immediate8bit = byte_array[index]
+            result += hex(immediate8bit)
+        elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_M:
+            if M:
+                immediate8bit = byte_array[index]
+                result += hex(immediate8bit)
+            else:
+                addr = byte_array[index]
+                index = index + 1
+                addr = addr + (byte_array[index] << 8)
+                index = index + 1
+                result += hex(addr)
+        elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_X:
+            if X:
+                immediate8bit = byte_array[index]
+                result += hex(immediate8bit)
+            else:
+                addr = byte_array[index]
+                index = index + 1
+                addr = addr + (byte_array[index] << 8)
+                index = index + 1
+                result += hex(addr)
+        elif length == 3:
+            addr = byte_array[index]
+            index = index + 1
+            addr = addr + (byte_array[index] << 8)
+            index = index + 1
+            result += hex(addr)
+        elif length == 4:
+            addr = byte_array[index]
+            index = index + 1
+            addr = addr + (byte_array[index] << 8)
+            index = index + 1
+            addr = addr + (byte_array[index] << 16)
+            index = index + 1
+            result += hex(addr)
+        return result
+
     def disassemble(self, byte_array, add_new_line=False, add_descr=False, add_addr=False, M=False, X=False):
         index = 0
         symbolic = []
