@@ -51,7 +51,7 @@ def test_PEI2():
     mem.write(0x001235, 0x56)
     cpu.P = 0b00000000  # M and X Flag have no effect on PEI
 
-    cpu.fetch_decode_execute([0xD4, 0x33]) # PEI ($34)
+    cpu.fetch_decode_execute([0xD4, 0x33]) # PEI ($33)
 
     assert mem.read(0x0001FF) == 0x56 # high
     assert mem.read(0x0001FE) == 0x78 # low
@@ -70,7 +70,23 @@ def test_PER():
     cpu.fetch_decode_execute(nops+[0x62, 0x34, 0x12]) # PER #$1234
 
     assert mem.read(0x0001FF) == 0x12 # high
-    assert mem.read(0x0001FE) == 0x57 # low (1234+PC+3 = 1254)
+    assert mem.read(0x0001FE) == 0x57 # low (1234+PC+3 = 1257)
+    assert cpu.SP == 0x01FD
+    assert cpu.cycles == 6
+
+
+def test_PER2():
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
+    cpu.SP = 0x01FF
+    cpu.PC = 0x12
+    cpu.P = 0b00000000  # M and X Flag have no effect on PER
+
+    nops = [0xEA] * cpu.PC
+    cpu.fetch_decode_execute(nops + [0x62, 0x12, 0x00])  # PER #$0012
+
+    assert mem.read(0x0001FF) == 0x00  # high
+    assert mem.read(0x0001FE) == 0x27  # low (0012+PC+3 = 0027)
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 6
 
