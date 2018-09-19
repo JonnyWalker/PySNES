@@ -17,7 +17,7 @@ def test_PEA():
     cpu.SP = 0x01FF
     cpu.P = 0b00000000  # M and X Flag have no effect on PEA
 
-    cpu.fetch_decode_execute([0xFA, 0x34, 0x12]) # PEA #$1234
+    cpu.fetch_decode_execute([0xF4, 0x34, 0x12]) # PEA #$1234
 
     assert mem.read(0x0001FF) == 0x12 # high
     assert mem.read(0x0001FE) == 0x34 # low

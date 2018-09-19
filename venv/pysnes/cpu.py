@@ -1297,7 +1297,7 @@ class CPU65816(object):
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
         # PEA imm
-        elif opcode == 0xFA:
+        elif opcode == 0xF4:
             bytes = self.fetch_twobyte(code)
             self.push_stack(bytes)
             self.cycles += 5
@@ -1413,6 +1413,7 @@ class CPU65816(object):
                 self.compute_NZflags(self.X,False)
                 self.cycles += 5
                 self.PC += 1
+        # PLY
         elif opcode == 0x7A:
             if self.isX(): # there is no y flag. the x flag controls the Y register.
                 self.Y = self.pop_stack_8bit() # in 8 bit mode the high byte of Y is forced to 0
