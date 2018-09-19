@@ -1296,6 +1296,26 @@ class CPU65816(object):
             self.A = result
             self.cycles += 6 - self.m()
             self.PC = self.PC + 1
+        # PEA imm
+        elif opcode == 0xFA:
+            bytes = self.fetch_twobyte(code)
+            self.push_stack(bytes)
+            self.cycles += 5
+            self.PC = self.PC + 1
+        # PEI dir
+        elif opcode == 0xD4:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num = 2, wrapp=True)
+            self.push_stack(value)
+            self.cycles = 6 + self.w()
+            self.PC = self.PC + 1
+        # PER imm
+        elif opcode == 0x62:
+            bytes = self.fetch_twobyte(code)
+            self.push_stack(bytes + self.PC+1)
+            self.cycles += 6
+            self.PC = self.PC + 1
         # PHA
         elif opcode == 0x48: 
             if self.isM():# 8 bit mode
