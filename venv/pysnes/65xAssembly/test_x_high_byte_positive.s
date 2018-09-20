@@ -17,19 +17,17 @@ reset:
     bpl @loop
 
 ; RELEVANT PART
-	.i16
+	.a16
 	; change to 16 bit mode
 	clc	
 	xce
-	; set X to 16 bit
-	rep #$10
-	ldx #$1100
-	; set X to 8 and back to 16
-	sep #$10
-	rep #$10
-	; if changing modes reset the high byte x + 1 - 1 should be 0
-	inx
-	dex
+	; set A to 16 bit
+	rep #$20
+	lda #$1100
+	; set A to 8 and back to 16
+	sep #$20
+	rep #$20
+	and #$1100
 	beq green
 ; END PART
 
