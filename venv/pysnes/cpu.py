@@ -212,14 +212,52 @@ class CPU65816(object):
                 self.PC = self.PC + 1
         # BIT dp
         elif opcode == 0x24:
-            if self.DP & 0b1000000000000000 != 0:
-                self.setN()
-            # use if second highest bit is set
-            if self.DP & 0b0100000000000000 != 0:
-                self.setV()
-            if self.DP & self.A != 0:
-                self.setZ()
-            self.cycles += 3
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping!
+            self.compute_bit_flags(value)
+            self.cycles += 4 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # BIT abs
+        elif opcode == 0x2C:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num=2 - self.m())
+            self.compute_bit_flags(value)
+            self.cycles += 5 - self.m()
+            self.PC = self.PC + 1
+        # BIT dir, X
+        elif opcode == 0x34:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp_x(byte, self.DP, self.X, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m(), wrapp=True)  # zero bank wrapping!
+            self.compute_bit_flags(value)
+            self.cycles += 5 - self.m() + self.w()
+            self.PC = self.PC + 1
+        # BIT abs, X
+        elif opcode == 0x3C:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs_x(bytes, self.DBR, self.X, self.isX())
+            value = self.read_memory(address, byte_num=2 - self.m())
+            self.compute_bit_flags(value)
+            self.cycles += 6 - self.m() - self.x() + self.x() * self.p()
+            self.PC = self.PC + 1
+        # BIT imm
+        # this is the only bit opcode that only affects the Z flag
+        elif opcode == 0x89:
+            if self.isM():
+                value = self.fetch_byte(code)
+                if not value & (0x00FF & self.A):
+                    self.setZ()
+                else:
+                    self.clearZ()
+            else:
+                value = self.fetch_twobyte(code)
+                if not value & self.A:
+                    self.setZ()
+                else:
+                    self.clearZ()
+            self.cycles += 3 - self.m()
             self.PC = self.PC + 1
         # BMI nearlabel
         elif opcode == 0x30:
@@ -1717,6 +1755,42 @@ class CPU65816(object):
             self.A = self.SP
             self.cycles += 2
             self.PC +=1
+        # TRB dir
+        elif opcode == 0x14:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            result = self.compute_trb(value)
+            self.write_memory(address, result, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            self.cycles += 7 - 2 * self.m() + self.w()
+            self.PC = self.PC + 1
+        # TRB abs
+        elif opcode == 0x1C:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
+            result = self.compute_trb(value)
+            self.write_memory(address, result, byte_num=2 - self.m())
+            self.cycles += 8 - 2 * self.m()
+            self.PC = self.PC + 1
+        # TSB dir
+        elif opcode == 0x04:
+            byte = self.fetch_byte(code)
+            address = compute_addr.dp(byte, self.DP)
+            value = self.read_memory(address, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            result = self.compute_tsb(value)
+            self.write_memory(address, result, byte_num = 2 - self.m(), wrapp=True) # zero bank wrapping!
+            self.cycles += 7 - 2 * self.m() + self.w()
+            self.PC = self.PC + 1
+        # TSB abs
+        elif opcode == 0x0C:
+            bytes = self.fetch_twobyte(code)
+            address = compute_addr.abs(bytes, self.DBR)
+            value = self.read_memory(address, byte_num = 2 - self.m())
+            result = self.compute_tsb(value)
+            self.write_memory(address, result, byte_num=2 - self.m())
+            self.cycles += 8 - 2 * self.m()
+            self.PC = self.PC + 1
         # XBA
         elif opcode == 0xEB:
             AH = (self.A & 0xFF00) >> 8
@@ -1790,6 +1864,71 @@ class CPU65816(object):
             # in 8 bit mode only the lower byte sets flags
             flag_result = flag_result & 0x00FF
         self.compute_NZflags(flag_result, self.isM())
+        return result
+
+    # the n flag reflects the highest bit of the value
+    # the v flag reflects the second highest bit of the value
+    # the n flag is set if the value and the accumulator is 0
+    def compute_bit_flags(self, value):
+        if self.isM():          # 8 bit mode
+            if value & 0x80:
+                self.setN()
+            else:
+                self.clearN()
+            if value & 0x40:
+                self.setV()
+            else:
+                self.clearV()
+            if not value & (self.A & 0x00FF):
+                self.setZ()
+            else:
+                self.clearZ()
+        else:                   # 16 bit mode
+            if value & 0x8000:
+                self.setN()
+            else:
+                self.clearN()
+            if value & 0x4000:
+                self.setV()
+            else:
+                self.clearV()
+            if not value & self.A:
+                self.setZ()
+            else:
+                self.clearZ()
+
+    # sets the Z flag if (value & accumulator = 0)
+    # resets the bits in the data that are 1s in the accumulator
+    def compute_trb(self, value):
+        if self.isM():
+            if not value & (self.A & 0x00FF):
+                self.setZ()
+            else:
+                self.clearZ()
+            result = value & (~self.A & 0x00FF)
+        else:
+            if not value & self.A:
+                self.setZ()
+            else:
+                self.clearZ()
+            result = value & ~self.A
+        return result
+
+    # sets the Z flag if (value & accumulator = 0)
+    # sets the bits in the data that are 1s in the accumulator
+    def compute_tsb(self, value):
+        if self.isM():
+            if not value & (self.A & 0x00FF):
+                self.setZ()
+            else:
+                self.clearZ()
+            result = value | (self.A & 0x00FF)
+        else:
+            if not value & self.A:
+                self.setZ()
+            else:
+                self.clearZ()
+            result = value | self.A
         return result
 
     def fetch_byte(self, code):
