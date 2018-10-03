@@ -1355,7 +1355,7 @@ class CPU65816(object):
             self.cycles += 6
             self.PC = self.PC + 1
         # PHA
-        elif opcode == 0x48: 
+        elif opcode == 0x48:
             if self.isM():# 8 bit mode
                 self.push_stack_8bit(self.A & 0x00FF)
                 self.cycles += 3
@@ -1386,7 +1386,7 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # PHX
         elif opcode == 0xDA:
-            if self.isX():            
+            if self.isX():
                 self.push_stack_8bit(self.X & 0x00FF)
                 self.cycles += 3
                 self.PC += 1
@@ -1396,7 +1396,7 @@ class CPU65816(object):
                 self.PC += 1
         # PHY
         elif opcode == 0x5A:
-            if self.isX():# x flag also controls Y register.         
+            if self.isX():# x flag also controls Y register.
                 self.push_stack_8bit(self.Y & 0x00FF)
                 self.cycles += 3
                 self.PC += 1
@@ -1791,6 +1791,150 @@ class CPU65816(object):
             self.write_memory(address, result, byte_num=2 - self.m())
             self.cycles += 8 - 2 * self.m()
             self.PC = self.PC + 1
+        # TAX
+        elif opcode == 0xAA:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.A & 0x00FF)
+            else:
+                self.X = self.A
+            self.compute_NZflags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TAY
+        elif opcode == 0xA8:
+            if self.isX():
+                self.Y = (self.Y & 0xFF00) | (self.A & 0x00FF)
+            else:
+                self.Y = self.A
+            self.compute_NZflags(self.Y, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TSX
+        elif opcode == 0xBA:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.SP & 0x00FF)
+            else:
+                self.X = self.SP
+            self.compute_NZflags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TXA
+        elif opcode == 0x8A:
+            if self.isM():
+                self.A = (self.A & 0xFF00) | (self.X & 0x00FF)
+            else:
+                self.A = self.X
+            self.compute_NZflags(self.A, self.isM())
+            self.cycles += 2
+            self.PC += 1
+        # TXS
+        elif opcode == 0x9A:
+            if e == 1:
+                self.SP = (self.SP & 0xFF00) | (self.X & 0x00FF)
+            else:
+                self.SP = self.X
+            # Flags are not set
+            self.cycles += 2
+            self.PC += 1
+        # TXY
+        elif opcode == 0x9B:
+            if self.isX():
+                self.Y = (self.Y & 0xFF00) | (self.X & 0x00FF)
+            else:
+                self.Y = self.X
+            self.compute_NZflags(self.Y, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TYA
+        elif opcode == 0x98:
+            if self.isM():
+                self.A = (self.A & 0xFF00) | (self.Y & 0x00FF)
+            else:
+                self.A = self.Y
+            self.compute_NZflags(self.A, self.isM())
+            self.cycles += 2
+            self.PC += 1
+        # TYX
+        elif opcode == 0xBB:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.Y & 0x00FF)
+            else:
+                self.X = self.Y
+            self.compute_NZflags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TAX
+        elif opcode == 0xAA:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.A & 0x00FF)
+            else:
+                self.X = self.A
+            self.compute_NZflags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TAY
+        elif opcode == 0xA8:
+            if self.isX():
+                self.Y = (self.Y & 0xFF00) | (self.A & 0x00FF)
+            else:
+                self.Y = self.A
+            self.compute_NZflags(self.Y, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TSX
+        elif opcode == 0xBA:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.SP & 0x00FF)
+            else:
+                self.X = self.SP
+            self.compute_NZflags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TXA
+        elif opcode == 0x8A:
+            if self.isM():
+                self.A = (self.A & 0xFF00) | (self.X & 0x00FF)
+            else:
+                self.A = self.X
+            self.compute_NZflags(self.A, self.isM())
+            self.cycles += 2
+            self.PC += 1
+        # TXS
+        elif opcode == 0x9A:
+            if self.isX():
+                self.SP = (self.SP & 0xFF00) | (self.X & 0x00FF)
+            else:
+                self.SP = self.X
+            # Flags are not set
+            self.cycles += 2
+            self.PC += 1
+        # TXY
+        elif opcode == 0x9B:
+            if self.isX():
+                self.Y = (self.Y & 0xFF00) | (self.X & 0x00FF)
+            else:
+                self.Y = self.X
+            self.compute_NZflags(self.Y, self.isX())
+            self.cycles += 2
+            self.PC += 1
+        # TYA
+        elif opcode == 0x98:
+            if self.isM():
+                self.A = (self.A & 0xFF00) | (self.Y & 0x00FF)
+            else:
+                self.A = self.Y
+            self.compute_NZflags(self.A, self.isM())
+            self.cycles += 2
+            self.PC += 1
+        # TYX
+        elif opcode == 0xBB:
+            if self.isX():
+                self.X = (self.X & 0xFF00) | (self.Y & 0x00FF)
+            else:
+                self.X = self.Y
+            self.compute_NZflags(self.X, self.isX())
+            self.cycles += 2
+            self.PC += 1
         # XBA
         elif opcode == 0xEB:
             AH = (self.A & 0xFF00) >> 8
