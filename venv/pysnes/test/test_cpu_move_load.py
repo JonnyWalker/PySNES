@@ -592,7 +592,6 @@ def test_LDA_stack_relative_indirect_indexed_Y():
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
 
-<<<<<<< HEAD:venv/pysnes/test/test_cpu_move_load.py
 
 def test_LDX_const16Bit():
     cpu = CPU65816(None)
@@ -898,7 +897,8 @@ def test_LDY_abs_indexed_X2():
     assert cpu.cycles >= 6
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
-=======
+
+
 def test_TAX():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -913,6 +913,7 @@ def test_TAX():
     assert cpu.X == 0x6789
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b00000000
+
 
 def test_TAX_N():
     cpu = CPU65816(None)
@@ -929,6 +930,7 @@ def test_TAX_N():
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b10000000 # n
 
+
 def test_TAX_Z():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -943,6 +945,7 @@ def test_TAX_Z():
     assert cpu.X == 0x0000
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b00000010 # z
+
 
 def test_TAX_X():
     cpu = CPU65816(None)
@@ -959,6 +962,7 @@ def test_TAX_X():
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b00010000 # x
 
+
 def test_TAX_NX():
     cpu = CPU65816(None)
     cpu.P = 0b00010000 # x
@@ -973,6 +977,7 @@ def test_TAX_NX():
     assert cpu.X == 0x1289
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b10010000 # nx
+
 
 def test_TAY():
     cpu = CPU65816(None)
@@ -989,6 +994,7 @@ def test_TAY():
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00000000
 
+
 def test_TAY_N():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1003,6 +1009,7 @@ def test_TAY_N():
     assert cpu.X == 0xABCD
     assert cpu.Y == 0xC789
     assert cpu.P == 0b10000000 # n
+
 
 def test_TAY_Z():
     cpu = CPU65816(None)
@@ -1019,6 +1026,7 @@ def test_TAY_Z():
     assert cpu.Y == 0x0000
     assert cpu.P == 0b00000010 # z
 
+
 def test_TAY_X():
     cpu = CPU65816(None)
     cpu.P = 0b00010000 # x
@@ -1033,6 +1041,7 @@ def test_TAY_X():
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x1278
     assert cpu.P == 0b00010000 # x
+
 
 def test_TAY_NX():
     cpu = CPU65816(None)
@@ -1049,6 +1058,7 @@ def test_TAY_NX():
     assert cpu.Y == 0x1289
     assert cpu.P == 0b10010000 # nx
 
+
 def test_TXA():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1063,6 +1073,7 @@ def test_TXA():
     assert cpu.X == 0x1234
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00000000
+
 
 def test_TXA_N():
     cpu = CPU65816(None)
@@ -1079,6 +1090,7 @@ def test_TXA_N():
     assert cpu.Y == 0x6789
     assert cpu.P == 0b10000000 # n
 
+
 def test_TXA_Z():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1094,6 +1106,7 @@ def test_TXA_Z():
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00000010 # z
 
+
 def test_TXA_X():
     cpu = CPU65816(None)
     cpu.P = 0b00010000 # x
@@ -1104,10 +1117,11 @@ def test_TXA_X():
 
     cpu.fetch_decode_execute([0x8A]) # TXA
     assert cpu.cycles == 2
-    assert cpu.A == 0x0034
+    assert cpu.A == 0x1234
     assert cpu.X == 0x1234
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00010000 # x
+
 
 def test_TXY():
     cpu = CPU65816(None)
@@ -1121,7 +1135,8 @@ def test_TXY():
     assert cpu.X == 0x1234
     assert cpu.Y == 0x1234
     assert cpu.P == 0b00000000
-    
+
+
 def test_TXY_N():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1134,6 +1149,7 @@ def test_TXY_N():
     assert cpu.X == 0x8234
     assert cpu.Y == 0x8234
     assert cpu.P == 0b10000000 # n
+
 
 def test_TXY_Z():
     cpu = CPU65816(None)
@@ -1148,6 +1164,7 @@ def test_TXY_Z():
     assert cpu.Y == 0x0000
     assert cpu.P == 0b00000010 # z
 
+
 def test_TXY_X():
     cpu = CPU65816(None)
     cpu.P = 0b00010000 # x
@@ -1160,6 +1177,7 @@ def test_TXY_X():
     assert cpu.X == 0x1234
     assert cpu.Y == 0xAB34
     assert cpu.P == 0b00010000 # x
+
 
 def test_TYA():
     cpu = CPU65816(None)
@@ -1176,6 +1194,7 @@ def test_TYA():
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000000
 
+
 def test_TYA_N():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1190,6 +1209,7 @@ def test_TYA_N():
     assert cpu.Y == 0x8234
     assert cpu.A == 0x8234
     assert cpu.P == 0b10000000 # n
+
 
 def test_TYA_Z():
     cpu = CPU65816(None)
@@ -1206,6 +1226,7 @@ def test_TYA_Z():
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010 # z
 
+
 def test_TYA_X():
     cpu = CPU65816(None)
     cpu.P = 0b00010000 # x
@@ -1218,8 +1239,9 @@ def test_TYA_X():
     assert cpu.cycles == 2
     assert cpu.X == 0x8765
     assert cpu.Y == 0x1234
-    assert cpu.A == 0x0034
+    assert cpu.A == 0x1234
     assert cpu.P == 0b00010000 # x
+
 
 def test_TYX():
     cpu = CPU65816(None)
@@ -1236,6 +1258,7 @@ def test_TYX():
     assert cpu.X == 0x1234
     assert cpu.P == 0b00000000
 
+
 def test_TYX_N():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1251,6 +1274,7 @@ def test_TYX_N():
     assert cpu.X == 0x8234
     assert cpu.P == 0b10000000 # n
 
+
 def test_TYX_Z():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
@@ -1265,6 +1289,7 @@ def test_TYX_Z():
     assert cpu.Y == 0x0000
     assert cpu.X == 0x0000
     assert cpu.P == 0b00000010 # z
+
 
 def test_TYX_X():
     cpu = CPU65816(None)
