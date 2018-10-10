@@ -68,7 +68,7 @@ def test_INC_Zero_8BIT():
     assert cpu.P == 0b00100010  # zero flag
 
 
-def test_INC_overflow():
+def test_INC_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000  # 16 Bit mode
@@ -79,10 +79,10 @@ def test_INC_overflow():
 
     assert cpu.cycles == 2
     assert cpu.A == 0x8000      # -32.768 (MIN INT)
-    assert cpu.P == 0b11000000  # negative flag, overflow flag
+    assert cpu.P == 0b10000000  # negative flag, no overflow flag
 
 
-def test_INC_overflow_8BIT():
+def test_INC_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00100000  # 8 Bit mode
@@ -93,7 +93,7 @@ def test_INC_overflow_8BIT():
 
     assert cpu.cycles == 2
     assert cpu.A == 0x80        # -128 (MIN INT)
-    assert cpu.P == 0b11100000  # negative flag, overflow flag
+    assert cpu.P == 0b10100000  # negative flag, no overflow flag
 
 
 def test_INC_DP():
@@ -164,7 +164,7 @@ def test_INC_DP_Zero_8BIT():
     assert cpu.P == 0b00100010 # zero flag
 
 
-def test_INC_DP_overflow():
+def test_INC_DP_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000  # 16 Bit mode
@@ -178,10 +178,10 @@ def test_INC_DP_overflow():
     assert cpu.cycles in (5, 6, 7, 8)
     assert mem.read(0x001234) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x001235) == 0x80
-    assert cpu.P == 0b11000000 # negative flag, overflow flag
+    assert cpu.P == 0b10000000 # negative flag, no overflow flag
 
 
-def test_INC_DP_overflow_8BIT():
+def test_INC_DP_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00100000  # 8 Bit mode
@@ -195,7 +195,7 @@ def test_INC_DP_overflow_8BIT():
     assert cpu.cycles in (5, 6, 7, 8)
     assert mem.read(0x001234) == 0x80 # -128 (MIN INT)
     assert mem.read(0x001235) == 0x00
-    assert cpu.P == 0b11100000 # negative flag, overflow flag
+    assert cpu.P == 0b10100000 # negative flag, no overflow flag
 
 
 def test_INC_absolute():
@@ -266,7 +266,7 @@ def test_INC_absolute_Zero_8BIT():
     assert cpu.P == 0b00100010 # zero flag
 
 
-def test_INC_absolute_overflow():
+def test_INC_absolute_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000  # 16 Bit mode
@@ -280,10 +280,10 @@ def test_INC_absolute_overflow():
     assert cpu.cycles == 8
     assert mem.read(0x123456) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x123457) == 0x80
-    assert cpu.P == 0b11000000 # negative flag, overflow flag
+    assert cpu.P == 0b10000000 # negative flag, no overflow flag
 
 
-def test_INC_absolute_overflow_8BIT():
+def test_INC_absolute_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00100000  # 8 Bit mode
@@ -297,7 +297,7 @@ def test_INC_absolute_overflow_8BIT():
     assert cpu.cycles == 6
     assert mem.read(0x123456) == 0x80 # -128 (MIN INT)
     assert mem.read(0x123457) == 0x00
-    assert cpu.P == 0b11100000 # negative flag, overflow flag
+    assert cpu.P == 0b10100000 # negative flag, no overflow flag
 
 
 def test_INC_DP_indexed_X():
@@ -376,7 +376,7 @@ def test_INC_DP_indexed_X_Zero_8BIT():
     assert cpu.P == 0b00100010  # zero flag
 
 
-def test_INC_DP_indexed_X_overflow():
+def test_INC_DP_indexed_X_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000  # 16 Bit mode
@@ -392,10 +392,10 @@ def test_INC_DP_indexed_X_overflow():
     assert cpu.cycles in (8, 9)
     assert mem.read(0x000054) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x000055) == 0x80
-    assert cpu.P == 0b11000000  # negative flag, overflow flag
+    assert cpu.P == 0b10000000  # negative flag, no overflow flag
 
 
-def test_INC_DP_indexed_X_overflow_8BIT():
+def test_INC_DP_indexed_X_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00100000  # 8 Bit mode
@@ -411,7 +411,7 @@ def test_INC_DP_indexed_X_overflow_8BIT():
     assert cpu.cycles in (6, 7)
     assert mem.read(0x000054) == 0x80 # -128 (MIN INT)
     assert mem.read(0x000055) == 0x00
-    assert cpu.P == 0b11100000  # negative flag, overflow flag
+    assert cpu.P == 0b10100000  # negative flag, no overflow flag
 
 
 def test_INC_abs_indexed_X():
@@ -485,7 +485,7 @@ def test_INC_abs_indexed_X_Zero_8BIT():
     assert cpu.P == 0b00100010 # zero flag
 
 
-def test_INC_abs_indexed_X_overflow():
+def test_INC_abs_indexed_X_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000 # 16 Bit mode
@@ -500,10 +500,10 @@ def test_INC_abs_indexed_X_overflow():
     assert cpu.cycles == 9
     assert mem.read(0x808001) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x808002) == 0x80
-    assert cpu.P == 0b11000000 # negative flag, overflow flag
+    assert cpu.P == 0b10000000 # negative flag, no overflow flag
 
 
-def test_INC_abs_indexed_X_overflow_8BIT():
+def test_INC_abs_indexed_X_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00100000 # 8 Bit mode
@@ -518,7 +518,7 @@ def test_INC_abs_indexed_X_overflow_8BIT():
     assert cpu.cycles == 7
     assert mem.read(0x808001) == 0x80 # -127(MIN INT)
     assert mem.read(0x808002) == 0x00
-    assert cpu.P == 0b11100000 # negative flag, overflow flag
+    assert cpu.P == 0b10100000 # negative flag, no overflow flag
 
 
 def test_INX():
@@ -577,7 +577,7 @@ def test_INX_Zero_8BIT():
     assert cpu.P == 0b00010010  # zero flag
 
 
-def test_INX_overflow():
+def test_INX_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000  # 16 Bit mode
@@ -588,10 +588,10 @@ def test_INX_overflow():
 
     assert cpu.cycles == 2
     assert cpu.X == 0x8000      # -32.768 (MIN INT)
-    assert cpu.P == 0b11000000  # negative flag, overflow flag
+    assert cpu.P == 0b10000000  # negative flag, no overflow flag
 
 
-def test_INX_overflow_8BIT():
+def test_INX_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00010000  # 8 Bit mode
@@ -602,7 +602,7 @@ def test_INX_overflow_8BIT():
 
     assert cpu.cycles == 2
     assert cpu.X == 0x80        # -128 (MIN INT)
-    assert cpu.P == 0b11010000  # negative flag, overflow flag
+    assert cpu.P == 0b10010000  # negative flag, no overflow flag
 
 
 def test_INY():
@@ -661,7 +661,7 @@ def test_INY_Zero_8BIT():
     assert cpu.P == 0b00010010  # zero flag
 
 
-def test_INY_overflow():
+def test_INY_no_overflow():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00000000  # 16 Bit mode
@@ -672,10 +672,10 @@ def test_INY_overflow():
 
     assert cpu.cycles == 2
     assert cpu.Y == 0x8000 # -32.768 (MIN INT)
-    assert cpu.P == 0b11000000  # negative flag, overflow flag
+    assert cpu.P == 0b10000000  # negative flag, no overflow flag
 
 
-def test_INY_overflow_8BIT():
+def test_INY_no_overflow_8BIT():
     mem = MemoryMock()
     cpu = CPU65816(mem)
     cpu.P = 0b00010000  # 8 Bit mode
@@ -686,4 +686,4 @@ def test_INY_overflow_8BIT():
 
     assert cpu.cycles == 2
     assert cpu.Y == 0x80 # -128 (MIN INT)
-    assert cpu.P == 0b11010000  # negative flag, overflow flag
+    assert cpu.P == 0b10010000  # negative flag, no overflow flag
