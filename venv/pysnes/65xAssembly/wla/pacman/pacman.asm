@@ -148,23 +148,17 @@ rep #%00010000	;16 bit xy
 sep #%00100000	;8 bit ab
 
 ldx #$0000
-- lda UntitledPalette.l,x
+- lda Palette0.l,x
 sta $2122
 inx
 cpx #8
 bne -
 
-;I'll explain this later
-;We'll have two palettes, only one color is needed for the second:
-lda #33		;The color we need is the 33rd
+lda #33		;The color we need is the 33rd - wituslki: hat irgendwas mit Farbe/Pixel von Pacman zu tun
 sta $2121
-;lda.l Palette2
-;sta $2122
-;lda.l Palette2+1
-;sta $2122
 
 ldx #$0000
-- lda Palette2.l,x
+- lda Palette1.l,x
 sta $2122
 inx
 cpx #8
@@ -173,7 +167,7 @@ bne -
 
 ldx #UntitledData	; Address
 lda #:UntitledData	; of UntitledData
-ldy #(15*16*2)	; length of data
+ldy #(64*16*2)	; length of data - witulski: 32 Tiles, 16 Breite und 2 Bit fuer Farbe
 stx $4302	; write
 sta $4304	; address
 sty $4305	; and length
@@ -193,44 +187,564 @@ ldx #$4000	; write to vram
 stx $2116	; from $4000
 
 ;ugly code starts here - it writes the # shape I mentioned before.
-.rept 2
-   ;X|X|X
-   .rept 2
-     ldx #$0000	; tile 0 ( )
-     stx $2118
-     ldx #$0002	; tile 2 (|)
-     stx $2118
-   .endr
-   ldx #$0000
-   stx $2118
-   ;first line finished, add BG's
-   .rept 27
-     stx $2118	; X=0
-   .endr
-   ;beginning of 2nd line
-   ;-+-+-
-   .rept 2
-     ldx #$0004	; tile 4 (-)
-     stx $2118
-     ldx #$0006	; tile 6 (+)
-     stx $2118
-   .endr
-   ldx #$0004	; tile 4 (-)
-   stx $2118
-   ldx #$0000
-   .rept 27
-     stx $2118
-   .endr
+; witulski: Man packt den Index der Tile in x und laed das Ganze in 2118.
+; das zeichnet dann (spaeter) die Tile. Es wird hier einfach von links nach rechts und
+; von oben nach unten gezeichent
+
+; Zeichne Labyrinth
+
+;Line 0: r------7r------7
+ldx #$0002	; tile 2 (r)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0008	; tile 8 (7)
+stx $2118
+ldx #$0002	; tile 2 (r)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0006	; tile 6 (-)
+stx $2118
+ldx #$0008	; tile 8 (7)
+stx $2118
+
+ldx #$0000 ; tile 0 (leer)
+;first line finished, add BG's
+.rept 16
+ stx $2118	; X=0 - witulski: dies macht die Zeile mit leeren Grafiken voll
 .endr
-.rept 2
-  ldx #$0000	; tile 0 ( )
-  stx $2118
-  ldx #$0002	; tile 2 (|)
-  stx $2118
+
+;Line 2: |G G    LJ     |
+ldx #$0026	; tile 4 (|)
+stx $2118
+ldx #$002E	; tile 48, (und 49, 62, 63): roter Geist
+stx $2118
+ldx #$0000	; tile 4 (leer)
+stx $2118
+ldx #$002C	; tile 44, (und 45, 60, 61): blauer Geist
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0004	; tile X (L)
+stx $2118
+ldx #$0000	; tile X (J)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile 0 (|)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
 .endr
+
+;Line 3: |              |
+ldx #$0026	; tile 4 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 4 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile 0 (|)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 4: |              |
+ldx #$0026	; tile 4 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 4 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile 0 (|)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 5: L__7        r__J
+ldx #$0020	; tile 4 (L)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0040	; tile 0 (7)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0042	; tile 0 (r)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0022	; tile 0 (J)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 6:    |        |
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile  (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0026	; tile 0 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 7: ___J        L___
+ldx #$0006	; tile 4 (-)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+ldx #$0006	; tile 4 (-)
+stx $2118
+ldx #$0044	; tile 0 (J)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0046	; tile 0 (L)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 8: L__7        r__J
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0040	; tile 0 (7)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0042	; tile 0 (r)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 09:    |        |
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile  (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0026	; tile 0 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 10: ___J        L___
+ldx #$0002	; tile 4 (r)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+ldx #$0006	; tile 4 (-)
+stx $2118
+ldx #$0044	; tile 0 (J)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0046	; tile 0 (L)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+ldx #$0006	; tile 0 (-)
+stx $2118
+ldx #$0008	; tile 0 (7)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 11: |              |
+ldx #$0026	; tile 4 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 4 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile 0 (|)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 12: |              |
+ldx #$0026	; tile 4 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 4 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile 0 (|)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 13: |              |
+ldx #$0026	; tile 4 (|)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 4 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0024	; tile 0 (|)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 14: L__7        r__J
+ldx #$0020	; tile 4 (L)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 4 (-)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0028	; tile 0 (-)
+stx $2118
+ldx #$0022	; tile 0 (J)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
 ldx #$6000	; BG2 will start here
 stx $2116
-ldx #$000C	; And will contain 1 tile
+ldx #$002A	; tile 42, (und 45, 60, 61): PacMan
+stx $2118
+ldx #$0002	; tile 0 (r)
 stx $2118
 ;set up the screen
 lda #%00110000	; 16x16 tiles, mode 0
@@ -288,6 +802,7 @@ xba
 sta $2110		; write 16 bits
 ;--------------------------------------
 ldx #$0000		; reset our counter
+; THeorie: Hier wird irgendwie mit 8 schwarzen Feldern uebermalt
 -
 rep #%00100000		; 16 bit A
 lda #$0000		; empty it
