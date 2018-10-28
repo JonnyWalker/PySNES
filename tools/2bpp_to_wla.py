@@ -1,3 +1,6 @@
+# python 2bpp_to_wla.py BMPPATH
+import sys
+
 # https://en.wikipedia.org/wiki/BMP_file_format
 class BitMap(object):
     size = 0
@@ -40,18 +43,6 @@ def file_to_bmp_obj(name):
          bmp.palette.append((R,G,B,A))
     bmp.palette.reverse()    
     return bmp
-
-
-def dump_bmp_info(bmp):
-    print("Bitmap Header")
-    print("type:\t\t\t" + str(bmp.type))
-    print("size:\t\t\t" + str(bmp.size) + " bytes")
-    print("pixel array offset:\t" + str(bmp.pixel_array_offset))
-    print("header size:\t\t" + str(bmp.header_size)+" bytes")
-    print("width:\t\t\t" + str(bmp.width))
-    print("height:\t\t\t" + str(bmp.height))
-    print("Bit per pixel:\t\t" + str(bmp.bpp))
-    print("Number of Colors:\t" + str(bmp.color_num))
 
 
 # works only with 2BPP
@@ -97,6 +88,7 @@ def bit_string_to_2BPP(bit_string):
 
 def color_8Bit_to_color_5Bit(bmp):
      color_5Bit = []
+     color_5Bit_bin = []
      for color in bmp.palette:
          R = bin(color[0]/8)[2:] # 32*8=256
          rp = (5-len(R))*"0"     # padding
@@ -105,6 +97,7 @@ def color_8Bit_to_color_5Bit(bmp):
          B = bin(color[2]/8)[2:] # 32*8=256
          bp = (5-len(B))*"0"     # padding
          bin_string = "0"+bp+B+gp+G+rp+R
+         color_5Bit_bin.append(bin_string)
          value = int(bin_string, 2)
          h_string = hex((value & 0xFF00) >> 8)[2:]
          l_string = hex(value & 0x00FF)[2:]
@@ -112,26 +105,43 @@ def color_8Bit_to_color_5Bit(bmp):
          lp = (2-len(l_string))*"0" # padding
          color_5Bit.append(lp+l_string) # little endian
          color_5Bit.append(hp+h_string)
-     return color_5Bit
+     return color_5Bit, color_5Bit_bin
 
 
-bmp = file_to_bmp_obj("img/pacman/GhostUL.bmp")
-dump_bmp_info(bmp)
-bit_string = bmp_to_bit_string(bmp)
-snes_encoding = bit_string_to_2BPP(bit_string)
-color_5Bit = color_8Bit_to_color_5Bit(bmp)
+def dump_bmp_info(bmp, snes_encoding, color_5Bit, color_5Bit_bin):
+    print("Bitmap Header")
+    print("type:\t\t\t" + str(bmp.type))
+    print("size:\t\t\t" + str(bmp.size) + " bytes")
+    print("pixel array offset:\t" + str(bmp.pixel_array_offset))
+    print("header size:\t\t" + str(bmp.header_size)+" bytes")
+    print("width:\t\t\t" + str(bmp.width))
+    print("height:\t\t\t" + str(bmp.height))
+    print("Bit per pixel:\t\t" + str(bmp.bpp))
+    print("Number of Colors:\t" + str(bmp.color_num))
+    print("Palette (BMP / SNES Encoding):")
+    for i, color in enumerate(bmp.palette):
+        print(str(i)+":"+str(color)+":"+str(color_5Bit_bin[i]))
+    print("Pixel Array (BMP / SNES Encoding):")
+    index = 0
+    for line in bit_string:
+        print(line+":"+snes_encoding[index] + snes_encoding[index+1])
+        index +=2
+    print("WLA tile data:")
+    wla_string = ".db "
+    for value in snes_encoding:
+        wla_string += "$"+value+","
+    print(wla_string[:-1]) 
+    print("WLA palette data:")
+    wla_string = ".db "
+    for value in color_5Bit:
+        wla_string += "$"+value+","
+    print(wla_string[:-1])
 
-index = 0
-for line in bit_string:
-    print(line+":"+snes_encoding[index] + snes_encoding[index+1])
-    index +=2
-print("WLA tile data:")
-wla_string = ".db "
-for value in snes_encoding:
-    wla_string += "$"+value+","
-print(wla_string[:-1])
-print("WLA palette data:")
-wla_string = ".db "
-for value in color_5Bit:
-    wla_string += "$"+value+","
-print(wla_string[:-1])
+if len(sys.argv) != 2:
+    print("python 2bpp_to_wla.py BMPPATH")
+else:
+    bmp = file_to_bmp_obj(sys.argv[1])
+    bit_string = bmp_to_bit_string(bmp)
+    snes_encoding = bit_string_to_2BPP(bit_string)
+    color_5Bit, color_5Bit_bin = color_8Bit_to_color_5Bit(bmp)
+    dump_bmp_info(bmp, snes_encoding, color_5Bit, color_5Bit_bin)
