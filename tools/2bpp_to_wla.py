@@ -23,7 +23,7 @@ def file_to_bmp_obj(name):
             bytes = data
     bmp.type = bytes[0:2]
     bmp.size = ord(bytes[2]) # TODO: read three more bytes
-    bmp.pixel_array_offset = ord(bytes[10])
+    bmp.pixel_array_offset = ord(bytes[10]) # TODO: read three more bytes
     bmp.header_size = ord(bytes[14])
     bmp.width = ord(bytes[18]) # TODO: read one more byte
     bmp.height = ord(bytes[22]) # TODO: read one more byte
