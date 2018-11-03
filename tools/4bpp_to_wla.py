@@ -161,22 +161,27 @@ def dump_bmp_info(bmp):
 
 
 def dump_wla_info(tiles, color_5Bit):
-    print(";WLA tile data:")
+    print("TileData:")
     for tile in tiles:
-        print(";Tile Numer:"+str(tile.num))
-        wla_string = ".db "
+        print("\n    ;Tile Numer:"+str(tile.num))
+        wla_string = "    .db "
         for value in tile.SNES_4BPP_encoding[0:16]:
             wla_string += "$"+value+","
         print(wla_string[:-1])
-        wla_string = ".db "
+        wla_string = "    .db "
         for value in tile.SNES_4BPP_encoding[16:]:
             wla_string += "$"+value+","
         print(wla_string[:-1])
-    print(";WLA palette data:")
-    wla_string = ".db "
-    for value in color_5Bit:
+    print("Palette:")
+    wla_string = "    .db "
+    for value in color_5Bit[:16]:
         wla_string += "$"+value+","
     print(wla_string[:-1])
+    if len(color_5Bit) > 16:
+        wla_string = "    .db "
+        for value in color_5Bit[16:32]:
+            wla_string += "$"+value+","
+        print(wla_string[:-1])
 
 
 if len(sys.argv) != 2:

@@ -45,7 +45,7 @@ def file_to_bmp_obj(name):
     return bmp
 
 
-# works only with 2BPP
+# works only with 4BPP Bitmaps
 def bmp_to_bit_string(bmp):
     index = 0
     bit_string = []
