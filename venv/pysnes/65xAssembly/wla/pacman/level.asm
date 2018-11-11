@@ -10,7 +10,7 @@
 
 PutLevelTileMapInVRAM:
 ; Zeichne Labyrinth
-;Line 0: r------7r------7
+;Line 0: r------||------7
 ldx #$000A	; tile (r)
 stx $2118
 ldx #$000C	; tile (-)
@@ -25,11 +25,9 @@ ldx #$000C	; tile (-)
 stx $2118
 ldx #$000C	; tile (-)
 stx $2118
-ldx #$000C	; tile (7) TODO
+ldx #$0048	; tile (||) 
 stx $2118
-ldx #$000C	; tile (r) TODO
-stx $2118
-ldx #$000C	; tile (-)
+ldx #$000C	; tile (-) 
 stx $2118
 ldx #$000C	; tile (-)
 stx $2118
@@ -43,6 +41,8 @@ ldx #$000C	; tile (-)
 stx $2118
 ldx #$000E	; tile (7)
 stx $2118
+ldx #$0000	; tile (leer)
+stx $2118
 
 ; Dies macht die Zeile mit leeren Grafiken voll
 ; Nur die halbe Zeile ist auf dem Monitor sichtbar
@@ -52,53 +52,369 @@ ldx #$0000 ; tile 0 (leer)
  stx $2118	 
 .endr
 
-;Line 2: |G G    LJ     |
+;Line 2: | <> <> || <> <> |
 ldx #$0008	; (|) 
 stx $2118
-ldx #$0046	; Kirsche 
+ldx #$004C	; < 
 stx $2118
-ldx #$0048	; Erdbeere 
+ldx #$004E	; > 
 stx $2118
-ldx #$004A	; Birne 
+ldx #$0000	;  
 stx $2118
-ldx #$004C	; Pacman 
+ldx #$004C	; < 
 stx $2118
-ldx #$004E  ; Pacman (unten)
+ldx #$004E  ; >
 stx $2118
-ldx #$0060	; nix
+ldx #$0000	; 
 stx $2118
-ldx #$0060	; nix
+ldx #$0048	; ||
 stx $2118
-ldx #$0062	; 
+ldx #$0000	; 
 stx $2118
-ldx #$0064	; Geist (hellblau)
+ldx #$004C	; <
 stx $2118
-ldx #$0066	; Geist (pink)
+ldx #$004E	; >
 stx $2118
-ldx #$0068	; Geist (rot)
+ldx #$0000	; 
 stx $2118
-ldx #$006A	; Geist (orange)
+ldx #$004C	; <
 stx $2118
-ldx #$006C	; Trans-Gender-Fluid PacMan (ok ok.. es ist Mrs PacMan)
-stx $2118
-ldx #$006E  ; Trans-Gender-Fluid PacMan (ok ok.. es ist Mrs PacMan)
+ldx #$004E  ; >
 stx $2118
 ldx #$0028	; tile (|)
 stx $2118
+ldx #$0000	; tile (leer)
+stx $2118
 
 ldx #$0000
 .rept 16
  stx $2118
 .endr
 
-;Line 3: |              |
+;Line 3: |       U       |
+ldx #$0008	; tile (|)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$00CA	; tile  (leer)
+stx $2118
+ldx #$00C8	; tile  (leer)
+stx $2118
+ldx #$00C6	; tile  (leer)
+stx $2118
+ldx #$00E2	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$006A	; tile  (U)
+stx $2118
+ldx #$00E4	; tile  (Geist)
+stx $2118
+ldx #$00E6	; tile  (blauer Geist)
+stx $2118
+ldx #$00E8	; tile  (pinker Geist)
+stx $2118
+ldx #$00EA	; tile  (roter Geist)
+stx $2118
+ldx #$00EC	; tile  (oranger Geist)
+stx $2118
+ldx #$00EE	; tile  (leer)
+stx $2118
+ldx #$0028	; tile  (|)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 4: |<=> n   n <=> |
+ldx #$0008	; tile (|)
+stx $2118
+ldx #$004C	; tile  (<)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$004E	; tile  (>)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$004A	; tile  (n)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$004A	; tile  (n)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$004C	; tile  (<)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$004E	; tile  (>)
+stx $2118
+ldx #$0028	; tile  (|)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 5: |    L> <J    |
+ldx #$0008	; tile (|)
+stx $2118
+ldx #$0000	; tile (leer)
+stx $2118
+ldx #$0000	; tile (leer)
+stx $2118
+ldx #$0000	; tile (leer)
+stx $2118
+ldx #$0000	; tile (leer)
+stx $2118
+ldx #$0064	; tile 0 (L)
+stx $2118
+ldx #$004E	; tile 0 (>)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$004C	; tile 0 (<)
+stx $2118
+ldx #$0066	; tile 0 (J)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0028	; tile  (|)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 6: ===>       <===
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$0024	; tile  (>)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0026	; tile  (<)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 7:       <===>      
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$004C	; tile  (<)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$004E	; tile  (>)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 8: ===>       <===
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$0024	; tile  (7)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$0026	; tile  (r)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 09: |     <===>      |
+ldx #$0008	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$004C	; tile 0 (<)
+stx $2118
+ldx #$006E	; tile 0 (=)
+stx $2118
+ldx #$006E	; tile 0 (=)
+stx $2118
+ldx #$006E	; tile 0 (=)
+stx $2118
+ldx #$004E	; tile 0 (>)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0028	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 10: | <=\   o   /=> |
+ldx #$0008	; tile 4 
+stx $2118
+ldx #$004C	; tile 0 (<)
+stx $2118
+ldx #$006E	; tile 0 (=)
+stx $2118
+ldx #$0046	; tile 0 (\)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$006C	; tile 0 (o)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0000	; tile 0 (leer)
+stx $2118
+ldx #$0044	; tile 0 (/)
+stx $2118
+ldx #$006E	; tile 0 (=)
+stx $2118
+ldx #$004E	; tile 0 (>)
+stx $2118
+ldx #$0028	; tile 0 (7)
+stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
+
+ldx #$0000
+.rept 16
+ stx $2118
+.endr
+
+;Line 11: |  u n    n u  |
 ldx #$0008	; tile (|)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
+ldx #$006A	; tile  (u)
+stx $2118
 ldx #$0000	; tile  (leer)
+stx $2118
+ldx #$004A	; tile  (n)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
@@ -106,17 +422,11 @@ ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$0000	; tile  (leer)
+ldx #$004A	; tile  (n)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
+ldx #$006A	; tile  (u)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
@@ -124,16 +434,18 @@ ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0028	; tile  (|)
 stx $2118
+ldx #$0000	; tile  (leer)
+stx $2118
 
 ldx #$0000
 .rept 16
  stx $2118
 .endr
 
-;Line 4: |              |
+;Line 12: |o   L===J   o|
 ldx #$0008	; tile (|)
 stx $2118
-ldx #$0000	; tile  (leer)
+ldx #$006C	; tile 0 (o)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
@@ -141,7 +453,15 @@ ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$0000	; tile  (leer)
+ldx #$0064	; tile  (L)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$006E	; tile  (=)
+stx $2118
+ldx #$0066	; tile  (J)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
@@ -149,58 +469,11 @@ ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
+ldx #$006C	; tile 0 (o)
 stx $2118
 ldx #$0028	; tile  (|)
 stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 5: L__7        r__J
-ldx #$002A	; tile (L)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-ldx #$002C	; tile 4 (-)
-stx $2118
-ldx #$0024	; tile 0 (7)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0026	; tile 0 (r)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-ldx #$002E	; tile 0 (J)
+ldx #$0000	; tile  (leer)
 stx $2118
 
 ldx #$0000
@@ -208,350 +481,38 @@ ldx #$0000
  stx $2118
 .endr
 
-;Line 6:    |        |
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0028	; tile  (|)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0008	; tile 0 (|)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 7: ___J        L___
-ldx #$000C	; tile 4 (-)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-ldx #$000C	; tile 4 (-)
-stx $2118
-ldx #$0004	; tile 0 (J)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0006	; tile 0 (L)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 8: L__7        r__J
-ldx #$002C	; tile 4 (-)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-ldx #$002C	; tile 4 (-)
-stx $2118
-ldx #$0024	; tile 0 (7)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0026	; tile 0 (r)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-ldx #$002C	; tile 0 (-)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 09:    |        |
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0028	; tile  (|)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0008	; tile 0 (|)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 10: ___J        L___
-ldx #$000A	; tile 4 (r)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-ldx #$000C	; tile 4 (-)
-stx $2118
-ldx #$0004	; tile 0 (J)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0000	; tile 0 (leer)
-stx $2118
-ldx #$0006	; tile 0 (L)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-ldx #$000C	; tile 0 (-)
-stx $2118
-ldx #$000E	; tile 0 (7)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 11: |              |
-ldx #$0008	; tile (|)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0028	; tile  (|)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 12: |              |
-ldx #$0008	; tile (|)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0028	; tile  (|)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 13: |              |
-ldx #$0008	; tile (|)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0000	; tile  (leer)
-stx $2118
-ldx #$0028	; tile  (|)
-stx $2118
-
-ldx #$0000
-.rept 16
- stx $2118
-.endr
-
-;Line 14: L__7        r__J
+;Line 13: L__n_______n__J
 ldx #$002A	; tile 4 (L)
 stx $2118
 ldx #$002C	; tile 0 (-)
 stx $2118
 ldx #$002C	; tile 4 (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$004A	; tile  (n)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$004A	; tile  (n)
 stx $2118
-ldx #$002C	; tile 4 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 0 (-)
+ldx #$002C	; tile  (-)
 stx $2118
-ldx #$002C	; tile 0 (-)
+ldx #$002E	; tile  (J)
 stx $2118
-ldx #$002E	; tile 0 (J)
+ldx #$0000	; tile  (leer)
 stx $2118
 
 ldx #$0000
@@ -559,9 +520,14 @@ ldx #$0000
  stx $2118
 .endr
 
+ldx #$0000
+.rept 32
+ stx $2118
+.endr
+
 ldx #$6000	; BG2 will start here
 stx $2116
-ldx #$004C	; Tile-Nummer $4C, (und $4D, $5C, $5D): PacMan
+ldx #$00CC	; Tile-Nummer $CC, (und $CD, $CC, $CD): PacMan
 stx $2118
 
 RTS ; Jump Back to call-side
