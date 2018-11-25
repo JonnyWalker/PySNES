@@ -32,7 +32,7 @@ stz $210B	; BG1 and BG2 use the $0000 tiles
 ;           Bit 2: BG3
 ;           Bit 3: BG4
 ;           Bit 4: OBJ (also die beweglichen Sprites) - nutzen wir nicht
-lda #%00000011	; enable bg1&2
+lda #%00010011	; enable bg1&2&obj
 sta $212C
 
 ;The PPU doesn't process the top line, so we scroll down 1 line.

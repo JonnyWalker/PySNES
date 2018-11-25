@@ -525,9 +525,10 @@ ldx #$0000
  stx $2118
 .endr
 
-ldx #$6000	; BG2 will start here
-stx $2116
-ldx #$00CC	; Tile-Nummer $CC, (und $CD, $CC, $CD): PacMan
-stx $2118
+;ldx #$6000	; BG2 will start here
+;stx $2116
+;ldx #$00CC	; Tile-Nummer $CC, (und $CD, $CC, $CD): PacMan
+;stx $2118
+
 
 RTS ; Jump Back to call-side

@@ -1,7 +1,7 @@
 ; Bewegt die Grafiken aus unsere tiles.inc in den VRAM
 PutTilesInVRAM:
 ldx #TileData	; Address
-lda #:TileData	; of UntitledData
+lda #:TileData	; of TileData
 ldy #(128*16*4)	; length of data - witulski: 64 Tiles, 16 Breite und 4 Bit fuer Farbe
 stx $4302	; write
 sta $4304	; address

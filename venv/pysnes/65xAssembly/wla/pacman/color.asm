@@ -5,7 +5,7 @@ ldx #$0000
 - lda Palette.l,x
 sta $2122
 inx
-cpx #24
+cpx #512
 bne -
 
 RTS
