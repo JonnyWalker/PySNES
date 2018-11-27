@@ -25,7 +25,7 @@ ldx #$000C	; tile (-)
 stx $2118
 ldx #$000C	; tile (-)
 stx $2118
-ldx #$0048	; tile (||) 
+ldx #$0060	; tile (||) 
 stx $2118
 ldx #$000C	; tile (-) 
 stx $2118
@@ -209,7 +209,7 @@ ldx #$0000
 .endr
 
 ;Line 6: ===>       <===
-ldx #$006E	; tile  (=)
+ldx #$0022	; tile  (=)
 stx $2118
 ldx #$006E	; tile  (=)
 stx $2118
@@ -237,7 +237,7 @@ ldx #$006E	; tile  (=)
 stx $2118
 ldx #$006E	; tile  (=)
 stx $2118
-ldx #$006E	; tile  (=)
+ldx #$0042	; tile  (=)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
@@ -287,13 +287,13 @@ ldx #$0000
 .endr
 
 ;Line 8: ===>       <===
-ldx #$006E	; tile  (=)
+ldx #$0002	; tile  (=)
 stx $2118
 ldx #$006E	; tile  (=)
 stx $2118
 ldx #$006E	; tile  (=)
 stx $2118
-ldx #$0024	; tile  (7)
+ldx #$0024	; tile  (>)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
@@ -315,7 +315,7 @@ ldx #$006E	; tile  (=)
 stx $2118
 ldx #$006E	; tile  (=)
 stx $2118
-ldx #$006E	; tile  (=)
+ldx #$0062	; tile  (=)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
