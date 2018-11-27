@@ -488,7 +488,7 @@ ldx #$002C	; tile 0 (-)
 stx $2118
 ldx #$002C	; tile 4 (-)
 stx $2118
-ldx #$004A	; tile  (n)
+ldx #$0040	; tile  (n)
 stx $2118
 ldx #$002C	; tile  (-)
 stx $2118
@@ -504,7 +504,7 @@ ldx #$002C	; tile  (-)
 stx $2118
 ldx #$002C	; tile  (-)
 stx $2118
-ldx #$004A	; tile  (n)
+ldx #$0040	; tile  (n)
 stx $2118
 ldx #$002C	; tile  (-)
 stx $2118
