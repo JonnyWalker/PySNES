@@ -1,6 +1,7 @@
 # python 4bpp_to_wla.py BMPPATH
 # input Windows 4BPP BMP File width = 128 height 16k (k in 1..n)
 # everthing else will break
+# e.g. $ python 4bpp_to_wla.py img/pacman/4BPP/PacMan.bmp >tiles.inc 
 import sys
 
 # https://en.wikipedia.org/wiki/BMP_file_format
