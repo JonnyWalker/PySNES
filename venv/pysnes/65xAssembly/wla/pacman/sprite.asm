@@ -5,15 +5,6 @@ sta $2101
 stz $2102           ; zero data
 stz $2103
   
-lda #$04 ; x
-sta $2104
-lda #$02 ; y
-sta $2104
-lda #$CC ; Pacman tile
-sta $2104
-lda #$30 ; vhppccct
-sta $2104
-
 lda #$00 ; x
 sta $2104
 lda #$02 ; y
@@ -988,6 +979,22 @@ sta $2104
 lda #$A8 ; Big Pill tile
 sta $2104
 lda #$30 ; vhppccct
+sta $2104
+
+; 120 Pills
+
+; now pacman and ghosts
+lda $80
+sta $2102           ; write at object (OEM Addr) 128
+
+
+lda $0100 ; x
+sta $2104
+lda $0101 ; y
+sta $2104
+lda $0103 ; Pacman tile
+sta $2104
+lda $0102 ; vhppccct
 sta $2104
 
 RTS

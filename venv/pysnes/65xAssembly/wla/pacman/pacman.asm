@@ -59,6 +59,11 @@ dec $0101	; sub 1 from Y
 dec $0101	; sub 1 from Y
 dec $0101	; sub 1 from Y
 dec $0101	; sub 1 from Y
+; modify pacman sprite
+lda #$C0 ; vhppccct
+sta $0102
+lda #$CE ; Pacman tile
+sta $0103
 +
 
 lda $0201	; get control
@@ -71,6 +76,11 @@ inc $0101	; add 1 to Y
 inc $0101	; add 1 to Y
 inc $0101	; add 1 to Y
 inc $0101	; add 1 to Y
+; modify pacman sprite
+lda #$30 ; vhppccct
+sta $0102
+lda #$CE ; Pacman tile
+sta $0103
 +
 
 lda $0201	; get control
@@ -83,6 +93,11 @@ dec $0100	; sub 1 from X
 dec $0100	; sub 1 from X
 dec $0100	; sub 1 from X
 dec $0100	; sub 1 from X
+; modify pacman sprite
+lda #$C0 ; vhppccct
+sta $0102
+lda #$CC ; Pacman tile
+sta $0103
 +
 
 lda $0201	; get control
@@ -95,18 +110,23 @@ inc $0100	; add 1 to X
 inc $0100	; add 1 to X
 inc $0100	; add 1 to X
 inc $0100	; add 1 to X
+; modify pacman sprite
+lda #$30 ; vhppccct
+sta $0102
+lda #$CC ; Pacman tile
+sta $0103
 +
 
 sep #%00100000	; 8 bit A
-stz $2102
-stz $2103  
+lda $80
+sta $2102       ; write at object (OEM Addr) 128
 lda $0100		; get our X coord
 sta $2104
 lda $0101		; get our Y coord
 sta $2104
-lda #$CC ; Pacman tile
+lda $0103       ; Pacman tile
 sta $2104
-lda #$30 ; vhppccct
+lda $0102       ; vhppccct
 sta $2104
 rep #%00100000	; get 16 bit A
 
@@ -124,6 +144,15 @@ Start:
 rep #%00010000	;16 bit xy
 sep #%00100000	;8 bit ab
 
+; set pacman start position
+lda #$70
+sta $0100
+lda #$70
+sta $0101
+lda #$C0 ; vhppccct
+sta $0102
+lda #$CC ; Pacman tile
+sta $0103
 
 JSR PutPaletteInCGRAM
 JSR PutTilesInVRAM        ; in graphics.asm
