@@ -520,6 +520,22 @@ ldx #$0000
  stx $2118
 .endr
 
+ldx #$0000
+.rept 32
+ stx $2118
+.endr
+
+ldx #$6000	; BG2 will start here
+stx $2116
+.rept 256
+ stx $2118
+.endr
+.rept 128
+ stx $2118
+.endr
+.rept 32
+ stx $2118
+.endr
 ldx #$00C0	; tile  (leer)
 stx $2118
 ldx #$00C2	; tile  (leer)
@@ -527,14 +543,6 @@ stx $2118
 ldx #$00C4	; tile  (leer)
 stx $2118
 ldx #$0000
-.rept 29
- stx $2118
-.endr
-
-;ldx #$6000	; BG2 will start here
-;stx $2116
-;ldx #$00CC	; Tile-Nummer $CC, (und $CD, $CC, $CD): PacMan
-;stx $2118
 
 
 RTS ; Jump Back to call-side
