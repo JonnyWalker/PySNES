@@ -108,17 +108,17 @@ ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$006A	; tile  (U)
 stx $2118
-ldx #$00E4	; tile  (Geist)
+ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$00E6	; tile  (blauer Geist)
+ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$00E8	; tile  (pinker Geist)
+ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$00EA	; tile  (roter Geist)
+ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$00EC	; tile  (oranger Geist)
+ldx #$00EC	; tile  (Mrs PacMan)
 stx $2118
-ldx #$00EE	; tile  (leer)
+ldx #$00EE	; tile  (Mrs PacMan)
 stx $2118
 ldx #$0028	; tile  (|)
 stx $2118

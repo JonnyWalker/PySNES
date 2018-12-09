@@ -997,4 +997,40 @@ sta $2104
 lda $0102 ; vhppccct
 sta $2104
 
+lda #$20  ; x
+sta $2104
+lda #$A0  ; y
+sta $2104
+lda #$E4  ; blauer Geist tile
+sta $2104
+lda #$30  ; vhppccct
+sta $2104
+
+lda #$C0  ; x
+sta $2104
+lda #$A0  ; y
+sta $2104
+lda #$E6  ; pinker Geist tile
+sta $2104
+lda #$30  ; vhppccct
+sta $2104
+
+lda #$C0  ; x
+sta $2104
+lda #$02  ; y
+sta $2104
+lda #$E8  ; roter Geist tile
+sta $2104
+lda #$30  ; vhppccct
+sta $2104
+
+lda #$20  ; x
+sta $2104
+lda #$02  ; y
+sta $2104
+lda #$EA  ; oranger Geist tile
+sta $2104
+lda #$30  ; vhppccct
+sta $2104
+
 RTS
