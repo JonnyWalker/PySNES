@@ -21,8 +21,10 @@ bne VBlank	; wait
 ; Dieses warten ist evtl unklug wenn es laenger als die VBlank phase dauert.
 ; TODO: Hier mal zur sicherheit ein Counter einbauen
 
-lda $4219	; read joypad: B,Y,Start, up, down, left, right (BYSTudlr) 
+lda $4219	; read joypad 1: B,Y, Select, Start, up, down, left, right (BYSTudlr) 
 sta $0201	; store it
+lda $421B	; read joypad 2: B,Y, Select, Start, up, down, left, right (BYSTudlr) 
+sta $0202	; store it
 ;cmp $0200	; compare it with the previous
 ;bne +		; if not equal, go
 ;rti		    ; if it's equal, then return
@@ -100,6 +102,78 @@ lda #$CC ; Pacman tile
 sta $0103
 +
 
+; mrs pacman moving comes now
+lda $0202	; get control
+and #%00001111	; care about directions
+sta $0202	; store this
+
+cmp #%00001000	; up?
+bne +		; if not, skip
+lda $0101	; get pacman Y Position
+cmp #$00	; if on the top,
+beq +		; don't do anything
+dec $0105	; sub 1 from Y
+dec $0105	; sub 1 from Y
+dec $0105	; sub 1 from Y
+dec $0105	; sub 1 from Y
+; modify pacman sprite
+lda #$C0 ; vhppccct
+sta $0106
+lda #$EE ; Pacman tile
+sta $0107
++
+
+lda $0202	; get control
+cmp #%00000100	; down?
+bne +		; if not, skip
+lda $0101   ; get pacman Y Position
+cmp #$FF	; if on the bottom, : MOVE LIMIT 
+beq +		; don't do anything
+inc $0105	; add 1 to Y
+inc $0105	; add 1 to Y
+inc $0105	; add 1 to Y
+inc $0105	; add 1 to Y
+; modify pacman sprite
+lda #$30 ; vhppccct
+sta $0106
+lda #$EE ; Pacman tile
+sta $0107
++
+
+lda $0202	; get control
+cmp #%00000010	; left?
+bne +		; if not, skip
+lda $0100   ; get pacman X Position
+cmp #$00	; if on the left,
+beq +		; don't do anything
+dec $0104	; sub 1 from X
+dec $0104	; sub 1 from X
+dec $0104	; sub 1 from X
+dec $0104	; sub 1 from X
+; modify pacman sprite
+lda #$F0 ; vhppccct
+sta $0106
+lda #$EC ; Pacman tile
+sta $0107
++
+
+lda $0202	; get control
+cmp #%00000001	; right?
+bne +		; if not, skip
+lda $0100   ; get pacman X Position
+cmp #$FF	; if on the right, ;MOVE LIMIT
+beq +		; don't do anything
+inc $0104	; add 1 to X
+inc $0104	; add 1 to X
+inc $0104	; add 1 to X
+inc $0104	; add 1 to X
+; modify pacman sprite
+lda #$30 ; vhppccct
+sta $0106
+lda #$EC ; Pacman tile
+sta $0107
++
+
 ; store old keyboard value to disable the effect of a
 ; pressed controll stick
 ;lda $0201
@@ -108,14 +182,25 @@ sta $0103
 sep #%00100000	; 8 bit A
 lda $80
 sta $2102       ; write at object (OEM Addr) 128
-lda $0100		; get our X coord
+
+lda $0100		; get pacman X coord
 sta $2104
-lda $0101		; get our Y coord
+lda $0101		; get pacman Y coord
 sta $2104
 lda $0103       ; Pacman tile
 sta $2104
 lda $0102       ; vhppccct
 sta $2104
+
+lda $0104 ; x
+sta $2104
+lda $0105 ; y
+sta $2104
+lda $0107 ; Mrs Pacman tile
+sta $2104
+lda $0106 ; vhppccct
+sta $2104
+
 rep #%00100000	; get 16 bit A
 
 
@@ -133,14 +218,23 @@ rep #%00010000	;16 bit xy
 sep #%00100000	;8 bit ab
 
 ; set pacman start position
-lda #$70
+lda #$60  ; PacMan X Pos
 sta $0100
-lda #$70
+lda #$70  ; PacMan Y Pos
 sta $0101
 lda #$C0 ; vhppccct
 sta $0102
 lda #$CC ; Pacman tile
 sta $0103
+
+lda #$80  ; Mrs. PacMan X Pos
+sta $0104
+lda #$70  ; Mrs. PacMan Y Pos
+sta $0105
+lda #$30  ; vhppccct
+sta $0106
+lda #$EC  ; Mrs. Pacman tile
+sta $0107
 
 JSR PutPaletteInCGRAM
 JSR PutTilesInVRAM        ; in graphics.asm

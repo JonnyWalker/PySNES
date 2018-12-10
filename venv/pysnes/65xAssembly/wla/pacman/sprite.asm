@@ -997,6 +997,15 @@ sta $2104
 lda $0102 ; vhppccct
 sta $2104
 
+lda $0104 ; x
+sta $2104
+lda $0105 ; y
+sta $2104
+lda $0107 ; Mrs Pacman tile
+sta $2104
+lda $0106 ; vhppccct
+sta $2104
+
 lda #$20  ; x
 sta $2104
 lda #$A0  ; y
