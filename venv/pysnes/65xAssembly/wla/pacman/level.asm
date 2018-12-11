@@ -116,9 +116,9 @@ ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$00EC	; tile  (Mrs PacMan)
+ldx #$0000	; tile  (leer)
 stx $2118
-ldx #$00EE	; tile  (Mrs PacMan)
+ldx #$0000	; tile  (leer)
 stx $2118
 ldx #$0028	; tile  (|)
 stx $2118

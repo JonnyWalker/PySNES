@@ -45,7 +45,7 @@ dec $0101	; sub 1 from Y
 dec $0101	; sub 1 from Y
 dec $0101	; sub 1 from Y
 ; modify pacman sprite
-lda #$C0 ; vhppccct
+lda #$B0 ; vhppccct
 sta $0102
 lda #$CE ; Pacman tile
 sta $0103
@@ -79,7 +79,7 @@ dec $0100	; sub 1 from X
 dec $0100	; sub 1 from X
 dec $0100	; sub 1 from X
 ; modify pacman sprite
-lda #$C0 ; vhppccct
+lda #$70 ; vhppccct
 sta $0102
 lda #$CC ; Pacman tile
 sta $0103
@@ -117,9 +117,9 @@ dec $0105	; sub 1 from Y
 dec $0105	; sub 1 from Y
 dec $0105	; sub 1 from Y
 ; modify pacman sprite
-lda #$C0 ; vhppccct
+lda #$B0 ; vhppccct
 sta $0106
-lda #$EE ; Pacman tile
+lda #$EE ; Mrs. Pacman tile
 sta $0107
 +
 
@@ -136,7 +136,7 @@ inc $0105	; add 1 to Y
 ; modify pacman sprite
 lda #$30 ; vhppccct
 sta $0106
-lda #$EE ; Pacman tile
+lda #$EE ; Mrs Pacman tile
 sta $0107
 +
 
@@ -151,9 +151,9 @@ dec $0104	; sub 1 from X
 dec $0104	; sub 1 from X
 dec $0104	; sub 1 from X
 ; modify pacman sprite
-lda #$F0 ; vhppccct
+lda #$70 ; vhppccct
 sta $0106
-lda #$EC ; Pacman tile
+lda #$EC ; Mrs. Pacman tile
 sta $0107
 +
 
@@ -170,7 +170,7 @@ inc $0104	; add 1 to X
 ; modify pacman sprite
 lda #$30 ; vhppccct
 sta $0106
-lda #$EC ; Pacman tile
+lda #$EC ; Mrs. Pacman tile
 sta $0107
 +
 
@@ -180,8 +180,8 @@ sta $0107
 ;sta $0200 
 
 sep #%00100000	; 8 bit A
-lda $80
-sta $2102       ; write at object (OEM Addr) 128
+stz $2102         ; zero data
+stz $2103
 
 lda $0100		; get pacman X coord
 sta $2104
@@ -235,6 +235,27 @@ lda #$30  ; vhppccct
 sta $0106
 lda #$EC  ; Mrs. Pacman tile
 sta $0107
+
+; level collision handling uses 13*2== 26 Byte .
+; you can not move on tile with an 1
+; X/Y are pacmans position properties
+; The first level:
+; X from 00 to E0
+;0000 0001 0000 0001 (Y=00) (02)
+;0110 1101 0110 1101 (Y=10)
+;0000 0001 0000 0001 (Y=20)
+;0111 0100 0101 1101 (Y=30)
+;0000 0110 1100 0001 (Y=40)
+;1111 0000 0001 1111 (Y=50)
+;0000 0111 1100 0000 (Y=60)
+;1111 0000 0001 1111 (Y=70)
+;0000 0111 1100 0001 (Y=80)
+;0111 0001 0001 1101 (Y=90)
+;0001 0100 0101 0001 (Y=A0)
+;0100 0111 1100 0101 (Y=B0)
+;0001 0000 0001 0000 (Y=C0) (BE)
+; TODO: get line by Y/10 
+; TODO: get bit in line by shifting with 1000 0000 0000 0000 and logical and
 
 JSR PutPaletteInCGRAM
 JSR PutTilesInVRAM        ; in graphics.asm

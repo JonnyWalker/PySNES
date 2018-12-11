@@ -31,6 +31,7 @@ John:
 03.11.2018 - 08 Stunden: 16 Farben PacMan im Modus 2, 4BPP Converter
 10.11.2018 - 05 Stunden: PacMan Level neu anordnen
 09.12.2018 - 02 Stunden> PacMan Pillen anordnen und Ausrichtung von PacMan ändert sich bei Bewegung. State wird aus dem Speicher gelesen
+10.12.2018 - 01 Stunden> PacMan Bugfix
 
 Sebastian:
 05.08.2018 - 05 Stunden: PU impl, lda, XCE
