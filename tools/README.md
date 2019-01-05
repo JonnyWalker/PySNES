@@ -4,9 +4,13 @@ PySNES Toolbox
   
 - 2bpp_to_wla.py:
    converts images (in 2bpp windows bmp format) to wla assembly code
-   e.g. run $python 2bpp_to_wla.py img/pacman/4BPP/Ghost2LL.bmp > tiles.inc
+
+   e.g. run **$python 2bpp_to_wla.py img/pacman/4BPP/Ghost2LL.bmp > img/pacman/2BPP/tiles.inc**
+
 - 4bpp_to_wla.py:
    converts images (in 4bpp windows bmp format) to wla assembly code
-   e.g. run $ python 4bpp_to_wla.py img/pacman/4BPP/PacMan.bmp >tiles.inc
+
+   e.g. run **$ python 4bpp_to_wla.py img/pacman/4BPP/PacMan.bmp > img/pacman/4BPP/tiles.inc**
+
 
 The converter tools will not check if the input is a valid file!
