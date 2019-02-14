@@ -27,6 +27,8 @@ def test_CMP_zero():
     assert cpu.cycles == 3
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000011  # z and c flag
+    assert cpu.PC == 3
+
 
 
 def test_CMP_zero_8bit():
@@ -41,6 +43,7 @@ def test_CMP_zero_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x12
     assert cpu.P == 0b00100011  # z and c flag
+    assert cpu.PC == 2
 
 
 def test_CMP_negative():
@@ -55,6 +58,7 @@ def test_CMP_negative():
     assert cpu.cycles == 3
     assert cpu.A == 0x1234
     assert cpu.P == 0b10000000  # n flag
+    assert cpu.PC == 3
 
 
 def test_CMP_negative_8bit():
@@ -69,6 +73,7 @@ def test_CMP_negative_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x12
     assert cpu.P == 0b10100000  # n flag
+    assert cpu.PC == 2
 
 
 def test_CMP_cflag():
@@ -83,6 +88,7 @@ def test_CMP_cflag():
     assert cpu.cycles == 3
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000001  # c flag
+    assert cpu.PC == 3
 
 
 def test_CMP_cflag_8bit():
@@ -97,6 +103,7 @@ def test_CMP_cflag_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x12
     assert cpu.P == 0b00100001  # c flag
+    assert cpu.PC == 2
 
 
 def test_CMP_DP_indexed_indirect_X():
@@ -120,6 +127,7 @@ def test_CMP_DP_indexed_indirect_X():
     assert cpu.cycles == 8
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000001
+    assert cpu.PC == 2
 
 
 def test_CMP_stack_relative():
@@ -138,6 +146,7 @@ def test_CMP_stack_relative():
     assert cpu.cycles == 5
     assert cpu.A == 0x0DAB
     assert cpu.P == 0b00000001
+    assert cpu.PC == 2
 
 
 def test_CMP_DP():
@@ -156,6 +165,7 @@ def test_CMP_DP():
     assert cpu.cycles == 4
     assert cpu.A == 0x0FAB
     assert cpu.P == 0b00000011
+    assert cpu.PC == 2
 
 
 def test_CMP_DP_indirect_long():
@@ -178,6 +188,7 @@ def test_CMP_DP_indirect_long():
     assert cpu.cycles == 8
     assert cpu.A == 0x0321
     assert cpu.P == 0b00000011
+    assert cpu.PC == 2
 
 
 def test_CMP_absolute():
@@ -196,6 +207,7 @@ def test_CMP_absolute():
     assert cpu.cycles == 5
     assert cpu.A == 0x0FFF
     assert cpu.P == 0b00000001
+    assert cpu.PC == 3
 
 
 def test_CMP_long():
@@ -213,6 +225,7 @@ def test_CMP_long():
     assert cpu.cycles == 6
     assert cpu.A == 0x0000
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_CMP_DP_indirect_indexed_Y():
@@ -236,6 +249,7 @@ def test_CMP_DP_indirect_indexed_Y():
     assert cpu.cycles >= 7
     assert cpu.A == 0x0FFF
     assert cpu.P == 0b00000001
+    assert cpu.PC == 2
 
 
 def test_CMP_DP_indirect():
@@ -258,6 +272,7 @@ def test_CMP_DP_indirect():
     assert cpu.cycles == 7
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000011
+    assert cpu.PC == 2
 
 
 def test_CMP_stack_relative_indirect_indexed_Y():
@@ -280,6 +295,7 @@ def test_CMP_stack_relative_indirect_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0x1234
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_CMP_DP_indexed_X():
@@ -299,6 +315,7 @@ def test_CMP_DP_indexed_X():
     assert cpu.cycles == 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b00000001
+    assert cpu.PC == 2
 
 
 def test_CMP_DP_indirect_long_indexed_Y():
@@ -322,6 +339,7 @@ def test_CMP_DP_indirect_long_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0xFEDC
     assert cpu.P == 0b00000011
+    assert cpu.PC == 2
 
 
 def test_CMP_abs_indexed_Y():
@@ -341,6 +359,7 @@ def test_CMP_abs_indexed_Y():
     assert cpu.cycles >= 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b00000001
+    assert cpu.PC == 3
 
 
 def test_CMP_abs_indexed_X():
@@ -360,6 +379,7 @@ def test_CMP_abs_indexed_X():
     assert cpu.cycles >= 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b00000001
+    assert cpu.PC == 3
 
 
 def test_CMP_long_indexed_X():
@@ -377,6 +397,7 @@ def test_CMP_long_indexed_X():
     assert cpu.cycles == 6
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b00000001
+    assert cpu.PC == 4
 
 
 def test_CPX_cflag():
@@ -391,6 +412,7 @@ def test_CPX_cflag():
     assert cpu.cycles == 3
     assert cpu.X == 0x1234
     assert cpu.P == 0b00000001  # c flag
+    assert cpu.PC == 3
 
 
 def test_CMP_DP():
@@ -409,6 +431,7 @@ def test_CMP_DP():
     assert cpu.cycles == 4
     assert cpu.X == 0x0FAB
     assert cpu.P == 0b00000011
+    assert cpu.PC == 2
 
 
 def test_CPX_absolute():
@@ -427,6 +450,7 @@ def test_CPX_absolute():
     assert cpu.cycles == 5
     assert cpu.X == 0x0FFF
     assert cpu.P == 0b00000001
+    assert cpu.PC == 3
 
 
 def test_CPY_cflag():
@@ -441,6 +465,7 @@ def test_CPY_cflag():
     assert cpu.cycles == 3
     assert cpu.Y == 0x1234
     assert cpu.P == 0b00000001  # c flag
+    assert cpu.PC == 3
 
 
 def test_CPY_DP():
@@ -459,6 +484,7 @@ def test_CPY_DP():
     assert cpu.cycles == 4
     assert cpu.Y == 0x0FAB
     assert cpu.P == 0b00000011
+    assert cpu.PC == 2
 
 
 def test_CPY_absolute():
@@ -477,3 +503,4 @@ def test_CPY_absolute():
     assert cpu.cycles == 5
     assert cpu.Y == 0x0FFF
     assert cpu.P == 0b00000001
+    assert cpu.PC == 3

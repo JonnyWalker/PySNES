@@ -23,6 +23,7 @@ def test_PEA():
     assert mem.read(0x0001FE) == 0x34 # low
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 5
+    assert cpu.PC == 3
 
 
 def test_PEI():
@@ -40,6 +41,7 @@ def test_PEI():
     assert mem.read(0x0001FE) == 0x78 # low
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 6 # DL=0 => w=0
+    assert cpu.PC == 2
 
 
 def test_PEI2():
@@ -57,6 +59,7 @@ def test_PEI2():
     assert mem.read(0x0001FE) == 0x78 # low
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 7 # DL!=0 => w=1
+    assert cpu.PC == 2
 
 
 def test_PER():
@@ -73,6 +76,7 @@ def test_PER():
     assert mem.read(0x0001FE) == 0x57 # low (1234+PC+3 = 1257)
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 6
+    assert cpu.PC == 0x23
 
 
 def test_PER2():
@@ -89,6 +93,7 @@ def test_PER2():
     assert mem.read(0x0001FE) == 0x27  # low (0012+PC+3 = 0027)
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 6
+    assert cpu.PC == 0x15
 
 
 def test_PHK():
@@ -107,6 +112,7 @@ def test_PHK():
     assert mem.read(0x0001FF) == 0x12
     assert cpu.SP == 0x01FE
     assert cpu.cycles == 3
+    assert cpu.PC == 1
 
 
 def test_PHB():
@@ -123,6 +129,7 @@ def test_PHB():
     assert mem.read(0x0001FF) == 0x12
     assert cpu.SP == 0x01FE
     assert cpu.cycles == 3
+    assert cpu.PC == 1
 
 
 def test_PHP():
@@ -137,6 +144,7 @@ def test_PHP():
     assert mem.read(0x0001FF) == 0b10101010
     assert cpu.SP == 0x01FE
     assert cpu.cycles == 3
+    assert cpu.PC == 1
 
 
 def test_PHD():
@@ -154,6 +162,7 @@ def test_PHD():
     assert mem.read(0x0001FE) == 0xFE
     assert cpu.SP == 0x01FD
     assert cpu.cycles == 4
+    assert cpu.PC == 1
 
 
 def test_PHA_8_bit():
@@ -169,6 +178,7 @@ def test_PHA_8_bit():
     assert mem.read(0x0001FF) == 0xFE
     assert cpu.cycles == 3
     assert cpu.P == 0b00100000
+    assert cpu.PC == 1
 
 
 def test_PHA_16_bit():
@@ -185,6 +195,7 @@ def test_PHA_16_bit():
     assert mem.read(0x0001FE) == 0x37
     assert cpu.cycles == 4
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_PLA_8_bit():
@@ -201,6 +212,7 @@ def test_PLA_8_bit():
     assert cpu.SP == 0x01FF
     assert cpu.cycles == 4
     assert cpu.P == 0b00100000
+    assert cpu.PC == 1
 
 
 def test_PLA_16_bit():
@@ -218,6 +230,7 @@ def test_PLA_16_bit():
     assert cpu.cycles == 5
     assert cpu.P == 0b10000000
     assert cpu.SP == 0x01FF
+    assert cpu.PC == 1
 
 
 def test_PHX_8_bit():
@@ -233,6 +246,7 @@ def test_PHX_8_bit():
     assert mem.read(0x0001FF) == 0xFE
     assert cpu.cycles == 3
     assert cpu.P == 0b00010000
+    assert cpu.PC == 1
 
 
 def test_PHX_16_bit():
@@ -249,6 +263,7 @@ def test_PHX_16_bit():
     assert mem.read(0x0001FE) == 0xFE
     assert cpu.cycles == 4
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_PLX_8_bit():
@@ -265,6 +280,7 @@ def test_PLX_8_bit():
     assert cpu.P == 0b10010000 # negative flag set
     assert cpu.cycles == 4
     assert cpu.X == 0x00B7 # in 8 bit mode the high byte of the X/Y registers is forced to 0
+    assert cpu.PC == 1
     
 
 def test_PLX_16_bit():
@@ -282,6 +298,7 @@ def test_PLX_16_bit():
     assert cpu.P == 0b10000000 # negative flag set
     assert cpu.cycles == 5
     assert cpu.X == 0xB00B
+    assert cpu.PC == 1
 
 
 def test_PLY_8_bit():
@@ -298,6 +315,7 @@ def test_PLY_8_bit():
     assert cpu.P == 0b00010010 # zero flag set
     assert cpu.cycles == 4
     assert cpu.Y == 0x0000
+    assert cpu.PC == 1
 
 
 def test_PLY_16_bit():
@@ -315,6 +333,7 @@ def test_PLY_16_bit():
     assert cpu.P == 0b00000000
     assert cpu.cycles == 5
     assert cpu.Y == 0x2468
+    assert cpu.PC == 1
 
 
 def test_PHY_8_bit():
@@ -330,6 +349,7 @@ def test_PHY_8_bit():
     assert mem.read(0x0001FF) == 0x01
     assert cpu.cycles == 3
     assert cpu.P == 0b00010000
+    assert cpu.PC == 1
 
 
 def test_PHY_16_bit():
@@ -346,6 +366,7 @@ def test_PHY_16_bit():
     assert mem.read(0x0001FE) == 0x01
     assert cpu.cycles == 4
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_PLP_16_bit():
@@ -362,6 +383,7 @@ def test_PLP_16_bit():
     assert cpu.P == 0b10101010
     assert cpu.e == 0
     assert cpu.cycles == 4
+    assert cpu.PC == 1
 
 
 def test_PLP_8_bit():
@@ -378,6 +400,7 @@ def test_PLP_8_bit():
     assert cpu.P == 0b11111111
     assert cpu.e == 1
     assert cpu.cycles == 4
+    assert cpu.PC == 1
 
 
 def test_PLD():
@@ -395,6 +418,7 @@ def test_PLD():
     assert cpu.P == 0b10000000 # n flag set and z flag not set
     assert cpu.SP == 0x01FF
     assert cpu.cycles == 5
+    assert cpu.PC == 1
 
 
 def test_PLB():
@@ -411,3 +435,4 @@ def test_PLB():
     assert cpu.P == 0b10000000
     assert cpu.SP == 0x01FF
     assert cpu.cycles == 4
+    assert cpu.PC == 1

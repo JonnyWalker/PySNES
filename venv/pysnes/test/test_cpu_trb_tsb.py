@@ -32,6 +32,7 @@ def test_TRB_DP_16bit():
     assert cpu.cycles == 7
     assert cpu.A == 0x0FAB
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_TRB_DP_8bit():
@@ -50,6 +51,7 @@ def test_TRB_DP_8bit():
     assert cpu.cycles == 5
     assert cpu.A == 0x9A
     assert cpu.P == 0b00100010
+    assert cpu.PC == 2
 
 
 def test_TRB_absolute_16bit():
@@ -70,6 +72,7 @@ def test_TRB_absolute_16bit():
     assert cpu.cycles == 8
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_TRB_absolute_8bit():
@@ -88,6 +91,7 @@ def test_TRB_absolute_8bit():
     assert cpu.cycles == 6
     assert cpu.A == 0x66
     assert cpu.P == 0b00100000
+    assert cpu.PC == 3
 
 
 def test_TSB_DP_16bit():
@@ -108,6 +112,7 @@ def test_TSB_DP_16bit():
     assert cpu.cycles == 7
     assert cpu.A == 0x6666
     assert cpu.P == 0b00000010
+    assert cpu.PC == 2
 
 
 def test_TSB_DP_8bit():
@@ -126,6 +131,7 @@ def test_TSB_DP_8bit():
     assert cpu.cycles == 5
     assert cpu.A == 0x9A
     assert cpu.P == 0b00100010
+    assert cpu.PC == 2
 
 
 def test_TSB_absolute_16bit():
@@ -146,6 +152,7 @@ def test_TSB_absolute_16bit():
     assert cpu.cycles == 8
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_TSB_absolute_8bit():
@@ -164,3 +171,4 @@ def test_TSB_absolute_8bit():
     assert cpu.cycles == 6
     assert cpu.A == 0x43
     assert cpu.P == 0b00100010
+    assert cpu.PC == 3

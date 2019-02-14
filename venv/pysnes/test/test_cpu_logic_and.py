@@ -27,6 +27,7 @@ def test_AND_8bit_affect_16bit_zero():
     assert cpu.cycles == 2
     assert cpu.A == 0xFF00
     assert cpu.P == 0b00100010  # zero flag
+    assert cpu.PC == 2
 
 
 def test_AND_8Bit_affect16bit_negative():
@@ -41,6 +42,7 @@ def test_AND_8Bit_affect16bit_negative():
     assert cpu.cycles == 2
     assert cpu.A == 0xFF80
     assert cpu.P == 0b10100000  # negative flag
+    assert cpu.PC == 2
 
 
 def test_AND_16Bit_constant_zero():
@@ -55,6 +57,7 @@ def test_AND_16Bit_constant_zero():
     assert cpu.cycles == 3
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010  # zero flag
+    assert cpu.PC == 3
 
 
 def test_AND_16Bit_constant_negative():
@@ -70,6 +73,7 @@ def test_AND_16Bit_constant_negative():
     # 1111 1111 1011 1010 & 1111 0000 1010 1011 = 1111 0000 1010 1010
     assert cpu.A == 0xF0AA
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 3
 
 
 def test_AND_8Bit_constant_zero():
@@ -84,6 +88,7 @@ def test_AND_8Bit_constant_zero():
     assert cpu.cycles == 2
     assert cpu.A == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 2
 
 
 def test_AND_8Bit_constant_negative():
@@ -99,6 +104,7 @@ def test_AND_8Bit_constant_negative():
     # 1111 1010 & 1111 1011 = 1111 1010
     assert cpu.A == 0xFA
     assert cpu.P == 0b10100000  # negative flag
+    assert cpu.PC == 2
 
 
 def test_AND_16Bit_constant_noflag():
@@ -114,6 +120,7 @@ def test_AND_16Bit_constant_noflag():
     # 0000 1111 1110 1101 & 0000 1100 1011 1010 = 0000 1100 1010 1000
     assert cpu.A == 0x0CA8
     assert cpu.P == 0b00000000  # no flag
+    assert cpu.PC == 3
 
 
 def test_AND_8Bit_constant_noflag():
@@ -129,6 +136,7 @@ def test_AND_8Bit_constant_noflag():
     # 0111 1101 & 1000 0101 = 0000 0101
     assert cpu.A == 0x05
     assert cpu.P == 0b00100000  # no flag
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indexed_indirect_X():
@@ -153,6 +161,7 @@ def test_AND_DP_indexed_indirect_X():
     # 1100 1101 1010 1011 & 1010 1011 1100 1101 = 1000 1001 1000 1001
     assert cpu.A == 0x8989
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indexed_indirect_X2():
@@ -176,6 +185,7 @@ def test_AND_DP_indexed_indirect_X2():
     assert cpu.cycles == 7
     assert cpu.A == 0x8989
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_AND_stack_relative():
@@ -194,6 +204,7 @@ def test_AND_stack_relative():
     assert cpu.cycles == 5
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010
+    assert cpu.PC == 2
 
 
 def test_AND_stack_relative2():
@@ -213,6 +224,7 @@ def test_AND_stack_relative2():
     # 0000 1010 1010 1010 & 0000 0001 0010 00011 = 0000 0000 0010 0010
     assert cpu.A == 0x0022
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP():
@@ -231,6 +243,7 @@ def test_AND_DP():
     assert cpu.cycles == 4
     assert cpu.A == 0x0FAB
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP2():
@@ -250,6 +263,7 @@ def test_AND_DP2():
     assert cpu.cycles == 4
     assert cpu.A == 0x0DAB
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indirect_long():
@@ -272,6 +286,7 @@ def test_AND_DP_indirect_long():
     assert cpu.cycles == 8
     assert cpu.A == 0x0121
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indirect_long2():
@@ -294,6 +309,7 @@ def test_AND_DP_indirect_long2():
     assert cpu.cycles == 7
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010
+    assert cpu.PC == 2
 
 
 def test_AND_absolute():
@@ -312,6 +328,7 @@ def test_AND_absolute():
     assert cpu.cycles == 5
     assert cpu.A == 0x0FFF
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_AND_absolute2():
@@ -330,6 +347,7 @@ def test_AND_absolute2():
     assert cpu.cycles == 5
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_AND_long():
@@ -347,6 +365,7 @@ def test_AND_long():
     assert cpu.cycles == 6
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010
+    assert cpu.PC == 4
 
 
 def test_AND_long2():
@@ -365,6 +384,7 @@ def test_AND_long2():
     # 1111 1010 1011 1100 & 1111 0001 0010 0011 = 1111 0000 0010 0000
     assert cpu.A == 0xF020
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_AND_DP_indirect_indexed_Y():
@@ -388,6 +408,7 @@ def test_AND_DP_indirect_indexed_Y():
     assert cpu.cycles >= 7
     assert cpu.A == 0x0F00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indirect_indexed_Y2():
@@ -411,6 +432,7 @@ def test_AND_DP_indirect_indexed_Y2():
     assert cpu.cycles >= 7
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indirect():
@@ -433,6 +455,7 @@ def test_AND_DP_indirect():
     assert cpu.cycles == 7
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 
@@ -456,6 +479,7 @@ def test_AND_DP_indirect2():
     assert cpu.cycles == 6
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010
+    assert cpu.PC == 2
 
 
 def test_AND_stack_relative_indirect_indexed_Y():
@@ -478,6 +502,7 @@ def test_AND_stack_relative_indirect_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0x0220
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 
@@ -498,6 +523,7 @@ def test_AND_DP_indexed_X():
     assert cpu.cycles == 6
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indexed_X2():
@@ -517,7 +543,7 @@ def test_AND_DP_indexed_X2():
     assert cpu.cycles == 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
-
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indirect_long_indexed_Y():
@@ -541,6 +567,7 @@ def test_AND_DP_indirect_long_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0xFEDC
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_AND_DP_indirect_long_indexed_Y2():
@@ -564,6 +591,7 @@ def test_AND_DP_indirect_long_indexed_Y2():
     assert cpu.cycles == 7
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_AND_abs_indexed_Y():
@@ -583,6 +611,7 @@ def test_AND_abs_indexed_Y():
     assert cpu.cycles >= 6
     assert cpu.A == 0x000F
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_AND_abs_indexed_Y2():
@@ -602,6 +631,7 @@ def test_AND_abs_indexed_Y2():
     assert cpu.cycles >= 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_AND_abs_indexed_X():
@@ -621,6 +651,7 @@ def test_AND_abs_indexed_X():
     assert cpu.cycles >= 6
     assert cpu.A == 0x000F
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_AND_abs_indexed_X2():
@@ -639,7 +670,7 @@ def test_AND_abs_indexed_X2():
     assert cpu.cycles >= 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b00000000
-
+    assert cpu.PC == 3
 
 
 def test_AND_long_indexed_X():
@@ -657,6 +688,7 @@ def test_AND_long_indexed_X():
     assert cpu.cycles == 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_AND_long_indexed_X2():
@@ -675,3 +707,4 @@ def test_AND_long_indexed_X2():
     assert cpu.cycles == 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
