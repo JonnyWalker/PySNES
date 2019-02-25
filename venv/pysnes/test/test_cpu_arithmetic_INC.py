@@ -24,6 +24,7 @@ def test_INC():
     assert cpu.cycles == 2
     assert cpu.A == 0x0001
     assert cpu.P == 0b00000000 # no flag
+    assert cpu.PC == 1
 
 
 def test_INC_8BIT():
@@ -38,6 +39,7 @@ def test_INC_8BIT():
     assert cpu.cycles == 2
     assert cpu.A == 0x01
     assert cpu.P == 0b00100000 # no flag
+    assert cpu.PC == 1
 
 
 def test_INC_Zero():
@@ -52,6 +54,7 @@ def test_INC_Zero():
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010  # zero flag
+    assert cpu.PC == 1
 
 
 def test_INC_Zero_8BIT():
@@ -66,6 +69,7 @@ def test_INC_Zero_8BIT():
     assert cpu.cycles == 2
     assert cpu.A == 0x00
     assert cpu.P == 0b00100010  # zero flag
+    assert cpu.PC == 1
 
 
 def test_INC_no_overflow():
@@ -80,6 +84,7 @@ def test_INC_no_overflow():
     assert cpu.cycles == 2
     assert cpu.A == 0x8000      # -32.768 (MIN INT)
     assert cpu.P == 0b10000000  # negative flag, no overflow flag
+    assert cpu.PC == 1
 
 
 def test_INC_no_overflow_8BIT():
@@ -94,6 +99,7 @@ def test_INC_no_overflow_8BIT():
     assert cpu.cycles == 2
     assert cpu.A == 0x80        # -128 (MIN INT)
     assert cpu.P == 0b10100000  # negative flag, no overflow flag
+    assert cpu.PC == 1
 
 
 def test_INC_DP():
@@ -111,6 +117,7 @@ def test_INC_DP():
     assert mem.read(0x001234) == 0x01
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00000000 # no flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_8BIT():
@@ -128,6 +135,7 @@ def test_INC_DP_8BIT():
     assert mem.read(0x001234) == 0x01
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00100000 # no flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_Zero():
@@ -145,6 +153,7 @@ def test_INC_DP_Zero():
     assert mem.read(0x001234) == 0x00
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_Zero_8BIT():
@@ -162,6 +171,7 @@ def test_INC_DP_Zero_8BIT():
     assert mem.read(0x001234) == 0x00
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_no_overflow():
@@ -179,6 +189,7 @@ def test_INC_DP_no_overflow():
     assert mem.read(0x001234) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x001235) == 0x80
     assert cpu.P == 0b10000000 # negative flag, no overflow flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_no_overflow_8BIT():
@@ -196,6 +207,7 @@ def test_INC_DP_no_overflow_8BIT():
     assert mem.read(0x001234) == 0x80 # -128 (MIN INT)
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b10100000 # negative flag, no overflow flag
+    assert cpu.PC == 2
 
 
 def test_INC_absolute():
@@ -213,6 +225,7 @@ def test_INC_absolute():
     assert mem.read(0x123456) == 0x01
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00000000 # no flag
+    assert cpu.PC == 3
 
 
 def test_INC_absolute_8BIT():
@@ -230,6 +243,7 @@ def test_INC_absolute_8BIT():
     assert mem.read(0x123456) == 0x01
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00100000 # no flag
+    assert cpu.PC == 3
 
 
 def test_INC_absolute_Zero():
@@ -247,6 +261,7 @@ def test_INC_absolute_Zero():
     assert mem.read(0x123456) == 0x00
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_INC_absolute_Zero_8BIT():
@@ -264,6 +279,7 @@ def test_INC_absolute_Zero_8BIT():
     assert mem.read(0x123456) == 0x00
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_INC_absolute_no_overflow():
@@ -281,6 +297,7 @@ def test_INC_absolute_no_overflow():
     assert mem.read(0x123456) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x123457) == 0x80
     assert cpu.P == 0b10000000 # negative flag, no overflow flag
+    assert cpu.PC == 3
 
 
 def test_INC_absolute_no_overflow_8BIT():
@@ -298,6 +315,7 @@ def test_INC_absolute_no_overflow_8BIT():
     assert mem.read(0x123456) == 0x80 # -128 (MIN INT)
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b10100000 # negative flag, no overflow flag
+    assert cpu.PC == 3
 
 
 def test_INC_DP_indexed_X():
@@ -317,6 +335,7 @@ def test_INC_DP_indexed_X():
     assert mem.read(0x000054) == 0x01
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00000000  # no flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_indexed_X_8BIT():
@@ -336,6 +355,7 @@ def test_INC_DP_indexed_X_8BIT():
     assert mem.read(0x000054) == 0x01
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00100000  # no flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_indexed_X_Zero():
@@ -355,6 +375,7 @@ def test_INC_DP_indexed_X_Zero():
     assert mem.read(0x000054) == 0x00
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00000010  # zero flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_indexed_X_Zero_8BIT():
@@ -374,6 +395,7 @@ def test_INC_DP_indexed_X_Zero_8BIT():
     assert mem.read(0x000054) == 0x00
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00100010  # zero flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_indexed_X_no_overflow():
@@ -393,6 +415,7 @@ def test_INC_DP_indexed_X_no_overflow():
     assert mem.read(0x000054) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x000055) == 0x80
     assert cpu.P == 0b10000000  # negative flag, no overflow flag
+    assert cpu.PC == 2
 
 
 def test_INC_DP_indexed_X_no_overflow_8BIT():
@@ -412,6 +435,7 @@ def test_INC_DP_indexed_X_no_overflow_8BIT():
     assert mem.read(0x000054) == 0x80 # -128 (MIN INT)
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b10100000  # negative flag, no overflow flag
+    assert cpu.PC == 2
 
 
 def test_INC_abs_indexed_X():
@@ -430,6 +454,7 @@ def test_INC_abs_indexed_X():
     assert mem.read(0x808001) == 0x01
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00000000 # no flag
+    assert cpu.PC == 3
 
 
 def test_INC_abs_indexed_X_8BIT():
@@ -448,6 +473,7 @@ def test_INC_abs_indexed_X_8BIT():
     assert mem.read(0x808001) == 0x01
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00100000 # no flag
+    assert cpu.PC == 3
 
 
 def test_INC_abs_indexed_X_Zero():
@@ -466,6 +492,7 @@ def test_INC_abs_indexed_X_Zero():
     assert mem.read(0x808001) == 0x00
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_INC_abs_indexed_X_Zero_8BIT():
@@ -483,6 +510,7 @@ def test_INC_abs_indexed_X_Zero_8BIT():
     assert mem.read(0x808001) == 0x00
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_INC_abs_indexed_X_no_overflow():
@@ -501,6 +529,7 @@ def test_INC_abs_indexed_X_no_overflow():
     assert mem.read(0x808001) == 0x00 # -32.768 (MIN INT)
     assert mem.read(0x808002) == 0x80
     assert cpu.P == 0b10000000 # negative flag, no overflow flag
+    assert cpu.PC == 3
 
 
 def test_INC_abs_indexed_X_no_overflow_8BIT():
@@ -519,6 +548,7 @@ def test_INC_abs_indexed_X_no_overflow_8BIT():
     assert mem.read(0x808001) == 0x80 # -127(MIN INT)
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b10100000 # negative flag, no overflow flag
+    assert cpu.PC == 3
 
 
 def test_INX():
@@ -533,6 +563,7 @@ def test_INX():
     assert cpu.cycles == 2
     assert cpu.X == 0x0001
     assert cpu.P == 0b00000000 # no flag
+    assert cpu.PC == 1
 
 
 def test_INX_8BIT():
@@ -547,6 +578,7 @@ def test_INX_8BIT():
     assert cpu.cycles == 2
     assert cpu.X == 0x01
     assert cpu.P == 0b00010000 # no flag
+    assert cpu.PC == 1
 
 
 def test_INX_Zero():
@@ -561,6 +593,7 @@ def test_INX_Zero():
     assert cpu.cycles == 2
     assert cpu.X == 0x0000
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_INX_Zero_8BIT():
@@ -575,6 +608,7 @@ def test_INX_Zero_8BIT():
     assert cpu.cycles == 2
     assert cpu.X == 0x00
     assert cpu.P == 0b00010010  # zero flag
+    assert cpu.PC == 1
 
 
 def test_INX_no_overflow():
@@ -589,6 +623,7 @@ def test_INX_no_overflow():
     assert cpu.cycles == 2
     assert cpu.X == 0x8000      # -32.768 (MIN INT)
     assert cpu.P == 0b10000000  # negative flag, no overflow flag
+    assert cpu.PC == 1
 
 
 def test_INX_no_overflow_8BIT():
@@ -603,6 +638,7 @@ def test_INX_no_overflow_8BIT():
     assert cpu.cycles == 2
     assert cpu.X == 0x80        # -128 (MIN INT)
     assert cpu.P == 0b10010000  # negative flag, no overflow flag
+    assert cpu.PC == 1
 
 
 def test_INY():
@@ -617,6 +653,7 @@ def test_INY():
     assert cpu.cycles == 2
     assert cpu.Y == 0x0001
     assert cpu.P == 0b00000000 # no flag
+    assert cpu.PC == 1
 
 
 def test_INY_8BIT():
@@ -631,6 +668,7 @@ def test_INY_8BIT():
     assert cpu.cycles == 2
     assert cpu.Y == 0x01
     assert cpu.P == 0b00010000 # no flag
+    assert cpu.PC == 1
 
 
 def test_INY_Zero():
@@ -645,6 +683,7 @@ def test_INY_Zero():
     assert cpu.cycles == 2
     assert cpu.Y == 0x0000
     assert cpu.P == 0b00000010  # zero flag
+    assert cpu.PC == 1
 
 
 def test_INY_Zero_8BIT():
@@ -659,6 +698,7 @@ def test_INY_Zero_8BIT():
     assert cpu.cycles == 2
     assert cpu.Y == 0x00
     assert cpu.P == 0b00010010  # zero flag
+    assert cpu.PC == 1
 
 
 def test_INY_no_overflow():
@@ -673,6 +713,7 @@ def test_INY_no_overflow():
     assert cpu.cycles == 2
     assert cpu.Y == 0x8000 # -32.768 (MIN INT)
     assert cpu.P == 0b10000000  # negative flag, no overflow flag
+    assert cpu.PC == 1
 
 
 def test_INY_no_overflow_8BIT():
@@ -687,3 +728,4 @@ def test_INY_no_overflow_8BIT():
     assert cpu.cycles == 2
     assert cpu.Y == 0x80 # -128 (MIN INT)
     assert cpu.P == 0b10010000  # negative flag, no overflow flag
+    assert cpu.PC == 1

@@ -30,6 +30,7 @@ def test_BIT_DP_16bit():
     assert cpu.cycles == 4
     assert cpu.A == 0x0FAB
     assert cpu.P == 0b00000010
+    assert cpu.PC == 2
 
 
 def test_BIT_DP_8bit():
@@ -47,6 +48,7 @@ def test_BIT_DP_8bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x0F
     assert cpu.P == 0b00100010
+    assert cpu.PC == 2
 
 
 def test_BIT_absolute_16bit():
@@ -65,6 +67,7 @@ def test_BIT_absolute_16bit():
     assert cpu.cycles == 5
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_BIT_absolute_8bit():
@@ -82,6 +85,7 @@ def test_BIT_absolute_8bit():
     assert cpu.cycles == 4
     assert cpu.A == 0x43
     assert cpu.P == 0b10100010
+    assert cpu.PC == 3
 
 
 def test_BIT_DP_indexed_X_16bit():
@@ -101,6 +105,7 @@ def test_BIT_DP_indexed_X_16bit():
     assert cpu.cycles == 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_BIT_DP_indexed_X_8bit():
@@ -119,6 +124,7 @@ def test_BIT_DP_indexed_X_8bit():
     assert cpu.cycles == 5
     assert cpu.A == 0x0F
     assert cpu.P == 0b00100000
+    assert cpu.PC == 2
 
 
 def test_BIT_abs_indexed_X_16bit():
@@ -138,6 +144,7 @@ def test_BIT_abs_indexed_X_16bit():
     assert cpu.cycles >= 6
     assert cpu.A == 0x0F0F
     assert cpu.P == 0b11000000
+    assert cpu.PC == 3
 
 
 def test_BIT_abs_indexed_X_8bit():
@@ -156,6 +163,7 @@ def test_BIT_abs_indexed_X_8bit():
     assert cpu.cycles >= 5
     assert cpu.A == 0x0F
     assert cpu.P == 0b11100000
+    assert cpu.PC == 3
 
 
 def test_BIT_imm_16bit():
@@ -170,6 +178,7 @@ def test_BIT_imm_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_BIT_imm_8bit():
@@ -184,3 +193,4 @@ def test_BIT_imm_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0xFF
     assert cpu.P == 0b11100010
+    assert cpu.PC == 2

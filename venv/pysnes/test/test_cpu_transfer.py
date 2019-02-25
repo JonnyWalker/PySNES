@@ -25,6 +25,8 @@ def test_tcd():
     assert cpu.cycles == 2
     assert cpu.DP == 0x1234
     assert cpu.P == 0b0000000  # no flag
+    assert cpu.PC == 1
+
 
 def test_tcd_zero():
     mem = MemoryMock()
@@ -38,6 +40,8 @@ def test_tcd_zero():
     assert cpu.cycles == 2
     assert cpu.DP == 0x0000
     assert cpu.P == 0b0000010  # zero flag
+    assert cpu.PC == 1
+
 
 def test_tcd_negative():
     mem = MemoryMock()
@@ -51,6 +55,7 @@ def test_tcd_negative():
     assert cpu.cycles == 2
     assert cpu.DP == 0xF234
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_tcs_16():
@@ -65,6 +70,8 @@ def test_tcs_16():
     assert cpu.cycles == 2
     assert cpu.SP == 0x1234
     assert cpu.P == 0b0000000  # no flag
+    assert cpu.PC == 1
+
 
 def test_tcs_16_zero():
     mem = MemoryMock()
@@ -78,6 +85,8 @@ def test_tcs_16_zero():
     assert cpu.cycles == 2
     assert cpu.SP == 0x0000
     assert cpu.P == 0b0000010  # zero flag
+    assert cpu.PC == 1
+
 
 def test_tcs_16_negative():
     mem = MemoryMock()
@@ -91,6 +100,7 @@ def test_tcs_16_negative():
     assert cpu.cycles == 2
     assert cpu.SP == 0xF234
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_tcs_8():
@@ -106,6 +116,8 @@ def test_tcs_8():
     assert cpu.cycles == 2
     assert cpu.SP == 0x3434
     assert cpu.P == 0b00100000  # no flag
+    assert cpu.PC == 1
+
 
 def test_tcs_8_zero():
     mem = MemoryMock()
@@ -120,6 +132,8 @@ def test_tcs_8_zero():
     assert cpu.cycles == 2
     assert cpu.SP == 0x3400
     assert cpu.P == 0b00100010  # zero flag
+    assert cpu.PC == 1
+
 
 def test_tcs_8_negative():
     mem = MemoryMock()
@@ -134,6 +148,7 @@ def test_tcs_8_negative():
     assert cpu.cycles == 2
     assert cpu.SP == 0x3480
     assert cpu.P == 0b10100000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_tdc():
@@ -148,6 +163,8 @@ def test_tdc():
     assert cpu.cycles == 2
     assert cpu.A == 0x1234
     assert cpu.P == 0b0000000  # no flag
+    assert cpu.PC == 1
+
 
 def test_tdc_zero():
     mem = MemoryMock()
@@ -161,6 +178,8 @@ def test_tdc_zero():
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.P == 0b0000010  # zero flag
+    assert cpu.PC == 1
+
 
 def test_tdc_negative():
     mem = MemoryMock()
@@ -174,6 +193,8 @@ def test_tdc_negative():
     assert cpu.cycles == 2
     assert cpu.A == 0xF234
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 1
+
 
 def test_tsc():
     mem = MemoryMock()
@@ -187,6 +208,8 @@ def test_tsc():
     assert cpu.cycles == 2
     assert cpu.A == 0x1234
     assert cpu.P == 0b0000000  # no flag
+    assert cpu.PC == 1
+
 
 def test_tsc_zero():
     mem = MemoryMock()
@@ -200,6 +223,8 @@ def test_tsc_zero():
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.P == 0b0000010  # zero flag
+    assert cpu.PC == 1
+
 
 def test_tsc_negative():
     mem = MemoryMock()
@@ -213,6 +238,7 @@ def test_tsc_negative():
     assert cpu.cycles == 2
     assert cpu.A == 0xF234
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_xba():
@@ -225,6 +251,7 @@ def test_xba():
     assert cpu.A == 0x8967
     assert cpu.P == 0b00000000  # result is based on AL
     assert cpu.cycles == 3
+    assert cpu.PC == 1
 
 
 def test_xba2():
@@ -237,6 +264,7 @@ def test_xba2():
     assert cpu.A == 0x89F7
     assert cpu.P == 0b10000000  # result is based on AL
     assert cpu.cycles == 3
+    assert cpu.PC == 1
 
 
 def test_xba3():
@@ -249,3 +277,4 @@ def test_xba3():
     assert cpu.A == 0x8900
     assert cpu.P == 0b00000010  # result is based on AL
     assert cpu.cycles == 3
+    assert cpu.PC == 1

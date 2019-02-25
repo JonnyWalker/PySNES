@@ -44,7 +44,9 @@ def test_STA_DP_indexed_indirect_X():
     mem.write(0x80880A, 0x00) # empty before
     mem.write(0x80880B, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x81, 0x02])
+
     assert mem.read(0x808808) == 0x00 # still empty
     assert mem.read(0x808809) == 0xAB
     assert mem.read(0x80880A) == 0xCD
@@ -52,6 +54,7 @@ def test_STA_DP_indexed_indirect_X():
     assert cpu.cycles in (6,7,8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_indirect_X_8BIT():
@@ -70,7 +73,9 @@ def test_STA_DP_indexed_indirect_X_8BIT():
     mem.write(0x80880A, 0x00) # empty before
     mem.write(0x80880B, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x81, 0x02])
+
     assert mem.read(0x808808) == 0x00 # still empty
     assert mem.read(0x808809) == 0xAB
     assert mem.read(0x80880A) == 0x00 # still empty!!!
@@ -78,6 +83,7 @@ def test_STA_DP_indexed_indirect_X_8BIT():
     assert cpu.cycles in (6,7,8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_indirect_X_wrapped():
@@ -97,7 +103,9 @@ def test_STA_DP_indexed_indirect_X_wrapped():
     mem.write(0x130000, 0x00) # empty before
     mem.write(0x130001, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x81, 0xFE])
+
     assert cpu.cycles in (6,7,8)
     assert mem.read(0x120000) == 0x00  # still empty, no wrapping!
     assert mem.read(0x12FFFF) == 0xAB
@@ -105,6 +113,7 @@ def test_STA_DP_indexed_indirect_X_wrapped():
     assert mem.read(0x130001) == 0x00  # still empty
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_indirect_X_wrapped_8BIT():
@@ -124,7 +133,9 @@ def test_STA_DP_indexed_indirect_X_wrapped_8BIT():
     mem.write(0x130000, 0x00) # empty before
     mem.write(0x130001, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x81, 0xFE])
+
     assert cpu.cycles in (6,7,8)
     assert mem.read(0x120000) == 0x00  # still empty
     assert mem.read(0x12FFFF) == 0xAB
@@ -132,6 +143,7 @@ def test_STA_DP_indexed_indirect_X_wrapped_8BIT():
     assert mem.read(0x130001) == 0x00  # still empty
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_stack_relative():
@@ -144,12 +156,15 @@ def test_STA_stack_relative():
     mem.write(0x001FF1, 0x00) # empty before
     mem.write(0x001FF2, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x83, 0x01])
+
     assert cpu.cycles == 5
     assert mem.read(0x001FF1) == 0xAB
     assert mem.read(0x001FF2) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_stack_relative_8BIT():
@@ -162,12 +177,15 @@ def test_STA_stack_relative_8BIT():
     mem.write(0x001FF1, 0x00) # empty before
     mem.write(0x001FF2, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x83, 0x01])
+
     assert cpu.cycles == 4
     assert mem.read(0x001FF1) == 0xAB
     assert mem.read(0x001FF2) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_stack_relative_wrapped():
@@ -180,12 +198,15 @@ def test_STA_stack_relative_wrapped():
     mem.write(0x00000A, 0x00) # empty before
     mem.write(0x00000B, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x83, 0xFA])
+
     assert cpu.cycles == 5
     assert mem.read(0x00000A) == 0xAB # wrapping: SP+FA==0xA
     assert mem.read(0x00000B) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_stack_relative_wrapped_8BIT():
@@ -198,12 +219,15 @@ def test_STA_stack_relative_wrapped_8BIT():
     mem.write(0x00000A, 0x00) # empty before
     mem.write(0x00000B, 0x00) # empty before
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x83, 0xFA])
+
     assert cpu.cycles == 4
     assert mem.read(0x00000A) == 0xAB # wrapping: SP+FA==0xA
     assert mem.read(0x00000B) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP():
@@ -223,6 +247,7 @@ def test_STA_DP():
     assert mem.read(0x001235) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_8BIT():
@@ -242,6 +267,7 @@ def test_STA_DP_8BIT():
     assert mem.read(0x001235) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_wrapped():
@@ -263,6 +289,7 @@ def test_STA_DP_wrapped():
     assert mem.read(0x010000) == 0x00
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_wrapped_8BIT():
@@ -284,6 +311,7 @@ def test_STA_DP_wrapped_8BIT():
     assert mem.read(0x010000) == 0x00
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long():
@@ -307,6 +335,7 @@ def test_STA_DP_indirect_long():
     assert mem.read(0x234031) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_8BIT():
@@ -330,6 +359,7 @@ def test_STA_DP_indirect_long_8BIT():
     assert mem.read(0x234031) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_no_wrapping():
@@ -353,6 +383,7 @@ def test_STA_DP_indirect_long_no_wrapping():
     assert mem.read(0x130000) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_no_wrapping_8BIT():
@@ -376,6 +407,7 @@ def test_STA_DP_indirect_long_no_wrapping_8BIT():
     assert mem.read(0x130000) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_absolute():
@@ -395,6 +427,7 @@ def test_STA_absolute():
     assert mem.read(0x123457) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_absolute_8Bit():
@@ -414,6 +447,7 @@ def test_STA_absolute_8Bit():
     assert mem.read(0x123457) == 0x00  # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_absolute_no_wrapping():
@@ -428,12 +462,12 @@ def test_STA_absolute_no_wrapping():
 
     cpu.fetch_decode_execute([0x8D, 0xFF, 0xFF])
 
-
     assert cpu.cycles == 5
     assert mem.read(0x12FFFF) == 0xAB # no wrapping
     assert mem.read(0x130000) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_absolute_no_wrapping_8BIT():
@@ -453,6 +487,7 @@ def test_STA_absolute_no_wrapping_8BIT():
     assert mem.read(0x130000) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_long():
@@ -471,6 +506,7 @@ def test_STA_long():
     assert mem.read(0x123457) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 4
 
 
 def test_STA_long_8BIT():
@@ -489,6 +525,7 @@ def test_STA_long_8BIT():
     assert mem.read(0x123457) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 4
 
 
 def test_STA_long2_no_wrapping():
@@ -507,6 +544,7 @@ def test_STA_long2_no_wrapping():
     assert mem.read(0x130000) == 0xCD # no wrapping
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 4
 
 
 def test_STA_long2_no_wrapping_8BIT():
@@ -525,6 +563,7 @@ def test_STA_long2_no_wrapping_8BIT():
     assert mem.read(0x130000) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 4
 
 
 def test_STA_DP_indirect_indexed_Y():
@@ -542,11 +581,13 @@ def test_STA_DP_indirect_indexed_Y():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x91, 0x10])
+
     assert cpu.cycles >= 5
     assert mem.read(0x804031) == 0xAB
     assert mem.read(0x804032) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_indexed_Y_8BIT():
@@ -564,11 +605,13 @@ def test_STA_DP_indirect_indexed_Y_8BIT():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x91, 0x10])
+
     assert cpu.cycles >= 5
     assert mem.read(0x804031) == 0xAB
     assert mem.read(0x804032) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_indexed_Y_wrapped():
@@ -586,11 +629,13 @@ def test_STA_DP_indirect_indexed_Y_wrapped():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x91, 0xFF])
+
     assert cpu.cycles >= 5
     assert mem.read(0x130008) == 0xAB
     assert mem.read(0x130009) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_indexed_Y_wrapped_8BIT():
@@ -608,11 +653,13 @@ def test_STA_DP_indirect_indexed_Y_wrapped_8BIT():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x91, 0xFF])
+
     assert cpu.cycles >= 5
     assert mem.read(0x130008) == 0xAB
     assert mem.read(0x130009) == 0x00  # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect():
@@ -636,6 +683,7 @@ def test_STA_DP_indirect():
     assert mem.read(0x804031) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_8BIT():
@@ -659,6 +707,7 @@ def test_STA_DP_indirect_8BIT():
     assert mem.read(0x804031) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_wrapped():
@@ -682,6 +731,7 @@ def test_STA_DP_indirect_wrapped():
     assert mem.read(0x130000) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_wrapped_8BIT():
@@ -705,6 +755,7 @@ def test_STA_DP_indirect_wrapped_8BIT():
     assert mem.read(0x130000) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_stack_relative_indirect_indexed_Y():
@@ -728,6 +779,7 @@ def test_STA_stack_relative_indirect_indexed_Y():
     assert mem.read(0x130041) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_stack_relative_indirect_indexed_Y_8BIT():
@@ -751,6 +803,7 @@ def test_STA_stack_relative_indirect_indexed_Y_8BIT():
     assert mem.read(0x130041) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_X():
@@ -772,6 +825,7 @@ def test_STA_DP_indexed_X():
     assert mem.read(0x000055) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_X_8BIT():
@@ -793,6 +847,7 @@ def test_STA_DP_indexed_X_8BIT():
     assert mem.read(0x000055) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_X_wrapping():
@@ -814,6 +869,7 @@ def test_STA_DP_indexed_X_wrapping():
     assert mem.read(0x000009) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indexed_X_wrapping_8BIT():
@@ -835,6 +891,7 @@ def test_STA_DP_indexed_X_wrapping_8BIT():
     assert mem.read(0x000009) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_indexed_Y():
@@ -859,6 +916,7 @@ def test_STA_DP_indirect_long_indexed_Y():
     assert mem.read(0x234032) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_indexed_Y_8BIT():
@@ -883,6 +941,7 @@ def test_STA_DP_indirect_long_indexed_Y_8BIT():
     assert mem.read(0x234032) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_indexed_Y_wrapping():
@@ -907,6 +966,7 @@ def test_STA_DP_indirect_long_indexed_Y_wrapping():
     assert mem.read(0x130007) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_DP_indirect_long_indexed_Y_wrapping_8BIT():
@@ -931,6 +991,7 @@ def test_STA_DP_indirect_long_indexed_Y_wrapping_8BIT():
     assert mem.read(0x130007) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 2
 
 
 def test_STA_abs_indexed_Y():
@@ -950,6 +1011,7 @@ def test_STA_abs_indexed_Y():
     assert mem.read(0x808002) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_Y_8BIT():
@@ -964,11 +1026,13 @@ def test_STA_abs_indexed_Y_8BIT():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x99, 0x00, 0x80])
+
     assert cpu.cycles == 5
     assert mem.read(0x808001) == 0xAB # no wrapping
     assert mem.read(0x808002) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_Y_no_wrapping():
@@ -983,11 +1047,13 @@ def test_STA_abs_indexed_Y_no_wrapping():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x99, 0xFE, 0xFF])
+
     assert cpu.cycles == 6
     assert mem.read(0x130008) == 0xAB # no wrapping
     assert mem.read(0x130009) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_Y_no_wrapping_8BIT():
@@ -1002,11 +1068,13 @@ def test_STA_abs_indexed_Y_no_wrapping_8BIT():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x99, 0xFE, 0xFF])
+
     assert cpu.cycles == 5
     assert mem.read(0x130008) == 0xAB # no wrapping
     assert mem.read(0x130009) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_X():
@@ -1021,11 +1089,13 @@ def test_STA_abs_indexed_X():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x9D, 0x00, 0x80])
+
     assert cpu.cycles == 6
     assert mem.read(0x808001) == 0xAB # no wrapping
     assert mem.read(0x808002) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_X_8BIT():
@@ -1040,11 +1110,13 @@ def test_STA_abs_indexed_X_8BIT():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x9D, 0x00, 0x80])
+
     assert cpu.cycles == 5
     assert mem.read(0x808001) == 0xAB # no wrapping
     assert mem.read(0x808002) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_X_no_wrapping():
@@ -1059,11 +1131,13 @@ def test_STA_abs_indexed_X_no_wrapping():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x9D, 0xFE, 0xFF])
+
     assert cpu.cycles == 6
     assert mem.read(0x130008) == 0xAB # no wrapping
     assert mem.read(0x130009) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_abs_indexed_X_no_wrapping_8BIT():
@@ -1078,11 +1152,13 @@ def test_STA_abs_indexed_X_no_wrapping_8BIT():
     cpu.A = 0xCDAB
 
     cpu.fetch_decode_execute([0x9D, 0xFE, 0xFF])
+
     assert cpu.cycles == 5
     assert mem.read(0x130008) == 0xAB # no wrapping
     assert mem.read(0x130009) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000 # no change
+    assert cpu.PC == 3
 
 
 def test_STA_long_indexed_X():
@@ -1095,6 +1171,7 @@ def test_STA_long_indexed_X():
     mem.write(0x808001, 0x00)
     mem.write(0x808002, 0x00)
     cpu.A = 0xCDAB
+
     cpu.fetch_decode_execute([0x9F, 0x00, 0x80, 0x80])
 
     assert cpu.cycles == 6
@@ -1102,6 +1179,7 @@ def test_STA_long_indexed_X():
     assert mem.read(0x808002) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 4
 
 
 def test_STA_long_indexed_X_8BIT():
@@ -1121,6 +1199,7 @@ def test_STA_long_indexed_X_8BIT():
     assert mem.read(0x808002) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 4
 
 
 def test_STA_long_indexed_X2():
@@ -1140,6 +1219,7 @@ def test_STA_long_indexed_X2():
     assert mem.read(0x130009) == 0xCD
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 4
 
 
 def test_STA_long_indexed_X2_8BIT():
@@ -1159,6 +1239,7 @@ def test_STA_long_indexed_X2_8BIT():
     assert mem.read(0x130009) == 0x00 # still empty !!!
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b00100000  # no change
+    assert cpu.PC == 4
 
 
 def test_STX_DP():
@@ -1178,6 +1259,7 @@ def test_STX_DP():
     assert mem.read(0x001235) == 0xCD
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_DP_8BIT():
@@ -1197,6 +1279,7 @@ def test_STX_DP_8BIT():
     assert mem.read(0x001235) == 0x00 # still empty !!!
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_DP_wrapped():
@@ -1218,6 +1301,7 @@ def test_STX_DP_wrapped():
     assert mem.read(0x010000) == 0x00
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_DP_wrapped_8BIT():
@@ -1239,6 +1323,7 @@ def test_STX_DP_wrapped_8BIT():
     assert mem.read(0x010000) == 0x00
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_absolute():
@@ -1258,6 +1343,7 @@ def test_STX_absolute():
     assert mem.read(0x123457) == 0xCD
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STX_absolute_8Bit():
@@ -1277,6 +1363,7 @@ def test_STX_absolute_8Bit():
     assert mem.read(0x123457) == 0x00  # still empty !!!
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 3
 
 
 def test_STX_absolute_no_wrapping():
@@ -1297,6 +1384,7 @@ def test_STX_absolute_no_wrapping():
     assert mem.read(0x130000) == 0xCD
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STX_absolute_no_wrapping_8BIT():
@@ -1316,6 +1404,7 @@ def test_STX_absolute_no_wrapping_8BIT():
     assert mem.read(0x130000) == 0x00 # still empty !!!
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 3
 
 
 def test_STX_DP_indexed_Y():
@@ -1337,6 +1426,7 @@ def test_STX_DP_indexed_Y():
     assert mem.read(0x000055) == 0xCD
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_DP_indexed_Y_8BIT():
@@ -1358,6 +1448,7 @@ def test_STX_DP_indexed_Y_8BIT():
     assert mem.read(0x000055) == 0x00 # still empty !!!
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_DP_indexed_Y_wrapping():
@@ -1379,6 +1470,7 @@ def test_STX_DP_indexed_Y_wrapping():
     assert mem.read(0x000009) == 0xCD
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STX_DP_indexed_Y_wrapping_8BIT():
@@ -1400,6 +1492,7 @@ def test_STX_DP_indexed_Y_wrapping_8BIT():
     assert mem.read(0x000009) == 0x00 # still empty !!!
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP():
@@ -1419,6 +1512,7 @@ def test_STY_DP():
     assert mem.read(0x001235) == 0xCD
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP_8BIT():
@@ -1438,6 +1532,7 @@ def test_STY_DP_8BIT():
     assert mem.read(0x001235) == 0x00 # still empty !!!
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP_wrapped():
@@ -1459,6 +1554,7 @@ def test_STY_DP_wrapped():
     assert mem.read(0x010000) == 0x00
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP_wrapped_8BIT():
@@ -1480,6 +1576,7 @@ def test_STY_DP_wrapped_8BIT():
     assert mem.read(0x010000) == 0x00
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_absolute():
@@ -1499,6 +1596,7 @@ def test_STY_absolute():
     assert mem.read(0x123457) == 0xCD
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STY_absolute_8Bit():
@@ -1518,6 +1616,7 @@ def test_STY_absolute_8Bit():
     assert mem.read(0x123457) == 0x00  # still empty !!!
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 3
 
 
 def test_STY_absolute_no_wrapping():
@@ -1532,12 +1631,12 @@ def test_STY_absolute_no_wrapping():
 
     cpu.fetch_decode_execute([0x8C, 0xFF, 0xFF])
 
-
     assert cpu.cycles == 5
     assert mem.read(0x12FFFF) == 0xAB # no wrapping
     assert mem.read(0x130000) == 0xCD
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 3
 
 
 def test_STY_absolute_no_wrapping_8BIT():
@@ -1557,6 +1656,7 @@ def test_STY_absolute_no_wrapping_8BIT():
     assert mem.read(0x130000) == 0x00 # still empty !!!
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 3
 
 
 def test_STY_DP_indexed_X():
@@ -1578,6 +1678,7 @@ def test_STY_DP_indexed_X():
     assert mem.read(0x000055) == 0xCD
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP_indexed_X_8BIT():
@@ -1599,6 +1700,7 @@ def test_STY_DP_indexed_X_8BIT():
     assert mem.read(0x000055) == 0x00 # still empty !!!
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP_indexed_X_wrapping():
@@ -1620,6 +1722,7 @@ def test_STY_DP_indexed_X_wrapping():
     assert mem.read(0x000009) == 0xCD
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00000000 # no change
+    assert cpu.PC == 2
 
 
 def test_STY_DP_indexed_X_wrapping_8BIT():
@@ -1641,6 +1744,7 @@ def test_STY_DP_indexed_X_wrapping_8BIT():
     assert mem.read(0x000009) == 0x00 # still empty !!!
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b00010000 # no change
+    assert cpu.PC == 2
 
 
 def test_STZ_DP():
@@ -1657,6 +1761,7 @@ def test_STZ_DP():
     assert mem.read(0x001234) == 0x00
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_8Bit():
@@ -1673,6 +1778,7 @@ def test_STZ_DP_8Bit():
     assert mem.read(0x001234) == 0x00
     assert mem.read(0x001235) == 0xCD
     assert cpu.P == 0b00100000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_wrapping():
@@ -1686,11 +1792,13 @@ def test_STZ_DP_wrapping():
     cpu.DP = 0xFF00
 
     cpu.fetch_decode_execute([0x64, 0xFF])
+
     assert cpu.cycles in (4, 5)
     assert mem.read(0x000000) == 0x00
     assert mem.read(0x00FFFF) == 0x00 # zero bank wrapping!
     assert mem.read(0x010000) == 0xEF # Bug if this is zero
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_wrapping_8Bit():
@@ -1704,11 +1812,13 @@ def test_STZ_DP_wrapping_8Bit():
     cpu.DP = 0xFF00
 
     cpu.fetch_decode_execute([0x64, 0xFF])
+
     assert cpu.cycles in (3, 4)
     assert mem.read(0x000000) == 0xCD
     assert mem.read(0x00FFFF) == 0x00 # zero bank wrapping!
     assert mem.read(0x010000) == 0xEF # Bug if this is zero
     assert cpu.P == 0b00100000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_indexed_X():
@@ -1722,11 +1832,14 @@ def test_STZ_DP_indexed_X():
 
     mem.write(0x000054, 0xAB)
     mem.write(0x000055, 0xCD)
+
     cpu.fetch_decode_execute([0x74, 0x30])
+
     assert cpu.cycles in (5, 6)
     assert mem.read(0x000054) == 0x00
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_indexed_X_8BIT():
@@ -1740,11 +1853,14 @@ def test_STZ_DP_indexed_X_8BIT():
 
     mem.write(0x000054, 0xAB)
     mem.write(0x000055, 0xCD)
+
     cpu.fetch_decode_execute([0x74, 0x30])
+
     assert cpu.cycles in (4, 5)
     assert mem.read(0x000054) == 0x00
     assert mem.read(0x000055) == 0xCD
     assert cpu.P == 0b00100000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_indexed_X_wrapped():
@@ -1758,11 +1874,14 @@ def test_STZ_DP_indexed_X_wrapped():
 
     mem.write(0x000008, 0xAB)
     mem.write(0x000009, 0xCD)
+
     cpu.fetch_decode_execute([0x74, 0xFE])
+
     assert cpu.cycles in (5, 6)
     assert mem.read(0x000008) == 0x00
     assert mem.read(0x000009) == 0x00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_STZ_DP_indexed_X_wrapped_8Bit():
@@ -1776,11 +1895,14 @@ def test_STZ_DP_indexed_X_wrapped_8Bit():
 
     mem.write(0x000008, 0xAB)
     mem.write(0x000009, 0xCD)
+
     cpu.fetch_decode_execute([0x74, 0xFE])
+
     assert cpu.cycles in (4, 5)
     assert mem.read(0x000008) == 0x00
     assert mem.read(0x000009) == 0xCD
     assert cpu.P == 0b00100000
+    assert cpu.PC == 2
 
 
 def test_STZ_absolute():
@@ -1798,6 +1920,7 @@ def test_STZ_absolute():
     assert mem.read(0x123456) == 0x00
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_STZ_absolute_8Bit():
@@ -1815,6 +1938,7 @@ def test_STZ_absolute_8Bit():
     assert mem.read(0x123456) == 0x00
     assert mem.read(0x123457) == 0xCD
     assert cpu.P == 0b00100000
+    assert cpu.PC == 3
 
 
 def test_STZ_absolute_no_wrapping():
@@ -1832,6 +1956,7 @@ def test_STZ_absolute_no_wrapping():
     assert mem.read(0x12FFFF) == 0x00 # no wrapping
     assert mem.read(0x130000) == 0x00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_STZ_absolute_no_wrapping_8BIT():
@@ -1849,6 +1974,7 @@ def test_STZ_absolute_no_wrapping_8BIT():
     assert mem.read(0x12FFFF) == 0x00  # no wrapping
     assert mem.read(0x130000) == 0xCD
     assert cpu.P == 0b00100000
+    assert cpu.PC == 3
 
 
 def test_STZ_abs_indexed_X():
@@ -1866,6 +1992,7 @@ def test_STZ_abs_indexed_X():
     assert mem.read(0x808001) == 0x00 # no wrapping
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_STZ_abs_indexed_X_8BIT():
@@ -1884,6 +2011,7 @@ def test_STZ_abs_indexed_X_8BIT():
     assert mem.read(0x808001) == 0x00 # no wrapping
     assert mem.read(0x808002) == 0xCD
     assert cpu.P == 0b00100000
+    assert cpu.PC == 3
 
 
 def test_STZ_abs_indexed_X_no_wrapping():
@@ -1902,6 +2030,7 @@ def test_STZ_abs_indexed_X_no_wrapping():
     assert mem.read(0x130009) == 0x00
     assert cpu.cycles == 6
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_STZ_abs_indexed_X_no_wrapping_8BIT():
@@ -1920,3 +2049,4 @@ def test_STZ_abs_indexed_X_no_wrapping_8BIT():
     assert mem.read(0x130009) == 0xCD
     assert cpu.cycles == 5
     assert cpu.P == 0b00100000
+    assert cpu.PC == 3

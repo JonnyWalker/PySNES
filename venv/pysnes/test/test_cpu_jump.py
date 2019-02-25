@@ -15,7 +15,9 @@ def test_JMP_abs():
     cpu = CPU65816(None)
     cpu.P = 0b00000000
     cpu.PC = 0
+
     cpu.fetch_decode_execute([0x4C, 0x34, 0x12])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 3
     assert cpu.PC == 0x1234
@@ -26,7 +28,9 @@ def test_JMP_abs2():
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     nops = [0xEA] * cpu.PC
+
     cpu.fetch_decode_execute(nops+[0x4C, 0x34, 0x12])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 3
     assert cpu.PC == 0x1234
@@ -38,7 +42,9 @@ def test_JMP_long():
     cpu.PC = 0
     cpu.PBR = 0
     nops = [0xEA] * cpu.PC
+
     cpu.fetch_decode_execute(nops+[0x5C, 0x56, 0x34, 0x12])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 4
     assert cpu.PC == 0x3456
@@ -54,7 +60,9 @@ def test_JMP_abs_indirect():
     mem.write(0x000000, 0x34)
     mem.write(0x00FFFF, 0x56) # zero bank wrapping!
     mem.write(0x010000, 0x00)
+
     cpu.fetch_decode_execute([0x6C, 0xFF, 0xFF])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 5
     assert cpu.PC == 0x3456
@@ -71,7 +79,9 @@ def test_JMP_abs_indirect_indexed_X():
     mem.write(0x000000, 0x34)
     mem.write(0x00FFFF, 0x56) # zero bank wrapping!
     mem.write(0x010000, 0x00)
+
     cpu.fetch_decode_execute([0x7C, 0xF0, 0xFF])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 6
     assert cpu.PC == 0x3456
@@ -88,7 +98,9 @@ def test_JMP_abs_indirect_3byte():
     mem.write(0x000001, 0x12)
     mem.write(0x00FFFF, 0x56) # zero bank wrapping!
     mem.write(0x010000, 0x00)
+
     cpu.fetch_decode_execute([0xDC, 0xFF, 0xFF])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 6
     assert cpu.PC == 0x3456
@@ -103,7 +115,9 @@ def test_JSR_abs():
     cpu.PC = 0x3456
     cpu.SP = 0x01FF
     nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
+
     cpu.fetch_decode_execute(nops+[0x20, 0xCD, 0xAB])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 6
     assert cpu.PBR == 0x12
@@ -125,7 +139,9 @@ def test_JSR_abs_indirect_indexed_X():
     mem.write(0x00FFFF, 0xCD) # zero bank wrapping!
     mem.write(0x010000, 0x00)
     nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
+
     cpu.fetch_decode_execute(nops+[0xFC, 0xF0, 0xFF])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 8
     assert cpu.PC == 0xABCD
@@ -143,7 +159,9 @@ def test_JSR_long():
     cpu.SP = 0x01FF
     cpu.PBR = 0x06
     nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
+
     cpu.fetch_decode_execute(nops+[0x22, 0xCD, 0xAB, 0x12])
+
     assert cpu.P == 0b00000000
     assert cpu.cycles == 8
     assert cpu.PC == 0xABCD

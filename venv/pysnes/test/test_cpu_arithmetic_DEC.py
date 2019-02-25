@@ -24,6 +24,7 @@ def test_DEC_Zero():
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_DEC_Zero_8BIT():
@@ -38,6 +39,7 @@ def test_DEC_Zero_8BIT():
     assert cpu.cycles == 2
     assert cpu.A == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_DEC_NEG():
@@ -52,6 +54,7 @@ def test_DEC_NEG():
     assert cpu.cycles == 2
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_DEC_NEG_8BIT():
@@ -66,6 +69,7 @@ def test_DEC_NEG_8BIT():
     assert cpu.cycles == 2
     assert cpu.A == 0xFF
     assert cpu.P == 0b10100000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_DEC_underflow():
@@ -80,6 +84,7 @@ def test_DEC_underflow():
     assert cpu.cycles == 2
     assert cpu.A == 0x7FFF      # 32.767 (Max Int)
     assert cpu.P == 0b00000000  # no negative flag
+    assert cpu.PC == 1
 
 
 def test_DEC_underflow_8BIT():
@@ -94,6 +99,7 @@ def test_DEC_underflow_8BIT():
     assert cpu.cycles == 2
     assert cpu.A == 0x7F        # 127 (Max Int)
     assert cpu.P == 0b00100000  # no negative flag
+    assert cpu.PC == 1
 
 
 def test_DEC_DP_Zero():
@@ -111,6 +117,7 @@ def test_DEC_DP_Zero():
     assert mem.read(0x001234) == 0x00
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_Zero_8BIT():
@@ -128,6 +135,7 @@ def test_DEC_DP_Zero_8BIT():
     assert mem.read(0x001234) == 0x00
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_NEG():
@@ -145,6 +153,7 @@ def test_DEC_DP_NEG():
     assert mem.read(0x001234) == 0xFF
     assert mem.read(0x001235) == 0xFF
     assert cpu.P == 0b10000000 # negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_NEG_8BIT():
@@ -162,6 +171,7 @@ def test_DEC_DP_NEG_8BIT():
     assert mem.read(0x001234) == 0xFF
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b10100000 # negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_underflow():
@@ -179,6 +189,7 @@ def test_DEC_DP_underflow():
     assert mem.read(0x001234) == 0xFF # 32.767 (Max Int)
     assert mem.read(0x001235) == 0x7F
     assert cpu.P == 0b00000000 # no negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_underflow_8BIT():
@@ -196,6 +207,7 @@ def test_DEC_DP_underflow_8BIT():
     assert mem.read(0x001234) == 0x7F # 127 (Max Int)
     assert mem.read(0x001235) == 0x00
     assert cpu.P == 0b00100000 # no negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_absolute_Zero():
@@ -213,6 +225,7 @@ def test_DEC_absolute_Zero():
     assert mem.read(0x123456) == 0x00
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_DEC_absolute_Zero_8BIT():
@@ -230,6 +243,7 @@ def test_DEC_absolute_Zero_8BIT():
     assert mem.read(0x123456) == 0x00
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_DEC_absolute_Neg():
@@ -247,6 +261,7 @@ def test_DEC_absolute_Neg():
     assert mem.read(0x123456) == 0xFF
     assert mem.read(0x123457) == 0xFF
     assert cpu.P == 0b10000000 # negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_absolute_Neg_8BIT():
@@ -264,6 +279,7 @@ def test_DEC_absolute_Neg_8BIT():
     assert mem.read(0x123456) == 0xFF
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b10100000 # negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_absolute_underflow():
@@ -281,6 +297,7 @@ def test_DEC_absolute_underflow():
     assert mem.read(0x123456) == 0xFF # 32.767 (Max Int)
     assert mem.read(0x123457) == 0x7F
     assert cpu.P == 0b00000000 # no negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_absolute_underflow_8BIT():
@@ -298,6 +315,7 @@ def test_DEC_absolute_underflow_8BIT():
     assert mem.read(0x123456) == 0x7F # 127 (Max Int)
     assert mem.read(0x123457) == 0x00
     assert cpu.P == 0b00100000 # no negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_DP_indexed_X_Zero():
@@ -317,6 +335,7 @@ def test_DEC_DP_indexed_X_Zero():
     assert mem.read(0x000054) == 0x00
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00000010  # zero flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_indexed_X_Zero_8BIT():
@@ -336,6 +355,7 @@ def test_DEC_DP_indexed_X_Zero_8BIT():
     assert mem.read(0x000054) == 0x00
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00100010  # zero flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_indexed_X_NEG():
@@ -355,6 +375,7 @@ def test_DEC_DP_indexed_X_NEG():
     assert mem.read(0x000054) == 0xFF
     assert mem.read(0x000055) == 0xFF
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_indexed_X_NEG_8BIT():
@@ -374,6 +395,7 @@ def test_DEC_DP_indexed_X_NEG_8BIT():
     assert mem.read(0x000054) == 0xFF
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b10100000  # negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_indexed_X_underflow():
@@ -393,6 +415,7 @@ def test_DEC_DP_indexed_X_underflow():
     assert mem.read(0x000054) == 0xFF # 32.767 (MAX INT)
     assert mem.read(0x000055) == 0x7F
     assert cpu.P == 0b00000000  # no negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_DP_indexed_X_underflow_8BIT():
@@ -412,6 +435,7 @@ def test_DEC_DP_indexed_X_underflow_8BIT():
     assert mem.read(0x000054) == 0x7F # 127 (MAX INT)
     assert mem.read(0x000055) == 0x00
     assert cpu.P == 0b00100000  # no negative flag
+    assert cpu.PC == 2
 
 
 def test_DEC_abs_indexed_X_Zero():
@@ -429,6 +453,7 @@ def test_DEC_abs_indexed_X_Zero():
     assert mem.read(0x808001) == 0x00 # no wrapping
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_DEC_abs_indexed_X_Zero_8BIT():
@@ -446,6 +471,7 @@ def test_DEC_abs_indexed_X_Zero_8BIT():
     assert mem.read(0x808001) == 0x00 # no wrapping
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b00100010 # zero flag
+    assert cpu.PC == 3
 
 
 def test_DEC_abs_indexed_X_NEG():
@@ -463,6 +489,7 @@ def test_DEC_abs_indexed_X_NEG():
     assert mem.read(0x808001) == 0xFF # no wrapping
     assert mem.read(0x808002) == 0xFF
     assert cpu.P == 0b10000000 # negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_abs_indexed_X_NEG_8BIT():
@@ -480,6 +507,7 @@ def test_DEC_abs_indexed_X_NEG_8BIT():
     assert mem.read(0x808001) == 0xFF # no wrapping
     assert mem.read(0x808002) == 0x00
     assert cpu.P == 0b10100000 # negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_abs_indexed_X_underflow():
@@ -497,6 +525,7 @@ def test_DEC_abs_indexed_X_underflow():
     assert mem.read(0x808001) == 0xFF # no wrapping
     assert mem.read(0x808002) == 0x7F # 32.767 (MAX INT)
     assert cpu.P == 0b00000000 # no negative flag
+    assert cpu.PC == 3
 
 
 def test_DEC_abs_indexed_X_underflow_8BIT():
@@ -514,6 +543,8 @@ def test_DEC_abs_indexed_X_underflow_8BIT():
     assert mem.read(0x808001) == 0x7F # no wrapping
     assert mem.read(0x808002) == 0x00 # 128(MAX INT)
     assert cpu.P == 0b00100000 # no negative flag
+    assert cpu.PC == 3
+
 
 def test_DEX_Zero():
     mem = MemoryMock()
@@ -527,6 +558,7 @@ def test_DEX_Zero():
     assert cpu.cycles == 2
     assert cpu.X == 0x0000
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_DEX_Zero_8BIT():
@@ -541,6 +573,7 @@ def test_DEX_Zero_8BIT():
     assert cpu.cycles == 2
     assert cpu.X == 0x00
     assert cpu.P == 0b00010010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_DEX_NEG():
@@ -555,6 +588,7 @@ def test_DEX_NEG():
     assert cpu.cycles == 2
     assert cpu.X == 0xFFFF
     assert cpu.P == 0b10000000 # negative flag
+    assert cpu.PC == 1
 
 
 def test_DEX_NEG_8BIT():
@@ -569,6 +603,7 @@ def test_DEX_NEG_8BIT():
     assert cpu.cycles == 2
     assert cpu.X == 0xFF
     assert cpu.P == 0b10010000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_DEX_underflow():
@@ -583,6 +618,7 @@ def test_DEX_underflow():
     assert cpu.cycles == 2
     assert cpu.X == 0x7FFF      # 32.767 (Max Int)
     assert cpu.P == 0b00000000  # no negative flag
+    assert cpu.PC == 1
 
 
 def test_DEX_underflow_8BIT():
@@ -597,6 +633,7 @@ def test_DEX_underflow_8BIT():
     assert cpu.cycles == 2
     assert cpu.X == 0x7F        # 127 (Max Int)
     assert cpu.P == 0b00010000  # no negative flag
+    assert cpu.PC == 1
 
 
 def test_DEY_Zero():
@@ -611,6 +648,7 @@ def test_DEY_Zero():
     assert cpu.cycles == 2
     assert cpu.Y == 0x0000
     assert cpu.P == 0b00000010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_DEY_Zero_8BIT():
@@ -625,6 +663,7 @@ def test_DEY_Zero_8BIT():
     assert cpu.cycles == 2
     assert cpu.Y == 0x00
     assert cpu.P == 0b00010010 # zero flag
+    assert cpu.PC == 1
 
 
 def test_DEY_NEG():
@@ -639,6 +678,7 @@ def test_DEY_NEG():
     assert cpu.cycles == 2
     assert cpu.Y == 0xFFFF
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_DEY_NEG_8BIT():
@@ -653,6 +693,7 @@ def test_DEY_NEG_8BIT():
     assert cpu.cycles == 2
     assert cpu.Y == 0xFF
     assert cpu.P == 0b10010000  # negative flag
+    assert cpu.PC == 1
 
 
 def test_DEY_underflow():
@@ -667,6 +708,7 @@ def test_DEY_underflow():
     assert cpu.cycles == 2
     assert cpu.Y == 0x7FFF      # 32.767 (Max Int)
     assert cpu.P == 0b00000000  # no negative flag
+    assert cpu.PC == 1
 
 
 def test_DEY_underflow_8BIT():
@@ -681,3 +723,4 @@ def test_DEY_underflow_8BIT():
     assert cpu.cycles == 2
     assert cpu.Y == 0x7F        # 127 (Max Int)
     assert cpu.P == 0b00010000  # no negative flag
+    assert cpu.PC == 1

@@ -20,10 +20,13 @@ def test_LDA_long():
     mem.write(0x123456, 0xAB)
     mem.write(0x123457, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xAF, 0x56, 0x34, 0x12])
+
     assert cpu.cycles == 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_LDA_long2():
@@ -34,10 +37,13 @@ def test_LDA_long2():
     mem.write(0x12FFFF, 0xAB)
     mem.write(0x130000, 0xCD) # no wrapping
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xAF, 0xFF, 0xFF, 0x12])
+
     assert cpu.cycles == 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_LDA_const16Bit():
@@ -45,10 +51,13 @@ def test_LDA_const16Bit():
     cpu.P = 0b00000000 # 16 Bit mode
     cpu.e = 0
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA9, 0x34, 0x12])
+
     assert cpu.cycles == 3
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_LDA_const8Bit():
@@ -56,10 +65,13 @@ def test_LDA_const8Bit():
     cpu.P = 0b00100000 # 8 Bit mode
     cpu.e = 1
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA9, 0x34])
+
     assert cpu.cycles == 2
     assert cpu.A == 0x34
     assert cpu.P == 0b00100000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP():
@@ -71,10 +83,13 @@ def test_LDA_DP():
     mem.write(0x001235, 0x00)
     cpu.DP = 0x1200
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA5, 0x34])
+
     assert cpu.cycles in (3, 4, 5)
     assert cpu.A == 0x00AB
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP2():
@@ -87,10 +102,13 @@ def test_LDA_DP2():
     mem.write(0x010000, 0xEF) # Bug if this is read
     cpu.DP = 0xFF00
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA5, 0xFF])
+
     assert cpu.cycles in (3, 4, 5)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_absolute():
@@ -102,10 +120,13 @@ def test_LDA_absolute():
     mem.write(0x123456, 0xAB)
     mem.write(0x123457, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xAD, 0x56, 0x34])
+
     assert cpu.cycles == 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDA_absolute2():
@@ -117,10 +138,13 @@ def test_LDA_absolute2():
     mem.write(0x12FFFF, 0xAB) # no wrapping
     mem.write(0x130000, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xAD, 0xFF, 0xFF])
+
     assert cpu.cycles == 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDA_DP_indirect_indexed_Y():
@@ -153,10 +177,13 @@ def test_LDA_DP_indirect_indexed_Y():
     mem.write(0x804032, 0xCD)
     cpu.P = 0b00000000  # 16 Bit mode
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB1, 0x10])
+
     assert cpu.cycles >= 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect_indexed_Y2():
@@ -174,10 +201,13 @@ def test_LDA_DP_indirect_indexed_Y2():
     mem.write(0x130009, 0xCD)
     cpu.P = 0b00000000  # 16 Bit mode
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB1, 0xFF])
+
     assert cpu.cycles >= 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect():
@@ -210,10 +240,13 @@ def test_LDA_DP_indirect():
     mem.write(0x804031, 0xCD)
     cpu.P = 0b00000000  # 16 Bit mode
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB2, 0x10])
+
     assert cpu.cycles in (6, 7)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect2():
@@ -231,10 +264,13 @@ def test_LDA_DP_indirect2():
     mem.write(0x130000, 0xCD)
     cpu.P = 0b00000000  # 16 Bit mode
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB2, 0xFF])
+
     assert cpu.cycles in (6, 7)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect_long_indexed_Y():
@@ -266,10 +302,13 @@ def test_LDA_DP_indirect_long_indexed_Y():
     mem.write(0x234031, 0xAB)
     mem.write(0x234032, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB7, 0x10])
+
     assert cpu.cycles in (7, 8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect_long_indexed_Y2():
@@ -287,10 +326,13 @@ def test_LDA_DP_indirect_long_indexed_Y2():
     mem.write(0x130006, 0xAB)
     mem.write(0x130007, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB7, 0xFE])
+
     assert cpu.cycles in (7, 8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect_long():
@@ -321,10 +363,13 @@ def test_LDA_DP_indirect_long():
     mem.write(0x234030, 0xAB)
     mem.write(0x234031, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA7, 0x10])
+
     assert cpu.cycles in (6, 7, 8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indirect_long2():
@@ -341,10 +386,13 @@ def test_LDA_DP_indirect_long2():
     mem.write(0x12FFFF, 0xAB)
     mem.write(0x130000, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA7, 0xFE])
+
     assert cpu.cycles in (6, 7, 8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indexed_indirect_X():
@@ -377,10 +425,13 @@ def test_LDA_DP_indexed_indirect_X():
     mem.write(0x808809, 0xAB)
     mem.write(0x80880A, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA1, 0x02])
+
     assert cpu.cycles in (6,7,8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indexed_indirect_X2():
@@ -398,10 +449,13 @@ def test_LDA_DP_indexed_indirect_X2():
     mem.write(0x12FFFF, 0xAB)
     mem.write(0x130000, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA1, 0xFE])
+
     assert cpu.cycles in (6,7,8)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indexed_X():
@@ -416,10 +470,13 @@ def test_LDA_DP_indexed_X():
     mem.write(0x000054, 0xAB)
     mem.write(0x000055, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB5, 0x30])
+
     assert cpu.cycles in (5, 6)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_DP_indexed_X2():
@@ -434,10 +491,13 @@ def test_LDA_DP_indexed_X2():
     mem.write(0x000008, 0xAB)
     mem.write(0x000009, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB5, 0xFE])
+
     assert cpu.cycles in (5, 6)
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_abs_indexed_X():
@@ -451,10 +511,13 @@ def test_LDA_abs_indexed_X():
     mem.write(0x808001, 0xAB) # no wrapping
     mem.write(0x808002, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xBD, 0x00, 0x80])
+
     assert cpu.cycles >= 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDA_abs_indexed_X2():
@@ -468,10 +531,13 @@ def test_LDA_abs_indexed_X2():
     mem.write(0x130008, 0xAB) # no wrapping
     mem.write(0x130009, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xBD, 0xFE, 0xFF])
+
     assert cpu.cycles >= 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDA_abs_indexed_Y():
@@ -485,10 +551,13 @@ def test_LDA_abs_indexed_Y():
     mem.write(0x808001, 0xAB) # no wrapping
     mem.write(0x808002, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB9, 0x00, 0x80])
+
     assert cpu.cycles >= 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDA_abs_indexed_Y2():
@@ -502,10 +571,13 @@ def test_LDA_abs_indexed_Y2():
     mem.write(0x130008, 0xAB) # no wrapping
     mem.write(0x130009, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB9, 0xFE, 0xFF])
+
     assert cpu.cycles >= 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDA_long_indexed_X():
@@ -518,10 +590,13 @@ def test_LDA_long_indexed_X():
     mem.write(0x808001, 0xAB)
     mem.write(0x808002, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xBF, 0x00, 0x80, 0x80])
+
     assert cpu.cycles == 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_LDA_long_indexed_X2():
@@ -534,10 +609,13 @@ def test_LDA_long_indexed_X2():
     mem.write(0x130008, 0xAB)
     mem.write(0x130009, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xBF, 0xFE, 0xFF, 0x12])
+
     assert cpu.cycles == 6
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 4
 
 
 def test_LDA_stack_relative():
@@ -550,10 +628,13 @@ def test_LDA_stack_relative():
     mem.write(0x001FF1, 0xAB)
     mem.write(0x001FF2, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA3, 0x01])
+
     assert cpu.cycles == 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_stack_relative2():
@@ -566,10 +647,13 @@ def test_LDA_stack_relative2():
     mem.write(0x00000A, 0xAB)
     mem.write(0x00000B, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xA3, 0xFA])
+
     assert cpu.cycles == 5
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDA_stack_relative_indirect_indexed_Y():
@@ -587,10 +671,13 @@ def test_LDA_stack_relative_indirect_indexed_Y():
     mem.write(0x130040, 0xAB)
     mem.write(0x130041, 0xCD)
     assert cpu.A == 0
+
     cpu.fetch_decode_execute([0xB3, 0xFA])
+
     assert cpu.cycles == 8
     assert cpu.A == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDX_const16Bit():
@@ -598,10 +685,13 @@ def test_LDX_const16Bit():
     cpu.P = 0b00000000 # 16 Bit mode
     cpu.e = 0
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xA2, 0x34, 0x12])
+
     assert cpu.cycles == 3
     assert cpu.X == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_LDX_const8Bit():
@@ -609,10 +699,13 @@ def test_LDX_const8Bit():
     cpu.P = 0b00010000 # 8 Bit mode
     cpu.e = 1
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xA2, 0x34])
+
     assert cpu.cycles == 2
     assert cpu.X == 0x34
     assert cpu.P == 0b00010000
+    assert cpu.PC == 2
 
 
 def test_LDX_DP():
@@ -624,10 +717,13 @@ def test_LDX_DP():
     mem.write(0x001235, 0x00)
     cpu.DP = 0x1200
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xA6, 0x34])
+
     assert cpu.cycles in (3, 4, 5)
     assert cpu.X == 0x00AB
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_LDX_DP2():
@@ -640,10 +736,13 @@ def test_LDX_DP2():
     mem.write(0x010000, 0xEF) # Bug if this is read
     cpu.DP = 0xFF00
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xA6, 0xFF])
+
     assert cpu.cycles in (3, 4, 5)
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDX_absolute():
@@ -655,10 +754,13 @@ def test_LDX_absolute():
     mem.write(0x123456, 0xAB)
     mem.write(0x123457, 0xCD)
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xAE, 0x56, 0x34])
+
     assert cpu.cycles == 5
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDX_absolute2():
@@ -670,10 +772,13 @@ def test_LDX_absolute2():
     mem.write(0x12FFFF, 0xAB) # no wrapping
     mem.write(0x130000, 0xCD)
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xAE, 0xFF, 0xFF])
+
     assert cpu.cycles == 5
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDX_DP_indexed_Y():
@@ -688,10 +793,13 @@ def test_LDX_DP_indexed_Y():
     mem.write(0x000054, 0xAB)
     mem.write(0x000055, 0xCD)
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xB6, 0x30])
+
     assert cpu.cycles in (5, 6)
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDX_DP_indexed_Y2():
@@ -706,10 +814,13 @@ def test_LDX_DP_indexed_Y2():
     mem.write(0x000008, 0xAB)
     mem.write(0x000009, 0xCD)
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xB6, 0xFE])
+
     assert cpu.cycles in (5, 6)
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDX_abs_indexed_Y():
@@ -723,10 +834,13 @@ def test_LDX_abs_indexed_Y():
     mem.write(0x808001, 0xAB) # no wrapping
     mem.write(0x808002, 0xCD)
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xBE, 0x00, 0x80])
+
     assert cpu.cycles >= 6
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDX_abs_indexed_Y2():
@@ -740,10 +854,13 @@ def test_LDX_abs_indexed_Y2():
     mem.write(0x130008, 0xAB) # no wrapping
     mem.write(0x130009, 0xCD)
     assert cpu.X == 0
+
     cpu.fetch_decode_execute([0xBE, 0xFE, 0xFF])
+
     assert cpu.cycles >= 6
     assert cpu.X == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDY_const16Bit():
@@ -751,10 +868,13 @@ def test_LDY_const16Bit():
     cpu.P = 0b00000000 # 16 Bit mode
     cpu.e = 0
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xA0, 0x34, 0x12])
+
     assert cpu.cycles == 3
     assert cpu.Y == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 3
 
 
 def test_LDY_const8Bit():
@@ -762,10 +882,13 @@ def test_LDY_const8Bit():
     cpu.P = 0b00010000 # 8 Bit mode
     cpu.e = 1
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xA0, 0x34])
+
     assert cpu.cycles == 2
     assert cpu.Y == 0x34
     assert cpu.P == 0b00010000
+    assert cpu.PC == 2
 
 
 def test_LDY_DP():
@@ -777,10 +900,13 @@ def test_LDY_DP():
     mem.write(0x001235, 0x00)
     cpu.DP = 0x1200
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xA4, 0x34])
+
     assert cpu.cycles in (3, 4, 5)
     assert cpu.Y == 0x00AB
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_LDY_DP2():
@@ -793,10 +919,13 @@ def test_LDY_DP2():
     mem.write(0x010000, 0xEF) # Bug if this is read
     cpu.DP = 0xFF00
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xA4, 0xFF])
+
     assert cpu.cycles in (3, 4, 5)
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDY_absolute():
@@ -808,10 +937,13 @@ def test_LDY_absolute():
     mem.write(0x123456, 0xAB)
     mem.write(0x123457, 0xCD)
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xAC, 0x56, 0x34])
+
     assert cpu.cycles == 5
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDY_absolute2():
@@ -823,10 +955,13 @@ def test_LDY_absolute2():
     mem.write(0x12FFFF, 0xAB) # no wrapping
     mem.write(0x130000, 0xCD)
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xAC, 0xFF, 0xFF])
+
     assert cpu.cycles == 5
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDY_DP_indexed_X():
@@ -841,10 +976,13 @@ def test_LDY_DP_indexed_X():
     mem.write(0x000054, 0xAB)
     mem.write(0x000055, 0xCD)
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xB4, 0x30])
+
     assert cpu.cycles in (5, 6)
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDY_DP_indexed_X2():
@@ -859,10 +997,13 @@ def test_LDY_DP_indexed_X2():
     mem.write(0x000008, 0xAB)
     mem.write(0x000009, 0xCD)
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xB4, 0xFE])
+
     assert cpu.cycles in (5, 6)
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 2
 
 
 def test_LDY_abs_indexed_X():
@@ -876,10 +1017,13 @@ def test_LDY_abs_indexed_X():
     mem.write(0x808001, 0xAB) # no wrapping
     mem.write(0x808002, 0xCD)
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xBC, 0x00, 0x80])
+
     assert cpu.cycles >= 6
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_LDY_abs_indexed_X2():
@@ -893,10 +1037,13 @@ def test_LDY_abs_indexed_X2():
     mem.write(0x130008, 0xAB) # no wrapping
     mem.write(0x130009, 0xCD)
     assert cpu.Y == 0
+
     cpu.fetch_decode_execute([0xBC, 0xFE, 0xFF])
+
     assert cpu.cycles >= 6
     assert cpu.Y == 0xCDAB
     assert cpu.P == 0b10000000
+    assert cpu.PC == 3
 
 
 def test_TAX():
@@ -908,11 +1055,13 @@ def test_TAX():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0xAA]) # TAX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x6789
     assert cpu.X == 0x6789
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_TAX_N():
@@ -924,11 +1073,13 @@ def test_TAX_N():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0xAA]) # TAX
+
     assert cpu.cycles == 2
     assert cpu.A == 0xC789
     assert cpu.X == 0xC789
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b10000000 # n
+    assert cpu.PC == 1
 
 
 def test_TAX_Z():
@@ -940,11 +1091,13 @@ def test_TAX_Z():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0xAA]) # TAX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.X == 0x0000
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b00000010 # z
+    assert cpu.PC == 1
 
 
 def test_TAX_X():
@@ -956,11 +1109,13 @@ def test_TAX_X():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0xAA]) # TAX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x5678
     assert cpu.X == 0x1278
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b00010000 # x
+    assert cpu.PC == 1
 
 
 def test_TAX_NX():
@@ -972,11 +1127,13 @@ def test_TAX_NX():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0xAA]) # TAX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x6789
     assert cpu.X == 0x1289
     assert cpu.Y == 0xABCD
     assert cpu.P == 0b10010000 # nx
+    assert cpu.PC == 1
 
 
 def test_TAY():
@@ -988,11 +1145,13 @@ def test_TAY():
     cpu.Y = 0x1234
 
     cpu.fetch_decode_execute([0xA8]) # TAY
+
     assert cpu.cycles == 2
     assert cpu.A == 0x6789
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_TAY_N():
@@ -1004,11 +1163,13 @@ def test_TAY_N():
     cpu.Y = 0x1234
 
     cpu.fetch_decode_execute([0xA8]) # TAY
+
     assert cpu.cycles == 2
     assert cpu.A == 0xC789
     assert cpu.X == 0xABCD
     assert cpu.Y == 0xC789
     assert cpu.P == 0b10000000 # n
+    assert cpu.PC == 1
 
 
 def test_TAY_Z():
@@ -1020,11 +1181,13 @@ def test_TAY_Z():
     cpu.Y = 0x1234
 
     cpu.fetch_decode_execute([0xA8]) # TAY
+
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x0000
     assert cpu.P == 0b00000010 # z
+    assert cpu.PC == 1
 
 
 def test_TAY_X():
@@ -1036,11 +1199,13 @@ def test_TAY_X():
     cpu.Y = 0x1234
 
     cpu.fetch_decode_execute([0xA8]) # TAY
+
     assert cpu.cycles == 2
     assert cpu.A == 0x5678
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x1278
     assert cpu.P == 0b00010000 # x
+    assert cpu.PC == 1
 
 
 def test_TAY_NX():
@@ -1052,11 +1217,13 @@ def test_TAY_NX():
     cpu.Y = 0x1234
 
     cpu.fetch_decode_execute([0xA8]) # TAY
+
     assert cpu.cycles == 2
     assert cpu.A == 0x6789
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x1289
     assert cpu.P == 0b10010000 # nx
+    assert cpu.PC == 1
 
 
 def test_TXA():
@@ -1068,11 +1235,13 @@ def test_TXA():
     cpu.Y = 0x6789
 
     cpu.fetch_decode_execute([0x8A]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.A == 0x1234
     assert cpu.X == 0x1234
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_TXA_N():
@@ -1084,11 +1253,13 @@ def test_TXA_N():
     cpu.Y = 0x6789
 
     cpu.fetch_decode_execute([0x8A]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.A == 0x8234
     assert cpu.X == 0x8234
     assert cpu.Y == 0x6789
     assert cpu.P == 0b10000000 # n
+    assert cpu.PC == 1
 
 
 def test_TXA_Z():
@@ -1100,11 +1271,13 @@ def test_TXA_Z():
     cpu.Y = 0x6789
 
     cpu.fetch_decode_execute([0x8A]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.A == 0x0000
     assert cpu.X == 0x0000
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00000010 # z
+    assert cpu.PC == 1
 
 
 def test_TXA_X():
@@ -1116,11 +1289,13 @@ def test_TXA_X():
     cpu.Y = 0x6789
 
     cpu.fetch_decode_execute([0x8A]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.A == 0x1234
     assert cpu.X == 0x1234
     assert cpu.Y == 0x6789
     assert cpu.P == 0b00010000 # x
+    assert cpu.PC == 1
 
 
 def test_TXY():
@@ -1131,10 +1306,12 @@ def test_TXY():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0x9B]) # TXY
+
     assert cpu.cycles == 2
     assert cpu.X == 0x1234
     assert cpu.Y == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_TXY_N():
@@ -1145,10 +1322,12 @@ def test_TXY_N():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0x9B]) # TXY
+
     assert cpu.cycles == 2
     assert cpu.X == 0x8234
     assert cpu.Y == 0x8234
     assert cpu.P == 0b10000000 # n
+    assert cpu.PC == 1
 
 
 def test_TXY_Z():
@@ -1159,10 +1338,12 @@ def test_TXY_Z():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0x9B]) # TXY
+
     assert cpu.cycles == 2
     assert cpu.X == 0x0000
     assert cpu.Y == 0x0000
     assert cpu.P == 0b00000010 # z
+    assert cpu.PC == 1
 
 
 def test_TXY_X():
@@ -1173,10 +1354,12 @@ def test_TXY_X():
     cpu.Y = 0xABCD
 
     cpu.fetch_decode_execute([0x9B]) # TXY
+
     assert cpu.cycles == 2
     assert cpu.X == 0x1234
     assert cpu.Y == 0xAB34
     assert cpu.P == 0b00010000 # x
+    assert cpu.PC == 1
 
 
 def test_TYA():
@@ -1188,11 +1371,13 @@ def test_TYA():
     cpu.A = 0xABCD
 
     cpu.fetch_decode_execute([0x98]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.X == 0x8976
     assert cpu.Y == 0x1234
     assert cpu.A == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_TYA_N():
@@ -1204,11 +1389,13 @@ def test_TYA_N():
     cpu.A = 0xABCD
 
     cpu.fetch_decode_execute([0x98]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x8234
     assert cpu.A == 0x8234
     assert cpu.P == 0b10000000 # n
+    assert cpu.PC == 1
 
 
 def test_TYA_Z():
@@ -1220,11 +1407,13 @@ def test_TYA_Z():
     cpu.A = 0xABCD
 
     cpu.fetch_decode_execute([0x98]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.X == 0xABCD
     assert cpu.Y == 0x0000
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010 # z
+    assert cpu.PC == 1
 
 
 def test_TYA_X():
@@ -1236,11 +1425,13 @@ def test_TYA_X():
     cpu.A = 0xABCD
 
     cpu.fetch_decode_execute([0x98]) # TXA
+
     assert cpu.cycles == 2
     assert cpu.X == 0x8765
     assert cpu.Y == 0x1234
     assert cpu.A == 0x1234
     assert cpu.P == 0b00010000 # x
+    assert cpu.PC == 1
 
 
 def test_TYX():
@@ -1252,11 +1443,13 @@ def test_TYX():
     cpu.X = 0xABCD
 
     cpu.fetch_decode_execute([0xBB]) # TYX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x8765
     assert cpu.Y == 0x1234
     assert cpu.X == 0x1234
     assert cpu.P == 0b00000000
+    assert cpu.PC == 1
 
 
 def test_TYX_N():
@@ -1268,11 +1461,13 @@ def test_TYX_N():
     cpu.X = 0xABCD
 
     cpu.fetch_decode_execute([0xBB]) # TYX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x8765
     assert cpu.Y == 0x8234
     assert cpu.X == 0x8234
     assert cpu.P == 0b10000000 # n
+    assert cpu.PC == 1
 
 
 def test_TYX_Z():
@@ -1284,11 +1479,13 @@ def test_TYX_Z():
     cpu.X = 0xABCD
 
     cpu.fetch_decode_execute([0xBB]) # TYX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x8765
     assert cpu.Y == 0x0000
     assert cpu.X == 0x0000
     assert cpu.P == 0b00000010 # z
+    assert cpu.PC == 1
 
 
 def test_TYX_X():
@@ -1300,8 +1497,10 @@ def test_TYX_X():
     cpu.X = 0xABCD
 
     cpu.fetch_decode_execute([0xBB]) # TYX
+
     assert cpu.cycles == 2
     assert cpu.A == 0x8765
     assert cpu.Y == 0x1234
     assert cpu.X == 0xAB34
     assert cpu.P == 0b00010000 # x
+    assert cpu.PC == 1

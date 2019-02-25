@@ -26,6 +26,7 @@ def test_ADC_imm_setZ_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x00
     assert cpu.P == 0b00100010  # zero flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_clearZ_8bit():
@@ -40,6 +41,7 @@ def test_ADC_imm_clearZ_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x10
     assert cpu.P == 0b00100000  # no zero flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_setN_8bit():
@@ -54,6 +56,7 @@ def test_ADC_imm_setN_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x8F
     assert cpu.P == 0b10100000  # negative flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_clearN_8bit():
@@ -68,7 +71,7 @@ def test_ADC_imm_clearN_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x10
     assert cpu.P == 0b00100000  # no negative flag
-
+    assert cpu.PC == 2
 
 def test_ADC_imm_setV_8bit():
     mem = MemoryMock()
@@ -82,6 +85,7 @@ def test_ADC_imm_setV_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x80
     assert cpu.P == 0b11100000  # overflow + negative flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_clearV_8bit():
@@ -96,6 +100,7 @@ def test_ADC_imm_clearV_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x10
     assert cpu.P == 0b00100000  # no overflow + negative flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_setC_8bit():
@@ -110,6 +115,7 @@ def test_ADC_imm_setC_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x01
     assert cpu.P == 0b00100001  # carry flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_clearC_8bit():
@@ -124,6 +130,7 @@ def test_ADC_imm_clearC_8bit():
     assert cpu.cycles == 2
     assert cpu.A == 0x03  # A + const + carry = 3
     assert cpu.P == 0b00100000  # no carry flag
+    assert cpu.PC == 2
 
 
 def test_ADC_imm_setZ_16bit():
@@ -138,6 +145,7 @@ def test_ADC_imm_setZ_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000010  # zero flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_clearZ_16bit():
@@ -152,6 +160,7 @@ def test_ADC_imm_clearZ_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x0010
     assert cpu.P == 0b00000000  # no zero flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_setN_16bit():
@@ -166,6 +175,7 @@ def test_ADC_imm_setN_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x8FFF
     assert cpu.P == 0b10000000  # negative flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_clearN_16bit():
@@ -180,6 +190,7 @@ def test_ADC_imm_clearN_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x0010
     assert cpu.P == 0b00000000  # no negative flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_setV_16bit():
@@ -194,6 +205,7 @@ def test_ADC_imm_setV_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x8000
     assert cpu.P == 0b11000000  # overflow + negative flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_clearV_16bit():
@@ -208,6 +220,7 @@ def test_ADC_imm_clearV_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x0010
     assert cpu.P == 0b00000000  # no overflow + negative flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_setC_16bit():
@@ -222,6 +235,7 @@ def test_ADC_imm_setC_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x0001
     assert cpu.P == 0b00000001  # carry flag
+    assert cpu.PC == 3
 
 
 def test_ADC_imm_clearC_16bit():
@@ -236,6 +250,7 @@ def test_ADC_imm_clearC_16bit():
     assert cpu.cycles == 3
     assert cpu.A == 0x03  # A + const + carry = 3
     assert cpu.P == 0b00000000  # no carry flag
+    assert cpu.PC == 3
 
 
 def test_ADC_DP_indexed_indirect_X():
@@ -259,6 +274,7 @@ def test_ADC_DP_indexed_indirect_X():
     assert cpu.cycles == 8
     assert cpu.A == 0x3333
     assert cpu.P == 0b00000000  # no flags
+    assert cpu.PC == 2
 
 
 def test_ADC_stack_relative():
@@ -277,6 +293,7 @@ def test_ADC_stack_relative():
     assert cpu.cycles == 5
     assert cpu.A == 0x8888
     assert cpu.P == 0b11000000  # negative and overflow flag
+    assert cpu.PC == 2
 
 
 def test_ADC_DP():
@@ -295,6 +312,7 @@ def test_ADC_DP():
     assert cpu.cycles == 4
     assert cpu.A == 0x5554
     assert cpu.P == 0b00000001  # carry flag
+    assert cpu.PC == 2
 
 
 def test_ADC_DP_indirect_long():
@@ -317,6 +335,7 @@ def test_ADC_DP_indirect_long():
     assert cpu.cycles == 8
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000011  # carry and zero flag
+    assert cpu.PC == 2
 
 
 def test_ADC_absolute():
@@ -335,6 +354,7 @@ def test_ADC_absolute():
     assert cpu.cycles == 5
     assert cpu.A == 0x8001
     assert cpu.P == 0b11000000  # negative and overflow flag
+    assert cpu.PC == 3
 
 
 def test_ADC_long():
@@ -352,6 +372,7 @@ def test_ADC_long():
     assert cpu.cycles == 6
     assert cpu.A == 0x0FFF
     assert cpu.P == 0b00000000  # no flags
+    assert cpu.PC == 4
 
 
 def test_ADC_DP_indirect_indexed_Y():
@@ -375,6 +396,7 @@ def test_ADC_DP_indirect_indexed_Y():
     assert cpu.cycles >= 7
     assert cpu.A == 0x1EFF
     assert cpu.P == 0b00000000  # no flags
+    assert cpu.PC == 2
 
 
 def test_ADC_DP_indirect():
@@ -397,6 +419,7 @@ def test_ADC_DP_indirect():
     assert cpu.cycles == 7
     assert cpu.A == 0x5555
     assert cpu.P == 0b00000000
+    assert cpu.PC == 2
 
 
 def test_ADC_stack_relative_indirect_indexed_Y():
@@ -419,6 +442,7 @@ def test_ADC_stack_relative_indirect_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0x0000
     assert cpu.P == 0b01000011  # negative, zero and carry flag
+    assert cpu.PC == 2
 
 
 def test_ADC_DP_indexed_X():
@@ -438,6 +462,7 @@ def test_ADC_DP_indexed_X():
     assert cpu.cycles == 6
     assert cpu.A == 0x0FFF
     assert cpu.P == 0b00000000  # no flags
+    assert cpu.PC == 2
 
 
 def test_ADC_DP_indirect_long_indexed_Y():
@@ -461,6 +486,7 @@ def test_ADC_DP_indirect_long_indexed_Y():
     assert cpu.cycles == 8
     assert cpu.A == 0x0000
     assert cpu.P == 0b00000011  # zero and carry flag
+    assert cpu.PC == 2
 
 
 def test_ADC_abs_indexed_Y():
@@ -480,6 +506,7 @@ def test_ADC_abs_indexed_Y():
     assert cpu.cycles >= 6
     assert cpu.A == 0x8000
     assert cpu.P == 0b11000000  # overflow and negative flag
+    assert cpu.PC == 3
 
 
 def test_ADC_abs_indexed_X():
@@ -499,6 +526,7 @@ def test_ADC_abs_indexed_X():
     assert cpu.cycles >= 6
     assert cpu.A == 0xFFFF
     assert cpu.P == 0b10000001  # carry and negative flag
+    assert cpu.PC == 3
 
 
 def test_ADC_long_indexed_X():
@@ -516,3 +544,4 @@ def test_ADC_long_indexed_X():
     assert cpu.cycles == 6
     assert cpu.A == 0xBE02
     assert cpu.P == 0b11000000  # negative and overflow flag
+    assert cpu.PC == 4
