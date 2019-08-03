@@ -1,4 +1,4 @@
-# python 2bpp_to_wla.py BMPPATH
+# python 2bpp_to_wla.py img/pacman/2BPP/Ghost2LL.bmp
 import sys
 
 # https://en.wikipedia.org/wiki/BMP_file_format

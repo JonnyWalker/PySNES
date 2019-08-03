@@ -2,7 +2,7 @@ from cartrige import ROMHeader
 from helper import open_as_byte_array
 from disassembler import Disassembler
 from cpu import CPU65816
-from opcodes import opcode_map
+from graphics import PictureProcessingUnit
 import sys
 
 if len(sys.argv) <= 1:
@@ -26,6 +26,8 @@ class MemoryMock(object):
         self.ram[address] = value
 
 c = CPU65816(MemoryMock())
+ppu = PictureProcessingUnit()
+ppu.init()
 while True:
     instr_str = d.disassemble_single_opcode(ba, c.PC, add_new_line=False,
                                   add_descr=False, add_addr=False, M=c.isM(), X=c.isX())

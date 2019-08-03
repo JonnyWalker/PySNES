@@ -688,7 +688,10 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # CPX #const
         elif opcode == 0xE0:
-            const = self.fetch_byte(code)
+            if self.isX():
+                const = self.fetch_byte(code)
+            else:
+                const = self.fetch_twobyte(code)
             result = self.X - const
             self.compute_NZflags(result, self.isM())
             if self.X >= const:
@@ -725,7 +728,10 @@ class CPU65816(object):
             self.PC = self.PC + 1
         # CPY #const
         elif opcode == 0xC0:
-            const = self.fetch_byte(code)
+            if self.isX():
+                const = self.fetch_byte(code)
+            else:
+                const = self.fetch_twobyte(code)
             result = self.Y - const
             self.compute_NZflags(result, self.isM())
             if self.Y >= const:
@@ -2270,11 +2276,11 @@ class CPU65816(object):
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = code[(self.PBR << 16) +self.PC]
+        addr = code[(self.PBR << 16) + self.PC]
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = addr + (code[(self.PBR << 16) +self.PC] << 8)
+        addr = (code[(self.PBR << 16) + self.PC] << 8) + addr
         return addr
 
     # little endian
@@ -2286,11 +2292,11 @@ class CPU65816(object):
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = addr + (code[(self.PBR << 16) +self.PC] << 8)
+        addr = (code[(self.PBR << 16) +self.PC] << 8) + addr
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = addr + (code[(self.PBR << 16) +self.PC] << 16)
+        addr = (code[(self.PBR << 16) +self.PC] << 16) + addr
         return addr
 
     def read_memory(self, address, byte_num, wrapp=False):
