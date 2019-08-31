@@ -703,6 +703,7 @@ def test_DEY_underflow():
     cpu.e = 0
     cpu.Y = 0x8000 # -32.768 (MIN INT)
 
+
     cpu.fetch_decode_execute([0x88])
 
     assert cpu.cycles == 2

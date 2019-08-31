@@ -1,9 +1,9 @@
 from opcodes import opcode_map, Mode
 
 class Disassembler(object):
-    def disassemble_single_opcode(self, byte_array, index, add_new_line=False,
+    def disassemble_single_opcode(self, memory, index, add_new_line=False,
                                   add_descr=False, add_addr=False, M=False, X=False):
-        opcode = byte_array[index]
+        opcode = memory.read(index)
         opcode_info = opcode_map[opcode]
         mnemonic = opcode_info[0]
         addr_mode = opcode_info[1]
@@ -17,49 +17,49 @@ class Disassembler(object):
         result += hex(opcode)+":"+mnemonic+" "
         index = index + 1
         if length == 2:
-            immediate8bit = byte_array[index]
+            immediate8bit = memory.read(index)
             result += hex(immediate8bit)
         elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_M:
             if M:
-                immediate8bit = byte_array[index]
+                immediate8bit = memory.read(index)
                 result += hex(immediate8bit)
             else:
-                addr = byte_array[index]
+                addr = memory.read(index)
                 index = index + 1
-                addr = addr + (byte_array[index] << 8)
+                addr = addr + (memory.read(index) << 8)
                 index = index + 1
                 result += hex(addr)
         elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_X:
             if X:
-                immediate8bit = byte_array[index]
+                immediate8bit = memory.read(index)
                 result += hex(immediate8bit)
             else:
-                addr = byte_array[index]
+                addr = memory.read(index)
                 index = index + 1
-                addr = addr + (byte_array[index] << 8)
+                addr = addr + (memory.read(index) << 8)
                 index = index + 1
                 result += hex(addr)
         elif length == 3:
-            addr = byte_array[index]
+            addr = memory.read(index)
             index = index + 1
-            addr = addr + (byte_array[index] << 8)
+            addr = addr + (memory.read(index) << 8)
             index = index + 1
             result += hex(addr)
         elif length == 4:
-            addr = byte_array[index]
+            addr = memory.read(index)
             index = index + 1
-            addr = addr + (byte_array[index] << 8)
+            addr = addr + (memory.read(index) << 8)
             index = index + 1
-            addr = addr + (byte_array[index] << 16)
+            addr = addr + (memory.read(index) << 16)
             index = index + 1
             result += hex(addr)
         return result
 
-    def disassemble(self, byte_array, add_new_line=False, add_descr=False, add_addr=False, M=False, X=False):
-        index = 0
+    def disassemble(self, memory, start, end, add_new_line=False, add_descr=False, add_addr=False, M=False, X=False):
+        index = start
         symbolic = []
-        while index < len(byte_array):
-            opcode_info = opcode_map[byte_array[index]]
+        while index < end:
+            opcode_info = opcode_map[memory.read(index)]
             mnemonic = opcode_info[0]
             addr_mode = opcode_info[1]
             flags = opcode_info[2]
@@ -76,43 +76,43 @@ class Disassembler(object):
             #       E.g. ADC has the length 2 or 3 depending on the M flag
             #       so basically, this code is wrong :'(
             if length == 2:
-                immediate8bit = byte_array[index]
+                immediate8bit = memory.read(index)
                 symbolic.append(hex(immediate8bit))
                 index = index + 1
             elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_M:
                 if M:
-                    immediate8bit = byte_array[index]
+                    immediate8bit = memory.read(index)
                     symbolic.append(hex(immediate8bit))
                     index = index + 1
                 else:
-                    addr = byte_array[index]
+                    addr = memory.read(index)
                     index = index + 1
-                    addr = addr + (byte_array[index] << 8)
+                    addr = addr + (memory.read(index) << 8)
                     index = index + 1
                     symbolic.append(hex(addr))
             elif length == 3 and addr_mode == Mode.IMMEDIATE_MINUS_X:
                 if X:
-                    immediate8bit = byte_array[index]
+                    immediate8bit = memory.read(index)
                     symbolic.append(hex(immediate8bit))
                     index = index + 1
                 else:
-                    addr = byte_array[index]
+                    addr = memory.read(index)
                     index = index + 1
-                    addr = addr + (byte_array[index] << 8)
+                    addr = addr + (memory.read(index) << 8)
                     index = index + 1
                     symbolic.append(hex(addr))
             elif length == 3:
-                addr = byte_array[index]
+                addr = memory.read(index)
                 index = index + 1
-                addr = addr + (byte_array[index] << 8)
+                addr = addr + (memory.read(index) << 8)
                 index = index + 1
                 symbolic.append(hex(addr))
             elif length == 4:
-                addr = byte_array[index]
+                addr = memory.read(index)
                 index = index + 1
-                addr = addr + (byte_array[index] << 8)
+                addr = addr + (memory.read(index) << 8)
                 index = index + 1
-                addr = addr + (byte_array[index] << 16)
+                addr = addr + (memory.read(index) << 16)
                 index = index + 1
                 symbolic.append(hex(addr))
             if add_descr:
@@ -126,8 +126,8 @@ class Disassembler(object):
                 symbolic.append("\n")
         return symbolic
 
-    def print_assembler(self, ba, start, end):
-        symbolic_code = self.disassemble(ba[start:end], True, True, True, True, False)
+    def print_assembler(self, memory, start, end):
+        symbolic_code = self.disassemble(memory, start, end, True, True, True, True, False)
         i = 0
         print
         print("Assembly:")

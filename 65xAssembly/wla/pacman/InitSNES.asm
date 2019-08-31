@@ -36,6 +36,7 @@ InitializeSNES:
   PHK			;set Data Bank = Program Bank
   PLB
 
+.ACCU 16
   LDA #$0000	;set Direct Page = $0000
   TCD			;Transfer Accumulator to Direct Register
 
@@ -44,6 +45,7 @@ InitializeSNES:
   LDX $1FFF
   STX $4374
 
+.ACCU 8
   SEP #$20		; mem/A = 8 bit
   REP #$10
 

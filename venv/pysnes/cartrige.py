@@ -160,6 +160,12 @@ class ROMHeader(object):
         print("RESET INTERRUPT ADDR:       \t0x" + self.reset_int_addr)
         print("IRQ INTERRUPT ADDR:         \t0x" + self.irq_int_addr )
 
+    def getCartridgeType(self):
+        if self.makeup == 32:
+            return CartrigeType.LOROM
+        if self.makeup == 33:
+            return CartrigeType.HIROM
+        raise NotImplementedError()
 
 class Cartrige(object):
     pass

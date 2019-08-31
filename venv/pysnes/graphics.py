@@ -16,6 +16,8 @@ class PictureProcessingUnit(object):
             return RSDL.Delay(int(secs * 1000))
         self.poll_event()
         self.update_display()
+        #while True:
+        #     pass
 
     def init_sdl(self):
         assert RSDL.Init(RSDL.INIT_VIDEO) >= 0

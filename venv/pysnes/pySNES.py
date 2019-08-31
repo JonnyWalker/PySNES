@@ -3,6 +3,7 @@ from helper import open_as_byte_array
 from disassembler import Disassembler
 from cpu import CPU65816
 from graphics import PictureProcessingUnit
+from memory import MemoryMapper
 import sys
 
 if len(sys.argv) <= 1:
@@ -25,17 +26,21 @@ class MemoryMock(object):
     def write(self, address, value):
         self.ram[address] = value
 
-c = CPU65816(MemoryMock())
+RAM  = [0] * (2 ** 17 - 1)  # 128 KB
+SRAM = [0] * 0x7FFF         # 32 KB
+
+memory = MemoryMapper(header.getCartridgeType(), RAM, ba, SRAM, False, 0x7FFF)
+c = CPU65816(memory, header)
 ppu = PictureProcessingUnit()
 ppu.init()
 while True:
-    instr_str = d.disassemble_single_opcode(ba, c.PC, add_new_line=False,
+    instr_str = d.disassemble_single_opcode(memory, c.PC, add_new_line=False,
                                   add_descr=False, add_addr=False, M=c.isM(), X=c.isX())
     cpu_status = "\t A:"+hex(c.A)+" X:"+hex(c.X)+" Y:"+hex(c.Y)+" DP:"+hex(c.DP)+ \
-                 " SP:"+hex(c.SP)+" P:"+bin(c.P)+" e:"+bin(c.e)
+                 " SP:"+hex(c.SP)+" P:"+bin(c.P)+ " PC:"+hex(c.PC) + " e:"+bin(c.e)
     print(instr_str+cpu_status)
     # FIXME:
-    if c.cycles > 10000:
+    if c.cycles > 100000:
         break
     c.fetch_decode_execute(ba)
 

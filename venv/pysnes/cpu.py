@@ -1,7 +1,7 @@
 import address_computation_helper as compute_addr
 
 class CPU65816(object):
-    def __init__(self, memory):
+    def __init__(self, memory, header):
         self.A = 0   # Accumulator           - 8 or 16 Bit (also called A(8Bit) and B(next 8Bit))
         self.X = 0   # Index Register        - 8 or 16 Bit
         self.Y = 0   # Index Register        - 8 or 16 Bit
@@ -9,8 +9,8 @@ class CPU65816(object):
         self.DBR = 0 # Data Bank Register    - 8 Bit (also called B)
         self.DP = 0  # Direct Page Register  - 16 Bit (also called D)
         self.PBR = 0 # Program Bank Register - 8 Bit (also called K)
-        self.P = 0   # Flag Register         - 8 Bit #TODO check if init ok
-        self.PC = 0  # Program Counter       - 16 Bit
+        self.P = 0x34   # Flag Register         - 8 Bit #TODO check if init ok
+        self.PC = int(header.reset_int_addr, 16) # Program Counter       - 16 Bit
         self.memory = memory
         self.cycles = 0
         self.e = 1  # e-flag = 0 (native 16 Bit) e-flag = 1 (emulation 8 Bit)
@@ -22,7 +22,7 @@ class CPU65816(object):
     def fetch_decode_execute(self, code):
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        opcode = code[(self.PBR << 16) +self.PC]
+        opcode = self.memory.read((self.PBR << 16) +self.PC)
         # this meean every address > 0xFF will be wrapped. E.g. 0xFF +1 == 0x00
         # TODO: use BCD sub if D Flag is set
         # ADC (dp, X)
@@ -1687,6 +1687,8 @@ class CPU65816(object):
         elif opcode == 0x6B:
             addr = self.pop_stack()      # get return addr
             bank = self.pop_stack_8bit() # get return addr
+            print(hex(addr))
+            print(hex(bank))
             self.PBR = bank
             self.cycles += 6
             self.PC = addr
@@ -2007,7 +2009,7 @@ class CPU65816(object):
             self.PC += 1
         # TXS
         elif opcode == 0x9A:
-            if e == 1:
+            if self.e == 1:
                 self.SP = (self.SP & 0xFF00) | (self.X & 0x00FF)
             else:
                 self.SP = self.X
@@ -2269,18 +2271,18 @@ class CPU65816(object):
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        return code[(self.PBR << 16) +self.PC]
+        return self.memory.read((self.PBR << 16) +self.PC)
 
     # little endian
     def fetch_twobyte(self, code):
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = code[(self.PBR << 16) + self.PC]
+        addr = self.memory.read((self.PBR << 16) + self.PC)
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = (code[(self.PBR << 16) + self.PC] << 8) + addr
+        addr = (self.memory.read((self.PBR << 16) + self.PC) << 8) + addr
         return addr
 
     # little endian
@@ -2288,15 +2290,15 @@ class CPU65816(object):
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = code[(self.PBR << 16) +self.PC]
+        addr = self.memory.read((self.PBR << 16) +self.PC)
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = (code[(self.PBR << 16) +self.PC] << 8) + addr
+        addr = (self.memory.read((self.PBR << 16) +self.PC) << 8) + addr
         self.PC = self.PC + 1
         # PC wrapping: if PC = 0xFFFF then PC + 1 = 0x0000
         self.PC = self.PC & 0xFFFF
-        addr = (code[(self.PBR << 16) +self.PC] << 16) + addr
+        addr = (self.memory.read((self.PBR << 16) +self.PC) << 16) + addr
         return addr
 
     def read_memory(self, address, byte_num, wrapp=False):

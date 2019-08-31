@@ -1,5 +1,4 @@
 from cartrige import CartrigeType
-from exceptions import CanNotWriteROMException, IllegalAddressExcpetion
 
 # When the CPU puts a signal on its address bus some bytes can be
 # read or written from/to "somewhere" (e.g. ROM, RAM, SRAM or other) via the data bus.
@@ -64,7 +63,8 @@ class LoROMMemoryMapper(object):
             # TODO: PPU, APU, Hardware Registers
             # 0x2100 - 0x213F PPU (or PPU2 ?)
             # 0x2180 - 0x2183 (insde RAM?)
-            raise NotImplementedError()
+            # raise NotImplementedError()
+            return 0
         elif offset >= 0x3000 and offset <= 0x3FFF:
             # TODO: Super-FX, DSP
             raise NotImplementedError()
@@ -77,7 +77,8 @@ class LoROMMemoryMapper(object):
             # 0x4200 - 0x420D CPU
             # 0x4100 - 0x421F CPU
             # 0x4300 - 0x437F CPU
-            raise NotImplementedError()
+            # raise NotImplementedError()
+            return 0
         elif offset >= 0x6000 and offset <= 0x7FFF:
             # TODO: enhancement chip memory
             raise NotImplementedError()
@@ -179,7 +180,8 @@ class LoROMMemoryMapper(object):
             # TODO: PPU, APU, Hardware Registers
             # 0x2100 - 0x213F PPU (or PPU2 ?)
             # 0x2180 - 0x2183 (insde RAM?)
-            raise NotImplementedError()
+            # raise NotImplementedError()
+            pass
         elif offset >= 0x3000 and offset <= 0x3FFF:
             # TODO: Super-FX, DSP
             raise NotImplementedError()
@@ -192,7 +194,8 @@ class LoROMMemoryMapper(object):
             # 0x4200 - 0x420D CPU
             # 0x4100 - 0x421F CPU
             # 0x4300 - 0x437F CPU
-            raise NotImplementedError()
+            # raise NotImplementedError()
+            pass
         elif offset >= 0x6000 and offset <= 0x7FFF:
             # TODO: enhancement chip memory
             raise NotImplementedError()
@@ -508,3 +511,11 @@ class ExLoROMMemoryMapper(object):
 
 class ExHiROMMemoryMapper(object):
     pass # low impl. priotity (e.g. Tales of Phantasia)
+
+class IllegalAddressExcpetion(Exception):
+    pass
+
+
+class CanNotWriteROMException(Exception):
+    '''Internal error: can not write ROM!'''
+    pass
