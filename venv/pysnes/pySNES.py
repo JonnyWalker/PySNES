@@ -10,27 +10,16 @@ if len(sys.argv) <= 1:
     print("usage: python PySNES.py ROM_PATH [start] [end]")
     exit(0)
 
-ba = open_as_byte_array(sys.argv[1])
+ROM = open_as_byte_array(sys.argv[1])
 #print_hex_dump(ba)[0:32]
-header = ROMHeader(ba)
+header = ROMHeader(ROM)
 header.dump()
 d = Disassembler()
-
-class MemoryMock(object):
-    def __init__(self):
-        self.ram = [0x00] * 16777216 # 2 ** 24
-
-    def read(self, address):
-        return self.ram[address]
-
-    def write(self, address, value):
-        self.ram[address] = value
-
 RAM  = [0] * (2 ** 17 - 1)  # 128 KB
 SRAM = [0] * 0x7FFF         # 32 KB
 
-memory = MemoryMapper(header.getCartridgeType(), RAM, ba, SRAM, False, 0x7FFF)
-c = CPU65816(memory, header)
+memory = MemoryMapper(header, RAM, ROM, SRAM, False, 0x7FFF)
+c = CPU65816(memory)
 ppu = PictureProcessingUnit()
 ppu.init()
 while True:
@@ -42,5 +31,5 @@ while True:
     # FIXME:
     if c.cycles > 100000:
         break
-    c.fetch_decode_execute(ba)
+    c.fetch_decode_execute(ROM)
 

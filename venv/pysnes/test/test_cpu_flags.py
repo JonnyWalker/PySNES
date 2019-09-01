@@ -1,270 +1,316 @@
 from pysnes.cpu import CPU65816
 
 # .../PySNES/venv/$ py.test pysnes/test/
+class HeaderMock():
+    def __init__(self):
+        self.reset_int_addr = 0x8000
+
+class MemoryMock(object):
+    def __init__(self, ROM):
+        self.ram = {}
+        self.ROM = ROM
+        self.header = HeaderMock()
+        pc = self.header.reset_int_addr
+        for byte in ROM:
+            self.ram[pc] = byte
+            pc += 1
+
+    def read(self, address):
+        return self.ram[address]
+
+    def write(self, address, value):
+        self.ram[address] = value
+
+
 def test_NOP():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xEA])
+    cpu = CPU65816(mem)
     assert cpu.P == 0b00000000
 
-    cpu.fetch_decode_execute([0xEA])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SEP1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xE2, 0x00])
+    cpu = CPU65816(mem)
     assert cpu.P == 0b00000000
 
-    cpu.fetch_decode_execute([0xE2, 0x00])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 3
-    assert cpu.PC == 2
+    assert cpu.PC == 2 + mem.header.reset_int_addr
 
 
 def test_SEP2():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xE2, 0x01])
+    cpu = CPU65816(mem)
     assert cpu.P == 0b00000000
 
-    cpu.fetch_decode_execute([0xE2, 0x01])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000001
     assert cpu.cycles == 3
-    assert cpu.PC == 2
+    assert cpu.PC == 2 + mem.header.reset_int_addr
 
 
 def test_SEP3():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xE2, 0x81])
+    cpu = CPU65816(mem)
     assert cpu.P == 0b00000000
 
-    cpu.fetch_decode_execute([0xE2, 0x81])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b10000001
     assert cpu.cycles == 3
-    assert cpu.PC == 2
+    assert cpu.PC == 2 + mem.header.reset_int_addr
 
 
 def test_REP0():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xC2, 0x00])
+    cpu = CPU65816(mem)
     assert cpu.P == 0b00000000
     cpu.e = 0
 
-    cpu.fetch_decode_execute([0xC2, 0x00])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 3
-    assert cpu.PC == 2
+    assert cpu.PC == 2 + mem.header.reset_int_addr
 
 
 def test_REP1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xC2, 0x00])
+    cpu = CPU65816(mem)
     cpu.P = 0b00100010
     cpu.e = 0
 
-    cpu.fetch_decode_execute([0xC2, 0x00])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00100010
-    assert cpu.PC == 2
+    assert cpu.PC == 2 + mem.header.reset_int_addr
 
 
 def test_REP2():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xC2, 0x02])
+    cpu = CPU65816(mem)
     cpu.P = 0b00100010
     cpu.e = 0
 
-    cpu.fetch_decode_execute([0xC2, 0x02])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00100000
-    assert cpu.PC == 2
+    assert cpu.PC == 2 + mem.header.reset_int_addr
 
 
 def test_SEP_REP():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xE2, 0x02, 0xC2, 0x02])
+    cpu = CPU65816(mem)
     cpu.e = 0
 
-    cpu.run_code([0xE2, 0x02, 0xC2, 0x02])
+    cpu.fetch_decode_execute() # SEP 00000 0010
+    cpu.fetch_decode_execute() # REP 0000 0010
 
     assert cpu.P == 0b00000000
-    assert cpu.PC == 4
+    assert cpu.PC == 4 + mem.header.reset_int_addr
 
 
 def test_CLC():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x18])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
 
-    cpu.run_code([0x18])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLC1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x18])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0x18])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SEI():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x78])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0x78])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000100
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SEI1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x78])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000100
 
-    cpu.run_code([0x78])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000100
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SED():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xF8])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0xF8])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00001000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SED1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xF8])
+    cpu = CPU65816(mem)
     cpu.P = 0b00001000
 
-    cpu.run_code([0xF8])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00001000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SEC():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x38])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0x38])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000001
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_SEC1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x38])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
 
-    cpu.run_code([0x38])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000001
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLD():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xD8])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0xD8])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLD1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xD8])
+    cpu = CPU65816(mem)
     cpu.P = 0b00001000
 
-    cpu.run_code([0xD8])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLI():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x58])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0x58])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLI1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x58])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000100
 
-    cpu.run_code([0x58])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLV():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xB8])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
 
-    cpu.run_code([0xB8])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_CLV1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xB8])
+    cpu = CPU65816(mem)
     cpu.P = 0b01000000
 
-    cpu.run_code([0xB8])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_XCE():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xFB])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.e = 1
 
-    cpu.run_code([0xFB])
+    cpu.fetch_decode_execute()
 
     assert cpu.e == 0
     assert cpu.P == 0b00000001
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_XCE1():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xFB])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
     cpu.e = 1
     cpu.X = 0x1234
     cpu.Y = 0x5678
     cpu.SP = 0x0201
 
-    cpu.run_code([0xFB])
+    cpu.fetch_decode_execute()
 
     assert cpu.e == 1
     assert cpu.P == 0b00110001
@@ -272,18 +318,19 @@ def test_XCE1():
     assert cpu.Y == 0x0078
     assert cpu.SP == 0x0101
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_XCE2():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0xFB])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
     cpu.e = 0
     cpu.X = 0x1234
     cpu.Y = 0x5678
     cpu.SP = 0x0201
 
-    cpu.run_code([0xFB])
+    cpu.fetch_decode_execute()
 
     assert cpu.e == 1
     assert cpu.P == 0b00110000
@@ -291,4 +338,4 @@ def test_XCE2():
     assert cpu.Y == 0x0078
     assert cpu.SP == 0x0101
     assert cpu.cycles == 2
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr

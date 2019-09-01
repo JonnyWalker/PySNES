@@ -127,7 +127,7 @@ class Disassembler(object):
         return symbolic
 
     def print_assembler(self, memory, start, end):
-        symbolic_code = self.disassemble(memory, start, end, True, True, True, True, False)
+        symbolic_code = self.disassemble(memory, start, end, True, True, True, True, False) # FIXME
         i = 0
         print
         print("Assembly:")

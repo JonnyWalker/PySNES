@@ -11,7 +11,9 @@ from cartrige import CartrigeType
 # on some games. Only in rare cases the mapping is done by the SNES
 # instead of the cartrige (e.g. RAM access)
 class MemoryMapper(object):
-    def __init__(self, cartrige_type, RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size):
+    def __init__(self, header, RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size):
+        self.header = header
+        cartrige_type = header.getCartridgeType()
         if cartrige_type == CartrigeType.LOROM:
             self.mapper = LoROMMemoryMapper(RAM, ROM, SRAM, use_MAD1_mapping, SRAM_size)
         elif cartrige_type == CartrigeType.HIROM:

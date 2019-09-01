@@ -1,9 +1,19 @@
 from pysnes.cpu import CPU65816
 
 # .../PySNES/venv/$ py.test pysnes/test/
-class MemoryMock(object):
+class HeaderMock():
     def __init__(self):
+        self.reset_int_addr = 0x8000
+
+class MemoryMock(object):
+    def __init__(self, ROM):
         self.ram = {}
+        self.ROM = ROM
+        self.header = HeaderMock()
+        pc = self.header.reset_int_addr
+        for byte in ROM:
+            self.ram[pc] = byte
+            pc += 1
 
     def read(self, address):
         return self.ram[address]

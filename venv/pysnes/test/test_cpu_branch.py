@@ -7,9 +7,31 @@ from pysnes.cpu import CPU65816
 # e = emulation mode
 # p = page crossed
 
+class HeaderMock():
+    def __init__(self):
+        self.reset_int_addr = 0x8000
+
+class MemoryMock(object):
+    def __init__(self, ROM):
+        self.ram = {}
+        self.ROM = ROM
+        self.header = HeaderMock()
+        pc = self.header.reset_int_addr
+        for byte in ROM:
+            self.ram[pc] = byte
+            pc += 1
+
+    def read(self, address):
+        return self.ram[address]
+
+    def write(self, address, value):
+        self.ram[address] = value
+
+
 # jump if C==0 to PC + 2 + OFFSET
 def test_BCC_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -22,7 +44,8 @@ def test_BCC_forward():
 
 # jump if C==0 to PC + 2 + OFFSET
 def test_BCC_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -36,7 +59,8 @@ def test_BCC_backward():
 
 # jump if C==0 to PC + 2 + OFFSET
 def test_BCC_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
     cpu.PC = 0
 
@@ -49,7 +73,8 @@ def test_BCC_no_branch():
 
 # jump if C==0 to PC + 2 + OFFSET
 def test_BCC_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110000
     cpu.PC = 253
@@ -64,7 +89,8 @@ def test_BCC_branch_page_boundary():
 
 # jump if C==0 to PC + 2 + OFFSET
 def test_BCC_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -79,7 +105,8 @@ def test_BCC_wrapped_execution():
 
 # jump if C==1 to PC + 2 + OFFSET
 def test_BCS_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
     cpu.PC = 0
 
@@ -92,7 +119,8 @@ def test_BCS_forward():
 
 # jump if C==1 to PC + 2 + OFFSET
 def test_BCS_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -106,7 +134,8 @@ def test_BCS_backward():
 
 # jump if C==1 to PC + 2 + OFFSET
 def test_BCS_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -119,7 +148,8 @@ def test_BCS_no_branch():
 
 # jump if C==1 to PC + 2 + OFFSET
 def test_BCS_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110001
     cpu.PC = 253
@@ -134,7 +164,8 @@ def test_BCS_branch_page_boundary():
 
 # jump if C==1 to PC + 2 + OFFSET
 def test_BCS_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000001
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -149,7 +180,8 @@ def test_BCS_wrapped_execution():
 
 # jump if Z==1 to PC + 2 + OFFSET
 def test_BEQ_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000010
     cpu.PC = 0
 
@@ -162,7 +194,8 @@ def test_BEQ_forward():
 
 # jump if Z==1 to PC + 2 + OFFSET
 def test_BEQ_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000010
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -176,7 +209,8 @@ def test_BEQ_backward():
 
 # jump if Z==1 to PC + 2 + OFFSET
 def test_BEQ_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b0000000
     cpu.PC = 0
 
@@ -189,7 +223,8 @@ def test_BEQ_no_branch():
 
 # jump if Z==1 to PC + 2 + OFFSET
 def test_BEQ_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110010
     cpu.PC = 253
@@ -204,7 +239,8 @@ def test_BEQ_branch_page_boundary():
 
 # jump if Z==1 to PC + 2 + OFFSET
 def test_BEQ_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000010
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -219,7 +255,8 @@ def test_BEQ_wrapped_execution():
 
 # jump if Z==0 to PC + 2 + OFFSET
 def test_BNE_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -232,7 +269,8 @@ def test_BNE_forward():
 
 # jump if Z==0 to PC + 2 + OFFSET
 def test_BNE_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -246,7 +284,8 @@ def test_BNE_backward():
 
 # jump if Z==0 to PC + 2 + OFFSET
 def test_BNE_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b0000010
     cpu.PC = 0
 
@@ -259,7 +298,8 @@ def test_BNE_no_branch():
 
 # jump if Z==0 to PC + 2 + OFFSET
 def test_BNE_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110000
     cpu.PC = 253
@@ -274,7 +314,8 @@ def test_BNE_branch_page_boundary():
 
 # jump if Z==0 to PC + 2 + OFFSET
 def test_BNE_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -289,7 +330,8 @@ def test_BNE_wrapped_execution():
 
 # jump if N==1 to PC + 2 + OFFSET
 def test_BMI_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b10000000
     cpu.PC = 0
 
@@ -302,7 +344,8 @@ def test_BMI_forward():
 
 # jump if N==1 to PC + 2 + OFFSET
 def test_BMI_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b10000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -316,7 +359,8 @@ def test_BMI_backward():
 
 # jump if N==1 to PC + 2 + OFFSET
 def test_BMI_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -329,7 +373,8 @@ def test_BMI_no_branch():
 
 # jump if N==1 to PC + 2 + OFFSET
 def test_BMI_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b10110000
     cpu.PC = 253
@@ -344,7 +389,8 @@ def test_BMI_branch_page_boundary():
 
 # jump if N==1 to PC + 2 + OFFSET
 def test_BMI_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b10000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -359,7 +405,8 @@ def test_BMI_wrapped_execution():
 
 # jump if N==0 to PC + 2 + OFFSET
 def test_BPL_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -372,7 +419,8 @@ def test_BPL_forward():
 
 # jump if N==0 to PC + 2 + OFFSET
 def test_BPL_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -386,7 +434,8 @@ def test_BPL_backward():
 
 # jump if N==0 to PC + 2 + OFFSET
 def test_BPL_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b10000000
     cpu.PC = 0
 
@@ -399,7 +448,8 @@ def test_BPL_no_branch():
 
 # jump if N==0 to PC + 2 + OFFSET
 def test_BPL_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110000
     cpu.PC = 253
@@ -414,7 +464,8 @@ def test_BPL_branch_page_boundary():
 
 # jump if N==0 to PC + 2 + OFFSET
 def test_BPL_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -429,7 +480,8 @@ def test_BPL_wrapped_execution():
 
 # jump if V==0 to PC + 2 + OFFSET
 def test_BVC_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -442,7 +494,8 @@ def test_BVC_forward():
 
 # jump if V==0 to PC + 2 + OFFSET
 def test_BVC_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -456,7 +509,8 @@ def test_BVC_backward():
 
 # jump if V==0 to PC + 2 + OFFSET
 def test_BVC_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b01000000
     cpu.PC = 0
 
@@ -469,7 +523,8 @@ def test_BVC_no_branch():
 
 # jump if V==0 to PC + 2 + OFFSET
 def test_BVC_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110000
     cpu.PC = 253
@@ -484,7 +539,8 @@ def test_BVC_branch_page_boundary():
 
 # jump if V==0 to PC + 2 + OFFSET
 def test_BVC_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -499,7 +555,8 @@ def test_BVC_wrapped_execution():
 
 # jump if V==1 to PC + 2 + OFFSET
 def test_BVS_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b01000000
     cpu.PC = 0
 
@@ -512,7 +569,8 @@ def test_BVS_forward():
 
 # jump if V==1 to PC + 2 + OFFSET
 def test_BVS_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b01000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -526,7 +584,8 @@ def test_BVS_backward():
 
 # jump if V==1 to PC + 2 + OFFSET
 def test_BVS_no_branch():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -539,7 +598,8 @@ def test_BVS_no_branch():
 
 # jump if V==1 to PC + 2 + OFFSET
 def test_BVS_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b01110000
     cpu.PC = 253
@@ -554,7 +614,8 @@ def test_BVS_branch_page_boundary():
 
 # jump if V==1 to PC + 2 + OFFSET
 def test_BVS_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b01000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -569,7 +630,8 @@ def test_BVS_wrapped_execution():
 
 # jump to PC + 2 + OFFSET
 def test_BRA_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -582,7 +644,8 @@ def test_BRA_forward():
 
 # jump to PC + 2 + OFFSET
 def test_BRA_backward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 10
     nops = [0xEA] * cpu.PC
@@ -596,7 +659,8 @@ def test_BRA_backward():
 
 # jump to PC + 2 + OFFSET
 def test_BRA_branch_page_boundary():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.e = 1
     cpu.P = 0b00110000
     cpu.PC = 253
@@ -611,7 +675,8 @@ def test_BRA_branch_page_boundary():
 
 # jump to PC + 2 + OFFSET
 def test_BRA_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     cpu.e = 0
@@ -628,7 +693,8 @@ def test_BRA_wrapped_execution():
 # maybe $C045 must be $0042
 # jump to PC + 3 + OFFSET
 def test_BRL_forward():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0
 
@@ -641,7 +707,8 @@ def test_BRL_forward():
 
 # jump to PC + 3 + OFFSET
 def test_BRL_wrapped_execution():
-    cpu = CPU65816(None)
+    mem = MemoryMock()
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0xFFF0
     cpu.e = 0
