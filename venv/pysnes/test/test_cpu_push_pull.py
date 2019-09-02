@@ -108,22 +108,21 @@ def test_PER2():
 
 
 def test_PHK():
-    mem = MemoryMock()
+    nops = [0xEA] * ((0x12 << 16))
+    mem = MemoryMock(nops+[0x4B])
     cpu = CPU65816(mem)
     cpu.PBR = 0x12 # K
     cpu.SP = 0x01FF
     cpu.P = 0b00000000
 
-    # opcode at 12:0000
-    nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
-    cpu.fetch_decode_execute(nops + [0x4B])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.PBR == 0x12
     assert mem.read(0x0001FF) == 0x12
     assert cpu.SP == 0x01FE
     assert cpu.cycles == 3
-    assert cpu.PC == 1
+    assert cpu.PC == 1 + mem.header.reset_int_addr
 
 
 def test_PHB():
