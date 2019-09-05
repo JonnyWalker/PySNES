@@ -31,5 +31,5 @@ while True:
     # FIXME:
     if c.cycles > 100000:
         break
-    c.fetch_decode_execute(ROM)
+    c.fetch_decode_execute()
 
