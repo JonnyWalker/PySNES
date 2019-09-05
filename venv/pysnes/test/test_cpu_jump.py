@@ -6,13 +6,13 @@ class HeaderMock():
         self.reset_int_addr = 0x8000
 
 class MemoryMock(object):
-    def __init__(self, ROM):
+    def __init__(self, ROM, start=0):
         self.ram = {}
         self.ROM = ROM
         self.header = HeaderMock()
         pc = self.header.reset_int_addr
         for byte in ROM:
-            self.ram[pc] = byte
+            self.ram[pc+start] = byte
             pc += 1
 
     def read(self, address):
@@ -22,11 +22,12 @@ class MemoryMock(object):
         self.ram[address] = value
 
 def test_JMP_abs():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x4C, 0x34, 0x12])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
-    cpu.PC = 0
+    cpu.PC += 0
 
-    cpu.fetch_decode_execute([0x4C, 0x34, 0x12])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 3
@@ -34,12 +35,13 @@ def test_JMP_abs():
 
 
 def test_JMP_abs2():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x4C, 0x34, 0x12], 0x7FF0)
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
-    cpu.PC = 0xFFF0
-    nops = [0xEA] * cpu.PC
+    cpu.PC += 0x7FF0
 
-    cpu.fetch_decode_execute(nops+[0x4C, 0x34, 0x12])
+    cpu.fetch_decode_execute()
+    print(mem.ram)
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 3
@@ -47,13 +49,13 @@ def test_JMP_abs2():
 
 
 def test_JMP_long():
-    cpu = CPU65816(None)
+    mem = MemoryMock([0x5C, 0x56, 0x34, 0x12])
+    cpu = CPU65816(mem)
     cpu.P = 0b00000000
-    cpu.PC = 0
+    cpu.PC += 0
     cpu.PBR = 0
-    nops = [0xEA] * cpu.PC
 
-    cpu.fetch_decode_execute(nops+[0x5C, 0x56, 0x34, 0x12])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 4
@@ -62,16 +64,16 @@ def test_JMP_long():
 
 
 def test_JMP_abs_indirect():
-    mem = MemoryMock()
+    mem = MemoryMock([0x6C, 0xFF, 0xFF])
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
-    cpu.PC = 0
+    cpu.PC += 0
     cpu.PBR = 0
     mem.write(0x000000, 0x34)
     mem.write(0x00FFFF, 0x56) # zero bank wrapping!
     mem.write(0x010000, 0x00)
 
-    cpu.fetch_decode_execute([0x6C, 0xFF, 0xFF])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 5
@@ -80,17 +82,17 @@ def test_JMP_abs_indirect():
 
 
 def test_JMP_abs_indirect_indexed_X():
-    mem = MemoryMock()
+    mem = MemoryMock([0x7C, 0xF0, 0xFF])
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
-    cpu.PC = 0
+    cpu.PC += 0
     cpu.PBR = 0
     cpu.X = 0xF
     mem.write(0x000000, 0x34)
     mem.write(0x00FFFF, 0x56) # zero bank wrapping!
     mem.write(0x010000, 0x00)
 
-    cpu.fetch_decode_execute([0x7C, 0xF0, 0xFF])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 6
@@ -99,17 +101,17 @@ def test_JMP_abs_indirect_indexed_X():
 
 
 def test_JMP_abs_indirect_3byte():
-    mem = MemoryMock()
+    mem = MemoryMock([0xDC, 0xFF, 0xFF])
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
-    cpu.PC = 0
+    cpu.PC += 0
     cpu.PBR = 0
     mem.write(0x000000, 0x34)
     mem.write(0x000001, 0x12)
     mem.write(0x00FFFF, 0x56) # zero bank wrapping!
     mem.write(0x010000, 0x00)
 
-    cpu.fetch_decode_execute([0xDC, 0xFF, 0xFF])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 6
@@ -118,15 +120,14 @@ def test_JMP_abs_indirect_3byte():
 
 
 def test_JSR_abs():
-    mem = MemoryMock()
+    mem = MemoryMock([0x20, 0xCD, 0xAB], ((0x12 << 16)+0x3456-0x8000))
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PBR = 0x12
     cpu.PC = 0x3456
     cpu.SP = 0x01FF
-    nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
 
-    cpu.fetch_decode_execute(nops+[0x20, 0xCD, 0xAB])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 6
@@ -138,7 +139,7 @@ def test_JSR_abs():
 
 
 def test_JSR_abs_indirect_indexed_X():
-    mem = MemoryMock()
+    mem = MemoryMock([0xFC, 0xF0, 0xFF], ((0x12 << 16)+0x3456-0x8000))
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0x3456
@@ -148,9 +149,8 @@ def test_JSR_abs_indirect_indexed_X():
     mem.write(0x000000, 0xAB)
     mem.write(0x00FFFF, 0xCD) # zero bank wrapping!
     mem.write(0x010000, 0x00)
-    nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
 
-    cpu.fetch_decode_execute(nops+[0xFC, 0xF0, 0xFF])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 8
@@ -162,15 +162,14 @@ def test_JSR_abs_indirect_indexed_X():
 
 
 def test_JSR_long():
-    mem = MemoryMock()
+    mem = MemoryMock([0x22, 0xCD, 0xAB, 0x12], ((0x06 << 16)++0x3456-0x8000))
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PC = 0x3456
     cpu.SP = 0x01FF
     cpu.PBR = 0x06
-    nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
 
-    cpu.fetch_decode_execute(nops+[0x22, 0xCD, 0xAB, 0x12])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000
     assert cpu.cycles == 8
@@ -183,16 +182,15 @@ def test_JSR_long():
 
 
 def test_RTS():
-    mem = MemoryMock()
+    mem = MemoryMock([0x60], ((0x12 << 16)))
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PBR = 0x12
     cpu.SP = 0x01FD
     mem.write(0x0001FF, 0x34)
     mem.write(0x0001FE, 0x56)
-    nops = [0xEA] * ((cpu.PBR << 16) + cpu.PC)
 
-    cpu.fetch_decode_execute(nops+[0x60])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000 # no effect
     assert cpu.cycles == 6
@@ -202,7 +200,7 @@ def test_RTS():
 
 
 def test_RTL():
-    mem = MemoryMock()
+    mem = MemoryMock([0x6B])
     cpu = CPU65816(mem)
     cpu.P = 0b00000000
     cpu.PBR = 0x00
@@ -211,10 +209,10 @@ def test_RTL():
     mem.write(0x0001FE, 0x34)
     mem.write(0x0001FD, 0x56)
 
-    cpu.fetch_decode_execute([0x6B])
+    cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000 # no effect
     assert cpu.cycles == 6
     assert cpu.PBR == 0x12
-    assert cpu.PC == 0x3456 # the inc to 3456 will be done by the loop
+    assert cpu.PC == 0x3456  # the inc to 3456 will be done by the loop
     assert cpu.SP == 0x01FF

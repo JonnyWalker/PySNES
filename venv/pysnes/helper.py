@@ -3,7 +3,7 @@ def get_two_bytes_little_endian(byte0, byte1):
     b0 = (2 - len(b0)) * "0" + b0
     b1 = hex(byte1)[2:]
     b1 = (2 - len(b1)) * "0" + b1
-    return  b1 + b0
+    return  int(b1 + b0, 16)
 
 def open_as_byte_array(rom_name):
     file = open(rom_name)

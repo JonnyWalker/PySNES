@@ -3,7 +3,7 @@ from pysnes.disassembler import Disassembler
 # .../PySNES/venv/$ py.test pysnes/test/
 class HeaderMock():
     def __init__(self):
-        self.reset_int_addr = 0x8000
+        self.reset_int_addr = 0x0
 
 class MemoryMock(object):
     def __init__(self, ROM):
