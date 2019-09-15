@@ -215,6 +215,7 @@ def test_PLA_8_bit():
     cpu.A = 0xFFFF
     mem.write(0x0001FF, 0x42)
     cpu.P = 0b00100000 # set m flag
+    cpu.stack = [0x42]
 
     cpu.fetch_decode_execute()
 
@@ -233,6 +234,7 @@ def test_PLA_16_bit():
     cpu.A = 0xFFFF
     mem.write(0x0001FF, 0xCD)
     mem.write(0x0001FE, 0xAB)
+    cpu.stack = [0xCD, 0xAB]
     
     cpu.fetch_decode_execute()
 
@@ -283,6 +285,7 @@ def test_PLX_8_bit():
     cpu.X = 0xFFFF
     cpu.P = 0b00010000 # set x flag
     mem.write(0x0001FF, 0xB7)
+    cpu.stack = [0xB7]
 
     cpu.fetch_decode_execute()
 
@@ -301,6 +304,7 @@ def test_PLX_16_bit():
     cpu.P = 0b00000000
     mem.write(0x0001FF, 0xB0)
     mem.write(0x0001FE, 0x0B)
+    cpu.stack = [0xB0, 0x0B]
 
     cpu.fetch_decode_execute()
 
@@ -318,6 +322,7 @@ def test_PLY_8_bit():
     cpu.Y = 0xFFFF
     cpu.P = 0b00010000 # set x flag
     mem.write(0x0001FF, 0x00)
+    cpu.stack = [0x00]
 
     cpu.fetch_decode_execute()
 
@@ -336,6 +341,7 @@ def test_PLY_16_bit():
     cpu.P = 0b00000000
     mem.write(0x0001FF, 0x24)
     mem.write(0x0001FE, 0x68)
+    cpu.stack = [0x24, 0x68]
 
     cpu.fetch_decode_execute()
 
@@ -385,6 +391,7 @@ def test_PLP_16_bit():
     cpu.SP = 0x01FE
     cpu.e = 0
     mem.write(0x01FF, 0b10101010)
+    cpu.stack = [0xb10101010]
     cpu.P = 0b00000000
 
     cpu.fetch_decode_execute()
@@ -401,6 +408,7 @@ def test_PLP_8_bit():
     cpu = CPU65816(mem)
     cpu.SP = 0x01FE
     mem.write(0x01FF, 0b11001111)
+    cpu.stack = [0xb11001111]
     cpu.P = 0b00000000
     cpu.e = 1
 
@@ -420,6 +428,7 @@ def test_PLD():
     cpu.SP = 0x01FD
     mem.write(0x01FF, 0xCD)
     mem.write(0x01FE, 0xAB)
+    cpu.stack = [0xCD, 0xAB]
     cpu.DP = 0x0000
 
     cpu.fetch_decode_execute()
@@ -438,6 +447,7 @@ def test_PLB():
     cpu.P = 0b00000010
     cpu.SP = 0x01FE
     mem.write(0x01FF, 0xFF)
+    cpu.stack = [0xFF]
 
     cpu.fetch_decode_execute()
 

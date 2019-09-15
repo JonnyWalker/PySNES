@@ -1,4 +1,8 @@
 from cartrige import CartrigeType
+from dma import DMAController, HDMAController
+from internal_cpu import InternalCPURegisters
+from ppu import PPU
+
 
 # When the CPU puts a signal on its address bus some bytes can be
 # read or written from/to "somewhere" (e.g. ROM, RAM, SRAM or other) via the data bus.
@@ -41,6 +45,10 @@ class LoROMMemoryMapper(object):
         self.SRAM = SRAM
         self.use_MAD1_mapping = use_MAD1_mapping
         self.SRAM_size = SRAM_size
+        self.dma = DMAController()
+        self.hdm = HDMAController()
+        self.internal_cpu_registers = InternalCPURegisters()
+        self.ppu = PPU()
 
     def read(self, bank, offset):
         if   bank >= 0x00 and bank <= 0x3F:
@@ -66,7 +74,7 @@ class LoROMMemoryMapper(object):
             # 0x2100 - 0x213F PPU (or PPU2 ?)
             # 0x2180 - 0x2183 (insde RAM?)
             # raise NotImplementedError()
-            return 0
+            return self.ppu.read(offset)
         elif offset >= 0x3000 and offset <= 0x3FFF:
             # TODO: Super-FX, DSP
             raise NotImplementedError()
@@ -79,7 +87,11 @@ class LoROMMemoryMapper(object):
             # 0x4200 - 0x420D CPU
             # 0x4100 - 0x421F CPU
             # 0x4300 - 0x437F CPU
-            # raise NotImplementedError()
+            if offset == 0x4200:
+                return self.internal_cpu_registers.read(offset)
+            elif offset >= 0x4300 and offset <= 0x43FF:
+                return self.dma.read(offset)
+            print("Error read Address: " + hex(offset))
             return 0
         elif offset >= 0x6000 and offset <= 0x7FFF:
             # TODO: enhancement chip memory
@@ -175,6 +187,7 @@ class LoROMMemoryMapper(object):
 
     # 0x00:0000 - 3F:FFFF write system stuff
     # TODO: the doc on the internet is very inconsistent about the memory ranges
+    # TODO: do we need the bak arg?
     def write_system(self, bank, offset, value):
         if offset <= 0x1FFF:
             self.RAM[offset] = value
@@ -183,7 +196,7 @@ class LoROMMemoryMapper(object):
             # 0x2100 - 0x213F PPU (or PPU2 ?)
             # 0x2180 - 0x2183 (insde RAM?)
             # raise NotImplementedError()
-            pass
+            self.ppu.write(offset, value)
         elif offset >= 0x3000 and offset <= 0x3FFF:
             # TODO: Super-FX, DSP
             raise NotImplementedError()
@@ -195,9 +208,14 @@ class LoROMMemoryMapper(object):
             # TODO: DMA, PPU2, Hardware Registers
             # 0x4200 - 0x420D CPU
             # 0x4100 - 0x421F CPU
+            if offset == 0x4200:
+                self.internal_cpu_registers.write(offset, value)
+                return
+            elif offset >= 0x4300 and offset <= 0x43FF:
+                self.dma.write(offset, value)
+                return
             # 0x4300 - 0x437F CPU
-            # raise NotImplementedError()
-            pass
+            print("Error write Address: " + hex(offset)+ str(value))
         elif offset >= 0x6000 and offset <= 0x7FFF:
             # TODO: enhancement chip memory
             raise NotImplementedError()

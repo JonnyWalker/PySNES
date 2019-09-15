@@ -15,6 +15,7 @@ class CPU65816(object):
         self.memory = memory
         self.cycles = 0
         self.e = 1  # e-flag = 0 (native 16 Bit) e-flag = 1 (emulation 8 Bit)
+        self.stack = [] # only for debugging
 
 
     def fetch_decode_execute(self):
@@ -1680,14 +1681,14 @@ class CPU65816(object):
         elif opcode == 0x60:
             addr = self.pop_stack() # get return addr
             self.cycles += 6
-            self.PC = addr
+            self.PC = addr +1
         # RTL
         elif opcode == 0x6B:
             addr = self.pop_stack()      # get return addr
             bank = self.pop_stack_8bit() # get return addr
             self.PBR = bank
             self.cycles += 6
-            self.PC = addr
+            self.PC = addr +1
         # TODO: use BCD sub if D Flag is set
         # SBC #const #TODO: v and c
         elif opcode == 0xE9:
@@ -2335,24 +2336,46 @@ class CPU65816(object):
 
     def push_stack(self, value):
         self.memory.write(self.SP, (value & 0xFF00) >> 8)
+        self.stack.append((value & 0xFF00) >> 8)  # only for debugging
         self.SP = self.SP - 1
         self.memory.write(self.SP, value & 0x00FF)
+        self.stack.append(value & 0x00FF)  # only for debugging
         self.SP = self.SP - 1
+        #print("push16")
+        #for i in range(self.SP, 0x2000):
+        #    print(hex(i)+":"+str(self.memory.read(i)))
+        #print("end push16")
 
     def push_stack_8bit(self, value):
         self.memory.write(self.SP, value & 0x00FF)
+        self.stack.append(value& 0x00FF) # only for debugging
         self.SP = self.SP - 1
+        #print("push8")
+        #for i in range(self.SP, 0x2000):
+        #    print(hex(i)+":"+str(self.memory.read(i)))
+        #print("end push8")
 
     def pop_stack(self):
         self.SP = self.SP + 1
         low = self.memory.read(self.SP)
+        self.stack.pop() # only for debugging
         self.SP = self.SP + 1
         high = self.memory.read(self.SP)
+        self.stack.pop()  # only for debugging
+        #print("pop16")
+        #for i in range(self.SP, 0x2000):
+        #    print(hex(i)+":"+str(self.memory.read(i)))
+        #print("end pop16")
         return low + (high << 8)
 
     def pop_stack_8bit(self):
         self.SP = self.SP + 1
         byte = self.memory.read(self.SP)
+        self.stack.pop()  # only for debugging
+        #print("pop8")
+        #for i in range(self.SP, 0x2000):
+        #    print(hex(i)+":"+str(self.memory.read(i)))
+        #print("end pop8")
         return byte
 
     def compute_NZflags(self, value, is8BitMode):

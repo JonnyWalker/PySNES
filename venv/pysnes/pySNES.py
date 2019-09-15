@@ -25,9 +25,10 @@ ppu.init()
 while True:
     instr_str = d.disassemble_single_opcode(memory, c.PC, add_new_line=False,
                                   add_descr=False, add_addr=False, M=c.isM(), X=c.isX())
-    cpu_status = "\t A:"+hex(c.A)+" X:"+hex(c.X)+" Y:"+hex(c.Y)+" DP:"+hex(c.DP)+ \
-                 " SP:"+hex(c.SP)+" P:"+bin(c.P)+ " PC:"+hex(c.PC) + " e:"+bin(c.e)
-    print(instr_str+cpu_status)
+    debug = "{0:<16} A={1:6} X={2:6} Y={3:6} DP={4:6} SP={5:6} P={6:6} PC={7:6} e={8:6} Stack:{9}"
+    debug = debug.format(instr_str, hex(c.A), hex(c.X), hex(c.Y), hex(c.DP),
+                               hex(c.SP), hex(c.P), hex(c.PC), hex(c.e), c.stack)
+    print(debug)
     # FIXME:
     if c.cycles > 100000:
         break

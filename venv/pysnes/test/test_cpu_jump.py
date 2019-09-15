@@ -189,13 +189,14 @@ def test_RTS():
     cpu.SP = 0x01FD
     mem.write(0x0001FF, 0x34)
     mem.write(0x0001FE, 0x56)
+    cpu.stack = [0x34, 0x56]
 
     cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000 # no effect
     assert cpu.cycles == 6
     assert cpu.PBR == 0x12
-    assert cpu.PC == 0x3456 # the inc to 3456 will be done by the loop
+    assert cpu.PC == 0x3456 + 1 # the inc to 3456 will be done by the loop
     assert cpu.SP == 0x01FF
 
 
@@ -208,11 +209,12 @@ def test_RTL():
     mem.write(0x0001FF, 0x12)
     mem.write(0x0001FE, 0x34)
     mem.write(0x0001FD, 0x56)
+    cpu.stack = [0x12, 0x34, 0x56]
 
     cpu.fetch_decode_execute()
 
     assert cpu.P == 0b00000000 # no effect
     assert cpu.cycles == 6
     assert cpu.PBR == 0x12
-    assert cpu.PC == 0x3456  # the inc to 3456 will be done by the loop
+    assert cpu.PC == 0x3456 + 1 # the inc to 3456 will be done by the loop
     assert cpu.SP == 0x01FF
