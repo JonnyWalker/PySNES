@@ -1,57 +1,57 @@
 class PPU(object):
     def __init__(self):
-        self.INIDISP = 0    # Screen Display Register
-        self.OBSEL   = 0    # Object Size and Character Size Register
+        self.INIDISP_8 = 0    # Screen Display Register
+        self.OBSEL_8   = 0    # Object Size and Character Size Register
         self.OAMADDL = 0    # OAM Address Registers(Low)
         self.OAMADDH = 0    # OAM Address Registers(High)
         self.OAMDATA = 0    # OAM Data Write Register
-        self.BGMODE  = 0    # BG Mode and Character Size Register
-        self.MOSAIC  = 0    # Mosaic Register
-        self.BG1SC   = 0    # BG Tilemap Address Registers(BG1)
-        self.BG2SC   = 0    # BG Tilemap Address Registers(BG2)
-        self.BG3SC   = 0    # BG Tilemap Address Registers(BG3)
-        self.BG4SC   = 0    # BG Tilemap Address Registers(BG4)
-        self.BG12NBA = 0    # BG Character Address Registers(BG1 & 2)
-        self.BG34NBA = 0    # BG Character Address Registers(BG3 & 4)
-        self.BG1HOFS = 0    # BG Scroll Registers(BG1)
-        self.BG1VOFS = 0    # BG Scroll Registers(BG1)
-        self.BG2HOFS = 0    # BG Scroll Registers(BG2)
-        self.BG2VOFS = 0    # BG Scroll Registers(BG2)
-        self.BG3HOFS = 0    # BG Scroll Registers(BG3)
-        self.BG3VOFS = 0    # BG Scroll Registers(BG3)
-        self.BG4HOFS = 0    # BG Scroll Registers(BG4)
-        self.BG4VOFS = 0    # BG Scroll Registers(BG4)
+        self.BGMODE_8  = 0    # BG Mode and Character Size Register
+        self.MOSAIC_8  = 0    # Mosaic Register
+        self.BG1SC_8   = 0    # BG Tilemap Address Registers(BG1)
+        self.BG2SC_8   = 0    # BG Tilemap Address Registers(BG2)
+        self.BG3SC_8   = 0    # BG Tilemap Address Registers(BG3)
+        self.BG4SC_8   = 0    # BG Tilemap Address Registers(BG4)
+        self.BG12NBA_8 = 0    # BG Character Address Registers(BG1 & 2)
+        self.BG34NBA_8 = 0    # BG Character Address Registers(BG3 & 4)
+        self.BG1HOFS_16 = 0    # BG Scroll Registers(BG1)
+        self.BG1VOFS_16 = 0    # BG Scroll Registers(BG1)
+        self.BG2HOFS_16 = 0    # BG Scroll Registers(BG2)
+        self.BG2VOFS_16 = 0    # BG Scroll Registers(BG2)
+        self.BG3HOFS_16 = 0    # BG Scroll Registers(BG3)
+        self.BG3VOFS_16 = 0    # BG Scroll Registers(BG3)
+        self.BG4HOFS_16 = 0    # BG Scroll Registers(BG4)
+        self.BG4VOFS_16 = 0    # BG Scroll Registers(BG4)
         self.VMAIN   = 0    # Video Port Control Register
         self.VMADDL  = 0    # VRAM Address Registers(Low)
         self.VMADDH  = 0    # VRAM Address Registers(High)
         self.VMDATAL = 0    # VRAM Data Write Registers(Low)
         self.VMDATAH = 0    # VRAM Data Write Registers(High)
-        self.M7SEL   = 0    # Mode 7 Settings Register
-        self.M7A     = 0    # Mode 7 Matrix Registers
-        self.M7B     = 0    # Mode 7 Matrix Registers
-        self.M7C     = 0    # Mode 7 Matrix Registers
-        self.M7D     = 0    # Mode 7 Matrix Registers
-        self.M7X     = 0    # Mode 7 Matrix Registers
-        self.M7Y     = 0    # Mode 7 Matrix Registers
+        self.M7SEL_8   = 0    # Mode 7 Settings Register
+        self.M7A_16     = 0    # Mode 7 Matrix Registers
+        self.M7B_16     = 0    # Mode 7 Matrix Registers
+        self.M7C_16     = 0    # Mode 7 Matrix Registers
+        self.M7D_16     = 0    # Mode 7 Matrix Registers
+        self.M7X_16     = 0    # Mode 7 Matrix Registers
+        self.M7Y_16     = 0    # Mode 7 Matrix Registers
         self.CGADD   = 0    # CGRAM Address Register
         self.CGDATA  = 0    # CGRAM Data Write Register
-        self.W12SEL  = 0    # Window Mask Settings Registers
-        self.W34SEL  = 0    # Window Mask Settings Registers
-        self.WOBJSEL = 0    # Window Mask Settings Registers
+        self.W12SEL_8  = 0    # Window Mask Settings Registers
+        self.W34SEL_8  = 0    # Window Mask Settings Registers
+        self.WOBJSEL_8 = 0    # Window Mask Settings Registers
         self.WH0     = 0    # Window Position Registers(WH0)
         self.WH1     = 0    # Window Position Registers(WH1)
         self.WH2     = 0    # Window Position Registers(WH2)
         self.WH3     = 0    # Window Position Registers(WH3)
-        self.WBGLOG  = 0    # Window Mask Logic Registers(BG)
-        self.WOBJLOG = 0    # Window Mask Logic Registers(OBJ)
-        self.TM      = 0    # Screen Destination Registers
-        self.TS      = 0    # Screen Destination Registers
-        self.TMW     = 0    # Window Mask Destination Registers
-        self.TSW     = 0    # Window Mask Destination Registers
-        self.CGWSEL  = 0    # Color Math Registers
-        self.CGADSUB = 0    # Color Math Registers
-        self.COLDATA = 0    # Color Math Registers
-        self.SETINI  = 0    # Screen Mode Select Register
+        self.WBGLOG_8  = 0    # Window Mask Logic Registers(BG)
+        self.WOBJLOG_8 = 0    # Window Mask Logic Registers(OBJ)
+        self.TM_8      = 0    # Screen Destination Registers
+        self.TS_8      = 0    # Screen Destination Registers
+        self.TMW_8     = 0    # Window Mask Destination Registers
+        self.TSW_8     = 0    # Window Mask Destination Registers
+        self.CGWSEL_8  = 0    # Color Math Registers
+        self.CGADSUB_8 = 0    # Color Math Registers
+        self.COLDATA_8 = 0    # Color Math Registers
+        self.SETINI_8  = 0    # Screen Mode Select Register
         self.MPYL    = 0    # Multiplication Result Registers
         self.MPYM    = 0    # Multiplication Result Registers
         self.MPYH    = 0    # Multiplication Result Registers
@@ -76,9 +76,9 @@ class PPU(object):
     # called by the memory mapper
     def read(self, address):
         if address == 0x2100:
-            return self.INIDISP # Screen Display Register
+            return self.INIDISP_8 # Screen Display Register
         elif address == 0x2101:
-            return self.OBSEL   # Object Size and Character Size Register
+            return self.OBSEL_8   # Object Size and Character Size Register
         elif address == 0x2102:
             return self.OAMADDL     # OAM Address Registers(Low)
         elif address == 0x2103:
@@ -86,37 +86,37 @@ class PPU(object):
         elif address == 0x2104:
             return self.OAMDATA     # OAM Data Write Register
         elif address == 0x2105:
-            return self.BGMODE      # BG Mode and Character Size Register
+            return self.BGMODE_8      # BG Mode and Character Size Register
         elif address == 0x2106:
-            return self.MOSAIC      # Mosaic Register
+            return self.MOSAIC_8      # Mosaic Register
         elif address == 0x2107:
-            return self.BG1SC       # BG Tilemap Address Registers(BG1)
+            return self.BG1SC_8       # BG Tilemap Address Registers(BG1)
         elif address == 0x2108:
-            return self.BG2SC       # BG Tilemap Address Registers(BG2)
+            return self.BG2SC_8       # BG Tilemap Address Registers(BG2)
         elif address == 0x2109:
-            return self.BG3SC       # BG Tilemap Address Registers(BG3)
+            return self.BG3SC_8       # BG Tilemap Address Registers(BG3)
         elif address == 0x210A:
-            return self.BG4SC       # BG Tilemap Address Registers(BG4)
+            return self.BG4SC_8       # BG Tilemap Address Registers(BG4)
         elif address == 0x210B:
-            return self.BG12NBA     # BG Character Address Registers(BG1 & 2)
+            return self.BG12NBA_8     # BG Character Address Registers(BG1 & 2)
         elif address == 0x210C:
-            return self.BG34NBA     # BG Character Address Registers(BG3 & 4)
+            return self.BG34NBA_8     # BG Character Address Registers(BG3 & 4)
         elif address == 0x210D:
-            return self.BG1HOFS     # BG Scroll Registers(BG1)
+            return self.BG1HOFS_16     # BG Scroll Registers(BG1)
         elif address == 0x210E:
-            return self.BG1VOFS     # BG Scroll Registers(BG1)
+            return self.BG1VOFS_16     # BG Scroll Registers(BG1)
         elif address == 0x210F:
-            return self.BG2HOFS     # BG Scroll Registers(BG2)
+            return self.BG2HOFS_16     # BG Scroll Registers(BG2)
         elif address == 0x2110:
-            return self.BG2VOFS     # BG Scroll Registers(BG2)
+            return self.BG2VOFS_16     # BG Scroll Registers(BG2)
         elif address == 0x2111:
-            return self.BG3HOFS     # BG Scroll Registers(BG3)
+            return self.BG3HOFS_16     # BG Scroll Registers(BG3)
         elif address == 0x2112:
-            return self.BG3VOFS     # BG Scroll Registers(BG3)
+            return self.BG3VOFS_16     # BG Scroll Registers(BG3)
         elif address == 0x2113:
-            return self.BG4HOFS     # BG Scroll Registers(BG4)
+            return self.BG4HOFS_16     # BG Scroll Registers(BG4)
         elif address == 0x2114:
-            return self.BG4VOFS     # BG Scroll Registers(BG4)
+            return self.BG4VOFS_16     # BG Scroll Registers(BG4)
         elif address == 0x2115:
             return self.VMAIN       # Video Port Control Register
         elif address == 0x2116:
@@ -128,29 +128,29 @@ class PPU(object):
         elif address == 0x2119:
             return self.VMDATAH     # VRAM Data Write Registers(High)
         elif address == 0x211A:
-            return self.M7SEL       # Mode 7 Settings Register
+            return self.M7SEL_8       # Mode 7 Settings Register
         elif address == 0x211B:
-            return self.M7A         # Mode 7 Matrix Registers
+            return self.M7A_16         # Mode 7 Matrix Registers
         elif address == 0x211C:
-            return self.M7B         # Mode 7 Matrix Registers
+            return self.M7B_16         # Mode 7 Matrix Registers
         elif address == 0x211D:
-            return self.M7C         # Mode 7 Matrix Registers
+            return self.M7C_16         # Mode 7 Matrix Registers
         elif address == 0x211E:
-            return self.M7D         # Mode 7 Matrix Registers
+            return self.M7D_16         # Mode 7 Matrix Registers
         elif address == 0x211F:
-            return self.M7X         # Mode 7 Matrix Registers
+            return self.M7X_16         # Mode 7 Matrix Registers
         elif address == 0x2120:
-            return self.M7Y         # Mode 7 Matrix Registers
+            return self.M7Y_16         # Mode 7 Matrix Registers
         elif address == 0x2121:
             return self.CGADD       # CGRAM Address Register
         elif address == 0x2122:
             return self.CGDATA      # CGRAM Data Write Register
         elif address == 0x2123:
-            return self.W12SEL      # Window Mask Settings Registers
+            return self.W12SEL_8      # Window Mask Settings Registers
         elif address == 0x2124:
-            return self.W34SEL      # Window Mask Settings Registers
+            return self.W34SEL_8      # Window Mask Settings Registers
         elif address == 0x2125:
-            return self.WOBJSEL     # Window Mask Settings Registers
+            return self.WOBJSEL_8     # Window Mask Settings Registers
         elif address == 0x2126:
             return self.WH0         # Window Position Registers(WH0)
         elif address == 0x2127:
@@ -160,25 +160,25 @@ class PPU(object):
         elif address == 0x2129:
             return self.WH3         # Window Position Registers(WH3)
         elif address == 0x212A:
-            return self.WBGLOG      # Window Mask Logic Registers(BG)
+            return self.WBGLOG_8      # Window Mask Logic Registers(BG)
         elif address == 0x212B:
-            return self.WOBJLOG     # Window Mask Logic Registers(OBJ)
+            return self.WOBJLOG_8     # Window Mask Logic Registers(OBJ)
         elif address == 0x212C:
-            return self.TM          # Screen Destination Registers
+            return self.TM_8          # Screen Destination Registers
         elif address == 0x212D:
-            return self.TS          # Screen Destination Registers
+            return self.TS_8          # Screen Destination Registers
         elif address == 0x212E:
-            return self.TMW         # Window Mask Destination Registers
+            return self.TMW_8         # Window Mask Destination Registers
         elif address == 0x212F:
-            return self.TSW         # Window Mask Destination Registers
+            return self.TSW_8         # Window Mask Destination Registers
         elif address == 0x2130:
-            return self.CGWSEL      # Color Math Registers
+            return self.CGWSEL_8      # Color Math Registers
         elif address == 0x2131:
-            return self.CGADSUB     # Color Math Registers
+            return self.CGADSUB_8     # Color Math Registers
         elif address == 0x2132:
-            return self.COLDATA     # Color Math Registers
+            return self.COLDATA_8     # Color Math Registers
         elif address == 0x2133:
-            return self.SETINI      # Screen Mode Select Register
+            return self.SETINI_8      # Screen Mode Select Register
         elif address == 0x2134:
             return self.MPYL        # Multiplication Result Registers
         elif address == 0x2135:
@@ -225,10 +225,10 @@ class PPU(object):
     # called by the memory mapper
     def write(self, address, value):
         if address == 0x2100:
-            self.INIDISP = value    # Screen Display Register
+            self.INIDISP_8 = value    # Screen Display Register
             return
         elif address == 0x2101:
-            self.OBSEL  = value     # Object Size and Character Size Register
+            self.OBSEL_8  = value     # Object Size and Character Size Register
             return
         elif address == 0x2102:
             self.OAMADDL  = value   # OAM Address Registers(Low)
@@ -240,52 +240,52 @@ class PPU(object):
             self.OAMDATA = value    # OAM Data Write Register
             return
         elif address == 0x2105:
-            self.BGMODE  = value    # BG Mode and Character Size Register
+            self.BGMODE_8  = value    # BG Mode and Character Size Register
             return
         elif address == 0x2106:
-            self.MOSAIC  = value    # Mosaic Register
+            self.MOSAIC_8  = value    # Mosaic Register
             return
         elif address == 0x2107:
-            self.BG1SC   = value    # BG Tilemap Address Registers(BG1)
+            self.BG1SC_8   = value    # BG Tilemap Address Registers(BG1)
             return
         elif address == 0x2108:
-            self.BG2SC   = value    # BG Tilemap Address Registers(BG2)
+            self.BG2SC_8   = value    # BG Tilemap Address Registers(BG2)
             return
         elif address == 0x2109:
-            self.BG3SC   = value    # BG Tilemap Address Registers(BG3)
+            self.BG3SC_8   = value    # BG Tilemap Address Registers(BG3)
             return
         elif address == 0x210A:
-            self.BG4SC   = value    # BG Tilemap Address Registers(BG4)
+            self.BG4SC_8   = value    # BG Tilemap Address Registers(BG4)
             return
         elif address == 0x210B:
-            self.BG12NBA = value    # BG Character Address Registers(BG1 & 2)
+            self.BG12NBA_8 = value    # BG Character Address Registers(BG1 & 2)
             return
         elif address == 0x210C:
-            self.BG34NBA = value    # BG Character Address Registers(BG3 & 4)
+            self.BG34NBA_8 = value    # BG Character Address Registers(BG3 & 4)
             return
         elif address == 0x210D:
-            self.BG1HOFS = value    # BG Scroll Registers(BG1)
+            self.BG1HOFS_16 = value    # BG Scroll Registers(BG1)
             return
         elif address == 0x210E:
-            self.BG1VOFS = value    # BG Scroll Registers(BG1)
+            self.BG1VOFS_16 = value    # BG Scroll Registers(BG1)
             return
         elif address == 0x210F:
-            self.BG2HOFS = value    # BG Scroll Registers(BG2)
+            self.BG2HOFS_16 = value    # BG Scroll Registers(BG2)
             return
         elif address == 0x2110:
-            self.BG2VOFS = value    # BG Scroll Registers(BG2)
+            self.BG2VOFS_16 = value    # BG Scroll Registers(BG2)
             return
         elif address == 0x2111:
-            self.BG3HOFS = value    # BG Scroll Registers(BG3)
+            self.BG3HOFS_16 = value    # BG Scroll Registers(BG3)
             return
         elif address == 0x2112:
-            self.BG3VOFS = value    # BG Scroll Registers(BG3)
+            self.BG3VOFS_16 = value    # BG Scroll Registers(BG3)
             return
         elif address == 0x2113:
-            self.BG4HOFS = value    # BG Scroll Registers(BG4)
+            self.BG4HOFS_16 = value    # BG Scroll Registers(BG4)
             return
         elif address == 0x2114:
-            self.BG4VOFS = value    # BG Scroll Registers(BG4)
+            self.BG4VOFS_16 = value    # BG Scroll Registers(BG4)
             return
         elif address == 0x2115:
             self.VMAIN   = value    # Video Port Control Register
@@ -303,25 +303,25 @@ class PPU(object):
             self.VMDATAH = value    # VRAM Data Write Registers(High)
             return
         elif address == 0x211A:
-            self.M7SEL   = value    # Mode 7 Settings Register
+            self.M7SEL_8   = value    # Mode 7 Settings Register
             return
         elif address == 0x211B:
-            self.M7A     = value    # Mode 7 Matrix Registers
+            self.M7A_16     = value    # Mode 7 Matrix Registers
             return
         elif address == 0x211C:
-            self.M7B     = value    # Mode 7 Matrix Registers
+            self.M7B_16     = value    # Mode 7 Matrix Registers
             return
         elif address == 0x211D:
-            self.M7C     = value    # Mode 7 Matrix Registers
+            self.M7C_16     = value    # Mode 7 Matrix Registers
             return
         elif address == 0x211E:
-            self.M7D     = value    # Mode 7 Matrix Registers
+            self.M7D_16     = value    # Mode 7 Matrix Registers
             return
         elif address == 0x211F:
-            self.M7X     = value    # Mode 7 Matrix Registers
+            self.M7X_16     = value    # Mode 7 Matrix Registers
             return
         elif address == 0x2120:
-            self.M7Y     = value    # Mode 7 Matrix Registers
+            self.M7Y_16     = value    # Mode 7 Matrix Registers
             return
         elif address == 0x2121:
             self.CGADD   = value    # CGRAM Address Register
@@ -330,13 +330,13 @@ class PPU(object):
             self.CGDATA  = value    # CGRAM Data Write Register
             return
         elif address == 0x2123:
-            self.W12SEL  = value    # Window Mask Settings Registers
+            self.W12SEL_8  = value    # Window Mask Settings Registers
             return
         elif address == 0x2124:
-            self.W34SEL  = value    # Window Mask Settings Registers
+            self.W34SEL_8  = value    # Window Mask Settings Registers
             return
         elif address == 0x2125:
-            self.WOBJSEL = value    # Window Mask Settings Registers
+            self.WOBJSEL_8 = value    # Window Mask Settings Registers
             return
         elif address == 0x2126:
             self.WH0     = value    # Window Position Registers(WH0)
@@ -351,34 +351,34 @@ class PPU(object):
             self.WH3     = value    # Window Position Registers(WH3)
             return
         elif address == 0x212A:
-            self.WBGLOG  = value    # Window Mask Logic Registers(BG)
+            self.WBGLOG_8  = value    # Window Mask Logic Registers(BG)
             return
         elif address == 0x212B:
-            self.WOBJLOG = value    # Window Mask Logic Registers(OBJ)
+            self.WOBJLOG_8 = value    # Window Mask Logic Registers(OBJ)
             return
         elif address == 0x212C:
-            self.TM      = value    # Screen Destination Registers
+            self.TM_8      = value    # Screen Destination Registers
             return
         elif address == 0x212D:
-            self.TS      = value    # Screen Destination Registers
+            self.TS_8      = value    # Screen Destination Registers
             return
         elif address == 0x212E:
-            self.TMW     = value    # Window Mask Destination Registers
+            self.TMW_8     = value    # Window Mask Destination Registers
             return
         elif address == 0x212F:
-            self.TSW     = value    # Window Mask Destination Registers
+            self.TSW_8     = value    # Window Mask Destination Registers
             return
         elif address == 0x2130:
-            self.CGWSEL  = value    # Color Math Registers
+            self.CGWSEL_8  = value    # Color Math Registers
             return
         elif address == 0x2131:
-            self.CGADSUB = value    # Color Math Registers
+            self.CGADSUB_8 = value    # Color Math Registers
             return
         elif address == 0x2132:
-            self.COLDATA = value    # Color Math Registers
+            self.COLDATA_8 = value    # Color Math Registers
             return
         elif address == 0x2133:
-            self.SETINI  = value    # Screen Mode Select Register
+            self.SETINI_8  = value    # Screen Mode Select Register
             return
         elif address == 0x2134:
             self.MPYL    = value    # Multiplication Result Registers

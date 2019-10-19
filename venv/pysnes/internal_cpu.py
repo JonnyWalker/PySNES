@@ -1,6 +1,6 @@
 class InternalCPURegisters(object):
     def __init__(self):
-        self.NMITIMEN = 0   # Interrupt Enable Register
+        self.NMITIMEN_8 = 0   # Interrupt Enable Register
         self.WRIO = 0       # IO Port Write Register
         self.WRMPYA = 0     # Multiplicand Registers
         self.WRMPYB = 0     # Multiplicand Registers
@@ -11,9 +11,9 @@ class InternalCPURegisters(object):
         self.HTIMEH = 0     # IRQ Timer Registers(Horizontal - High)
         self.VTIMEL = 0     # IRQ Timer Registers(Vertical - Low)
         self.VTIMEH = 0     # IRQ Timer Registers(Vertical - High)
-        self.MDMAEN = 0     # DMA Enable Register
-        self.HDMAEN = 0     # HDMA Enable Register
-        self.MEMSEL = 0     # ROM Speed Register
+        self.MDMAEN_8 = 0     # DMA Enable Register
+        self.HDMAEN_8 = 0     # HDMA Enable Register
+        self.MEMSEL_8 = 0     # ROM Speed Register
         self.RDNMI  = 0     # Interrupt Flag Registers
         self.TIMEUP = 0     # Interrupt Flag Registers
         self.HVBJOY = 0     # PPU Status Register
@@ -22,20 +22,20 @@ class InternalCPURegisters(object):
         self.RDDIVH = 0     # Multiplication Or Divide Result Registers(High)
         self.RDMPYL = 0     # Multiplication Or Divide Result Registers(Low)
         self.RDMPYH = 0     # Multiplication Or Divide Result Registers(High)
-        self.JOY1L  = 0     # Controller Port Data Registers(Pad1 - Low)
-        self.JOY1H  = 0     # Controller Port Data Registers(Pad1 - High)
-        self.JOY2L  = 0     # Controller Port Data Registers(Pad2 - Low)
-        self.JOY2H  = 0     # Controller Port Data Registers(Pad2 - High)
-        self.JOY3L  = 0     # Controller Port Data Registers(Pad3 - Low)
-        self.JOY3H  = 0     # Controller Port Data Registers(Pad3 - High)
-        self.JOY4L  = 0     # Controller Port Data Registers(Pad4 - Low)
-        self.JOY4H  = 0     # Controller Port Data Registers(Pad4 - High)
+        self.JOY1L_8  = 0     # Controller Port Data Registers(Pad1 - Low)
+        self.JOY1H_8  = 0     # Controller Port Data Registers(Pad1 - High)
+        self.JOY2L_8  = 0     # Controller Port Data Registers(Pad2 - Low)
+        self.JOY2H_8  = 0     # Controller Port Data Registers(Pad2 - High)
+        self.JOY3L_8  = 0     # Controller Port Data Registers(Pad3 - Low)
+        self.JOY3H_8  = 0     # Controller Port Data Registers(Pad3 - High)
+        self.JOY4L_8  = 0     # Controller Port Data Registers(Pad4 - Low)
+        self.JOY4H_8  = 0     # Controller Port Data Registers(Pad4 - High)
 
 
     # called by the memory mapper
     def read(self, address):
         if address == 0x4200 :
-            return self.NMITIMEN    # Interrupt Enable Register
+            return self.NMITIMEN_8    # Interrupt Enable Register
         elif address == 0x4201:
             return self.WRIO        # IO Port Write Register
         elif address == 0x4202:
@@ -57,11 +57,11 @@ class InternalCPURegisters(object):
         elif address == 0x420A:
             return self.VTIMEH      # IRQ Timer Registers(Vertical - High)
         elif address == 0x420B:
-            return self.MDMAEN      # DMA Enable Register
+            return self.MDMAEN_8      # DMA Enable Register
         elif address == 0x420C:
-            return self.HDMAEN      # HDMA Enable Register
+            return self.HDMAEN_8      # HDMA Enable Register
         elif address == 0x420D:
-            return self.MEMSEL      # ROM Speed Register
+            return self.MEMSEL_8      # ROM Speed Register
         elif address == 0x4210:
             return self.RDNMI       # Interrupt Flag Registers
         elif address == 0x4211:
@@ -79,28 +79,28 @@ class InternalCPURegisters(object):
         elif address == 0x4217:
             return self.RDMPYH      # Multiplication Or Divide Result Registers(High)
         elif address == 0x4218:
-            return self.JOY1L       # Controller Port Data Registers(Pad1 - Low)
+            return self.JOY1L_8       # Controller Port Data Registers(Pad1 - Low)
         elif address == 0x4219:
-            return self.JOY1H       # Controller Port Data Registers(Pad1 - High)
+            return self.JOY1H_8       # Controller Port Data Registers(Pad1 - High)
         elif address == 0x421A:
-            return self.JOY2L       # Controller Port Data Registers(Pad2 - Low)
+            return self.JOY2L_8       # Controller Port Data Registers(Pad2 - Low)
         elif address == 0x421B:
-            return self.JOY2H       # Controller Port Data Registers(Pad2 - High)
+            return self.JOY2H_8       # Controller Port Data Registers(Pad2 - High)
         elif address == 0x421C:
-            return self.JOY3L       # Controller Port Data Registers(Pad3 - Low)
+            return self.JOY3L_8       # Controller Port Data Registers(Pad3 - Low)
         elif address == 0x421D:
-            return self.JOY3H       # Controller Port Data Registers(Pad3 - High)
+            return self.JOY3H_8       # Controller Port Data Registers(Pad3 - High)
         elif address == 0x421E:
-            return self.JOY4L       # Controller Port Data Registers(Pad4 - Low)
+            return self.JOY4L_8       # Controller Port Data Registers(Pad4 - Low)
         elif address == 0x421F:
-            return self.JOY4H       # Controller Port Data Registers(Pad4 - High)
+            return self.JOY4H_8       # Controller Port Data Registers(Pad4 - High)
         print("Error read Internal CPU Address: " + hex(address))
         return 0
 
     # called by the memory mapper
     def write(self, address, value):
         if address == 0x4200 :
-            self.NMITIMEN = value    # Interrupt Enable Register
+            self.NMITIMEN_8 = value    # Interrupt Enable Register
             return
         elif address == 0x4201:
             self.WRIO = value        # IO Port Write Register
@@ -133,13 +133,13 @@ class InternalCPURegisters(object):
             self.VTIMEH = value      # IRQ Timer Registers(Vertical - High)
             return
         elif address == 0x420B:
-            self.MDMAEN = value      # DMA Enable Register
+            self.MDMAEN_8 = value      # DMA Enable Register
             return
         elif address == 0x420C:
-            self.HDMAEN = value      # HDMA Enable Register
+            self.HDMAEN_8 = value      # HDMA Enable Register
             return
         elif address == 0x420D:
-            self.MEMSEL = value      # ROM Speed Register
+            self.MEMSEL_8 = value      # ROM Speed Register
             return
         elif address == 0x4210:
             self.RDNMI  = value      # Interrupt Flag Registers
@@ -166,27 +166,27 @@ class InternalCPURegisters(object):
             self.RDMPYH = value      # Multiplication Or Divide Result Registers(High)
             return
         elif address == 0x4218:
-            self.JOY1L = value       # Controller Port Data Registers(Pad1 - Low)
+            self.JOY1L_8 = value       # Controller Port Data Registers(Pad1 - Low)
             return
         elif address == 0x4219:
-            self.JOY1H = value       # Controller Port Data Registers(Pad1 - High)
+            self.JOY1H_8 = value       # Controller Port Data Registers(Pad1 - High)
             return
         elif address == 0x421A:
-            self.JOY2L = value       # Controller Port Data Registers(Pad2 - Low)
+            self.JOY2L_8 = value       # Controller Port Data Registers(Pad2 - Low)
             return
         elif address == 0x421B:
-            self.JOY2H = value       # Controller Port Data Registers(Pad2 - High)
+            self.JOY2H_8 = value       # Controller Port Data Registers(Pad2 - High)
             return
         elif address == 0x421C:
-            self.JOY3L = value       # Controller Port Data Registers(Pad3 - Low)
+            self.JOY3L_8 = value       # Controller Port Data Registers(Pad3 - Low)
             return
         elif address == 0x421D:
-            self.JOY3H = value       # Controller Port Data Registers(Pad3 - High)
+            self.JOY3H_8 = value       # Controller Port Data Registers(Pad3 - High)
             return
         elif address == 0x421E:
-            self.JOY4L = value       # Controller Port Data Registers(Pad4 - Low)
+            self.JOY4L_8 = value       # Controller Port Data Registers(Pad4 - Low)
             return
         elif address == 0x421F:
-            self.JOY4H = value       # Controller Port Data Registers(Pad4 - High)
+            self.JOY4H_8 = value       # Controller Port Data Registers(Pad4 - High)
             return
         print("Error write Internal CPU Address: " + hex(address) + value(value))
